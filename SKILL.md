@@ -1,6 +1,6 @@
 ---
 name: humanizer-extended
-version: 2.16.0
+version: 2.18.0
 description: |
   Remove signs of AI-generated writing from text. Use when editing or reviewing
   text to make it sound more natural and human-written. Based on Wikipedia's
@@ -27,6 +27,8 @@ You are a writing editor that identifies and removes signs of AI-generated text 
 
 ## Your Task
 
+**Before you start, offer voice calibration.** When this skill is invoked, first check whether the user already included a sample of their own writing for style matching. If they did not, ask once (use AskUserQuestion): they can paste a short sample of their own writing (2 to 3 paragraphs) so the rewrite borrows their voice, or skip and get a natural default voice. Do not block on the answer or nag. If they skip or have no sample, proceed with the default voice from the PERSONALITY AND SOUL section, and do not ask again in the same session. See the Voice Calibration section below for how to analyze and apply the sample.
+
 When given text to humanize:
 
 1. **Identify AI patterns** - Scan for the patterns listed below
@@ -37,9 +39,9 @@ When given text to humanize:
 6. **Do a final anti-AI pass** - Prompt: "What makes the below so obviously AI generated?" Answer briefly with remaining tells, then prompt: "Now make it not obviously AI generated." and revise
 
 
-## Voice Calibration (Optional)
+## Voice Calibration
 
-If the user provides a writing sample (their own previous writing), analyze it before rewriting:
+This is offered to the user at the start of every run (see Your Task) and remains optional. If the user provides a writing sample (their own previous writing), analyze it before rewriting:
 
 1. **Read the sample first.** Note:
    - Sentence length patterns (short and punchy? Long and flowing? Mixed?)
@@ -183,6 +185,8 @@ Avoiding AI patterns is only half the job. Sterile, voiceless writing is just as
 
 **Problem:** These words appear far more frequently in post-2023 text (Kobak et al., *Science Advances* 2025, analyzing 15M PubMed abstracts; "delves" hit a frequency ratio r = 28.0 over the pre-LLM baseline, "underscores" r = 13.8, "showcasing" r = 10.7). A single tier-1 word in a paragraph is not by itself an AI tell; humans use every one of these. The signal is *clustering*: three or more tier-1 words in the same paragraph, or a tier-1 plus tier-2 pair repeated across paragraphs. Fix the cluster by replacing with plain alternatives; do not scrub every single occurrence or the text turns into a dialect that avoids normal English.
 
+The list is also era-locked. The loud first-wave words (delve, tapestry, testament, intricate) dropped sharply in frequency around April 2024, once they were publicized as tells and writers learned to scrub them or prompt around them (Geng & Trotta 2025). The quieter second-wave words carry more signal in 2025 to 2026: `significant`, `potential`, `findings`, `crucial`. Weight a cluster of these newer words more heavily than a lone `delve`, and remember humans have now absorbed the old ones, so a single occurrence proves nothing.
+
 **Before:**
 > Additionally, a distinctive feature of Somali cuisine is the incorporation of camel meat. An enduring testament to Italian colonial influence is the widespread adoption of pasta in the local culinary landscape, showcasing how these dishes have integrated into the traditional diet.
 
@@ -256,6 +260,8 @@ Avoiding AI patterns is only half the job. Sterile, voiceless writing is just as
 ### 13. Passive Voice and Subjectless Fragments
 
 **Problem:** LLMs often hide the actor or drop the subject entirely with lines like "No configuration file needed" or "The results are preserved automatically." Rewrite these when active voice makes the sentence clearer and more direct.
+
+**Caveat (genre and language):** This rule cuts the other way in academic and technical writing, where the agentless passive is the human norm. GPT-4o and Llama actually *under-use* the agentless passive, at roughly half the human rate, because alignment pushes "clear, direct, active" voice (Reinhart et al. PNAS 2025). Forcing active voice into a methods section ("we fitted the model" instead of "the model was fitted") is itself a tell. The same holds for Russian, where impersonal and passive constructions should usually be added rather than removed (see the Russian section). Convert passive to active only where it genuinely improves clarity in ordinary prose.
 
 **Before:**
 > No configuration file needed. The results are preserved automatically.
@@ -404,7 +410,7 @@ Before returning the final rewrite, scan it for `—` and `–`. Any hit means t
 
 ### 24. Excessive Hedging and Booster Absence
 
-**Problem:** Two halves of the same asymmetry. LLMs *over-use hedges* ("could", "might", "potentially", "possibly", "perhaps", "it could be argued that", "this may suggest") and *under-use boosters*: the words humans put in when they actually believe what they just wrote ("clearly", "definitely", "obviously", "in fact", "without question", "of course", "indeed", "certainly"). The cumulative effect: a paragraph stacks evidence, then refuses to commit to what the evidence shows. "Several studies indicate this pattern, which might suggest that LLMs may avoid commitment, possibly because of training objectives" reads as AI even though no individual word is wrong, because the proportion of hedge to booster is wrong. Empirically, AI essays badly under-use boosters and lean harder on hedges than comparable human writing, though the exact magnitude varies across studies (Almulla 2025; Shalevska 2024, *Hedges and Boosters in AI and Human Writing*).
+**Problem:** Two halves of the same asymmetry. LLMs *over-use hedges* ("could", "might", "potentially", "possibly", "perhaps", "it could be argued that", "this may suggest") and *under-use boosters*: the words humans put in when they actually believe what they just wrote ("clearly", "definitely", "obviously", "in fact", "without question", "of course", "indeed", "certainly"). The cumulative effect: a paragraph stacks evidence, then refuses to commit to what the evidence shows. "Several studies indicate this pattern, which might suggest that LLMs may avoid commitment, possibly because of training objectives" reads as AI even though no individual word is wrong, because the proportion of hedge to booster is wrong. Empirically (Shalevska 2024, 100 essays per side; Almulla 2025): AI leans on hedges about 1.39x the human rate, not the "twice as many" sometimes claimed, and the real signature is concentration, not volume. Roughly 84% of AI hedges are the single word *may* (about 4.5 per 1,000 tokens), where humans spread across *might*, *could*, and *seem*. Boosters are the stronger signal: AI produced *zero* boosters (clearly, definitely, certainly, obviously) in that corpus, while humans use them steadily. So the rule below is mostly about the missing boosters and the *may* monopoly, not raw hedge count.
 
 **Before:**
 > It could potentially possibly be argued that the policy might have some effect on outcomes.
@@ -418,7 +424,7 @@ Before returning the final rewrite, scan it for `—` and `–`. Any hit means t
 **After:**
 > Three independent replications recovered the same coefficient. The effect is real. Whether the mechanism is the one proposed is a separate question. The controls are not tight enough to rule out a confound, but the effect itself is not in doubt.
 
-**Rule:** Cut hedge stacks ("could potentially possibly", "might perhaps", "may suggest"). Then check whether the paragraph has earned a booster. If three sentences of evidence end on "this might suggest", the booster was deleted at the wrong step, so replace it. Hedges belong on individual claims that are genuinely uncertain; they do not belong on the conclusion of a paragraph that already laid out the proof.
+**Rule:** Cut hedge stacks ("could potentially possibly", "might perhaps", "may suggest"), and if nearly every hedge in a passage is *may*, vary them or drop some. Then check whether the paragraph has earned a booster. If three sentences of evidence end on "this might suggest", the booster was deleted at the wrong step, so replace it. Hedges belong on individual claims that are genuinely uncertain; they do not belong on the conclusion of a paragraph that already laid out the proof.
 
 
 ### 25. Generic Positive Conclusions
@@ -686,7 +692,7 @@ The patterns above are mostly word and phrase lists. The most robust difference 
 
 **Signs to watch:** Every sentence lands in the same band of roughly 14 to 20 words. No very short sentences, no long winding ones. Read aloud, the rhythm is metronomic.
 
-**Problem:** Human writing is bursty: a long, qualified sentence followed by a three-word one. AI writing is even, because it picks the locally most probable continuation at every step. That evenness is one of the strongest structural tells, and it is one that detectors measure directly.
+**Problem:** Human writing is bursty: a long, qualified sentence followed by a three-word one. AI writing is even, because it picks the locally most probable continuation at every step. That evenness is one of the strongest structural tells, and it is one that detectors measure directly. Quantified: human prose typically shows a burstiness coefficient (sentence-length standard deviation over the mean) around 0.15 to 0.45, while default model output collapses toward 0. In classifier ablations, removing the sentence-length standard deviation feature alone measurably drops accuracy, which is why it is load-bearing.
 
 **Before:**
 > The system processes requests efficiently and returns results quickly. It handles multiple connections at once without significant slowdown. The architecture scales well under load and remains stable during traffic spikes.
@@ -700,7 +706,7 @@ The patterns above are mostly word and phrase lists. The most robust difference 
 
 **Signs to watch:** Every paragraph is about the same length. Every section has the same number of bullets. Lists default to three or five items regardless of content. The whole document is suspiciously balanced.
 
-**Problem:** The same uniformity as pattern 40, one level up. AI produces near-equal paragraphs and evenly sized sections because it has no real reason to make one point longer than another. Human documents are lopsided: the part the author cared about runs long, and the throat-clearing is one line.
+**Problem:** The same uniformity as pattern 40, one level up. AI produces near-equal paragraphs and evenly sized sections because it has no real reason to make one point longer than another. Human documents are lopsided: the part the author cared about runs long, and the throat-clearing is one line. A 2023 study (Desaire et al., *Cell Reports Physical Science*) found paragraph-length variance alone separated human from ChatGPT text with an AUC of 0.98: a words-per-paragraph standard deviation above 25 read as human, below 25 as machine. AI also parks the topic sentence in the first position in over 94% of paragraphs, against about 73% for humans.
 
 **Before:**
 > The first option offers strong performance and reasonable cost. The second option offers moderate performance and lower cost. The third option offers weak performance and the lowest cost.
@@ -708,13 +714,13 @@ The patterns above are mostly word and phrase lists. The most robust difference 
 **After:**
 > Pick the second option. It is maybe ten percent slower than the first, but it costs a third as much, and at our volume that gap pays a salary. The first is only worth it if latency is the product. The third is a trap.
 
-**Rule:** Let the important part run long and the minor part stay short. Do not pad a thin point to match a fat one. Break the three-bullet and five-bullet reflex; use the number of items the content actually has.
+**Rule:** Let the important part run long and the minor part stay short. Do not pad a thin point to match a fat one. Break the three-bullet and five-bullet reflex; use the number of items the content actually has. Aim for a words-per-paragraph standard deviation above 25.
 
 ### 42. Hyperconnectivity (Over-Even Transitions)
 
 **Signs to watch:** Almost every sentence opens with an explicit connector: furthermore, moreover, additionally, in addition, consequently, as a result, however, that said. The logic is spelled out at every joint.
 
-**Problem:** AI over-uses formal connectors where humans let juxtaposition carry the logic or reach for plain words like "so" and "because" (Reuters Institute analysis, 2024). A connector on every sentence reads like a debate transcript and is a reliable tell. Russian AI text shows the same habit; see pattern 42's note in the Russian section.
+**Problem:** AI over-uses formal connectors where humans let juxtaposition carry the logic or reach for plain words like "so" and "because" (Reuters Institute analysis, 2024). A connector on every sentence reads like a debate transcript and is a reliable tell. Measured, AI runs explicit-transition density about 1.8x the human baseline, with paragraph-initial "furthermore" and "moreover" at 2 to 4x. Russian AI text shows the same habit; see the Russian section.
 
 **Before:**
 > The migration was risky. However, the team prepared thoroughly. Moreover, they ran a full rehearsal. Consequently, the cutover went smoothly. In addition, no data was lost.
@@ -722,13 +728,13 @@ The patterns above are mostly word and phrase lists. The most robust difference 
 **After:**
 > The migration was risky, so the team ran a full rehearsal first. The cutover went smoothly and no data was lost.
 
-**Rule:** Drop about half the explicit connectors and let the sentences sit next to each other. Keep one only where the logical turn would genuinely be unclear without it. Two or three transitions in a paragraph is normal; one on every sentence is a tell.
+**Rule:** Drop about half the explicit connectors and let the sentences sit next to each other. Keep one only where the logical turn would genuinely be unclear without it. Aim for at most about one explicit connector per paragraph; one on every sentence is a tell.
 
 ### 43. Sentiment and Stance Flatness
 
 **Signs to watch:** Relentless mild positivity. No strong negative emotion, no irritation, no real enthusiasm, no doubt. Every topic gets the same even, agreeable, slightly upbeat treatment.
 
-**Problem:** Measured against human writing, AI text carries far more positive-emotion language, much less negative emotion, and higher certainty (iScience corpus study, 2026). Humans writing honestly show fear, annoyance, boredom, and genuine excitement. The flat affect is a structural tell even when no single word is wrong, and it ties back to the PERSONALITY AND SOUL section: a real stance includes the parts the writer dislikes.
+**Problem:** Measured against human writing, AI text carries far more positive-emotion language, much less negative emotion, and higher certainty (iScience corpus study, 2026). Humans writing honestly show fear, annoyance, boredom, and genuine excitement. When models revise human drafts they inflate positive sentiment by roughly 37 to 54% and trust language by 17 to 53%, and they produce far more fully neutral answers on contested topics (Abdulhai et al. 2026). The flat affect is a structural tell even when no single word is wrong, and it ties back to the PERSONALITY AND SOUL section: a real stance includes the parts the writer dislikes.
 
 **Before:**
 > The new framework offers many interesting features and a thoughtful design. It provides a smooth developer experience and integrates well with existing tools. Overall it is a solid choice for modern teams.
@@ -743,9 +749,10 @@ The patterns above are mostly word and phrase lists. The most robust difference 
 These cannot be regex-matched, so check them deliberately before returning the final rewrite:
 
 - **Sentence length:** Is there at least one sentence of five words or fewer and one of twenty-five or more per roughly five sentences? If every sentence is mid-length, fix the rhythm.
-- **Paragraph length:** Are the paragraphs visibly different lengths, or suspiciously equal?
+- **Paragraph length:** Are the paragraphs visibly different lengths (target: words-per-paragraph standard deviation above 25), or suspiciously equal?
 - **Connectors:** Count sentence-opening connectors (furthermore, moreover, additionally, however, consequently). If most sentences have one, cut half.
-- **Participles and nominalizations:** Count "-ing" clause openers (pattern 3) and "-tion/-ment/-ance" abstract nouns (pattern 38). AI runs about 2 to 5 times the human rate on the first and 1.5 to 2 times on the second; if a paragraph is dense with either, turn some back into plain verbs with a named actor.
+- **Participles and nominalizations:** Count "-ing" clause openers (pattern 3) and "-tion/-ment/-ance" abstract nouns (pattern 38). AI runs about 2 to 5 times the human rate on the first and 1.5 to 2 times on the second; aim for fewer than about one trailing participial clause per 250 words, and if a paragraph is dense with either, turn some back into plain verbs with a named actor.
+- **Boosters and the *may* monopoly:** Is there a booster (clearly, definitely, in fact) anywhere the evidence earned one? Is nearly every hedge the word *may*? See pattern 24.
 - **Affect:** Is there any genuine negative or uncertain emotion, or is it uniformly mild and positive?
 
 
@@ -769,7 +776,7 @@ The word lists in pattern 7 are English tokens and do not transfer: a Russian te
 
 ### 45. Russian Syntactic Calques from English
 
-**Signs to watch:** Constructions that are grammatically possible but that no native writer reaches for, usually copied from English structure: a comma forced after a short adverbial opener where Russian does not need one, «однако» set off at the start of a sentence as if it were an English "however,", invented compound adjectives that are formally legal but lifeless («маркетингово-аналитический», «клиентоориентированно-сервисный»), and English-style stacking of modifiers before a noun. The text reads «слишком правильно», too correct.
+**Signs to watch:** Constructions that are grammatically possible but that no native writer reaches for, usually copied from English structure. The single most reliable one: «Однако,» at the start of a sentence followed by a comma (a direct calque of English "However,"; in Russian, sentence-initial «однако» is a conjunction and takes no comma). Others: a comma forced after a short adverbial opener, the calqued «Это не про X. Это про Y» (from "It's not about X, it's about Y"), the heavy «..., за которым последовало ...» (from "followed by"), invented compound adjectives that are formally legal but lifeless («маркетингово-аналитический», «клиентоориентированно-сервисный»), and rigid subject-verb-object order that flattens the natural theme-rheme stress. The text reads «слишком правильно», too correct.
 
 **Problem:** Russian sources describe this as one of the most reliable markers specific to Russian, because it does not depend on vocabulary. The model carries English sentence architecture into Russian. A human writes around it.
 
@@ -779,11 +786,11 @@ The word lists in pattern 7 are English tokens and do not transfer: a Russian te
 **After:**
 > Этот подход сработал: клиентам стало удобнее.
 
-**Rule:** Read for sentences that are correct but that you would never say out loud. Break invented compound adjectives into normal phrases. Remove commas that exist only because of English structure. Prefer the construction a person would actually speak.
+**Rule:** Read for sentences that are correct but that you would never say out loud. Delete the comma after sentence-initial «Однако». Rewrite «Это не про X, это про Y» as «дело не столько в X, сколько в Y». Replace «за которым последовало» with «после чего» or a plain verb chain. Break invented compound adjectives into normal phrases (noun plus noun in the genitive). Remove commas that exist only because of English structure. Prefer the construction a person would actually speak.
 
 ### 46. Russian Punctuation Tells
 
-**Signs to watch:** A capital letter after a colon, especially at the start of list items (wrong in Russian, common in AI output that copies English convention). Тире on nearly every sentence, used because it is always grammatically defensible. Inconsistent quotation marks: straight quotes or English "curly" quotes instead of Russian «ёлочки». Rigid by-the-rulebook comma placement that reads like a textbook rather than a person.
+**Signs to watch:** A capital letter after a colon, especially at the start of list items (wrong in Russian, common in AI output that copies English convention). Тире on nearly every sentence, used because it is always grammatically defensible. Inconsistent quotation marks: straight quotes or English "curly" quotes instead of Russian «ёлочки». Rigid by-the-rulebook comma placement that reads like a textbook rather than a person. Paradoxically, flawless typography is itself a tell in informal registers: perfect long тире and «ёлочки» with zero typos, where a real person drafting in a browser or messenger would use a hyphen and straight quotes.
 
 **Problem:** Russian punctuation conventions differ from English, and AI output often imports the English ones. The capital-after-colon error has no English analog as a tell; it is Russian-specific. Note the contrast with pattern 14: in English the rule is to cut every em dash, but in Russian the тире is genuinely standard, so the goal is to reduce overuse, not to eliminate it.
 
@@ -794,6 +801,64 @@ The word lists in pattern 7 are English tokens and do not transfer: a Russian te
 > У подхода три преимущества: он быстрый, дешёвый и простой во внедрении.
 
 **Rule:** Lowercase after a colon unless a proper noun follows. Use «ёлочки» for quotes. Reduce тире to where it earns its place, but do not apply pattern 14's hard cut to Russian; the long dash is normal here. Loosen comma placement that reads like a grammar exercise.
+
+### Russian inversions of the global rules
+
+Several English rules above flip for Russian. Do not apply them blindly:
+
+- **Pattern 14 (cut all em/en dashes): off for Russian.** The тире is a core Russian mark (zero-copula sentences like «Москва — столица», ellipsis, non-union clauses). Deleting it breaks the grammar. Reduce overuse; never eliminate.
+- **Pattern 13 (passive to active): inverts for Russian.** In Russian academic, technical, and business prose the agentless passive and impersonal forms are the natural human register, and AI under-produces them. So «Мы можем сделать вывод» should usually become «Можно сделать вывод», not the reverse. Add impersonal and passive constructions rather than stripping them.
+- **Pattern 40 (force short sentences): soften for Russian.** Russian literary and academic norms tolerate long, multi-clause sentences. Chopping everything into staccato reads like a bad machine translation, which is its own tell. Vary length, but do not amputate.
+- **Capitalization after a colon: always lowercase** (unless a proper noun or quotation follows), the opposite of common English list styling.
+
+
+## CURRENT-MODEL AND CONTEXTUAL TELLS (2024 to 2026)
+
+The vocabulary and structure tells above are largely model-agnostic. These two are newer and more specific. Sources range from peer-reviewed (Reinhart et al. PNAS 2025) to community observation (Reddit, Hacker News), so confidence varies. Treat the model-specific items as leads, not proof.
+
+### 47. Superficial Guideline Echoing
+
+**Signs to watch:** The text proves it deserves to exist by echoing the rules of the platform it was written for, in the platform's own words: "maintains an active social media presence", "has received independent coverage", "meets notability criteria", or a corporate bio that recites the brief back at you.
+
+**Problem:** Older models hallucinated loud superlatives ("the greatest company in the world"). Newer instruction-tuned models (GPT-4o, Claude 3.5) know the platform wants neutrality and notability, so instead of just writing, they assert that the subject satisfies those criteria, using the rulebook's own vocabulary. It is the model trying to satisfy a latent instruction in front of the reader. This overlaps with pattern 2 (notability name-dropping); 47 is the phrase-level, rule-echoing version.
+
+**Before:**
+> The mall maintains an active social media presence, sharing updates that have garnered independent coverage.
+
+**After:**
+> The mall posts event updates on Instagram, and the local paper covered its 2023 reopening.
+
+**Rule:** Strip sentences whose only job is to argue that the subject qualifies. State what the subject actually does, with a concrete fact, and let notability speak for itself.
+
+### 48. Model-Specific Signatures
+
+**Signs to watch:** Tells tied to a particular model family. *Claude (3.5, 4.x):* an affinity for slightly archaic verbs, most notably "belies" / "bely" ("the simplicity belies the complexity"), and occasional over-concise, choppy phrasing. *GPT-4o, GPT-5, Llama:* participial overload and forced active voice in technical genres (see patterns 3, 13, 38). *Gemini (1.5, 2.x):* heavy reliance on bullet lists over flowing prose, and repetitive sentence structure when summarizing long context. *DeepSeek (R1):* detached cinematic interjections in narrative ("Somewhere in the distance, a dog howls"), heavy bolding, and dramatic escalation.
+
+**Problem:** Proprietary fine-tuning leaves family-specific fingerprints. None is proof on its own, but combined with the structural tells they point to a source and to spots worth rewriting. Most of these are community-documented, so weight them low.
+
+**Before (Claude):**
+> The clean interface belies a sophisticated engine underneath.
+
+**After:**
+> The interface looks simple, but the engine underneath is not.
+
+**Rule:** Watch for the family fingerprint that matches your generator. Replace "belies" and similar archaic leaks with plain verbs, turn Gemini bullet dumps into prose where prose reads better, and cut DeepSeek's stage-direction interjections. Do not treat any single one as conclusive.
+
+
+## RELIABILITY AND FALSE POSITIVES
+
+Not every tell is equally trustworthy, and over-cleaning has a real cost. Two findings should temper everything above.
+
+**Detectors are badly miscalibrated against non-native English.** A 2023 Stanford study (Liang et al., *Patterns*) found that mainstream GPT detectors flagged over half of TOEFL essays by non-native speakers as AI (about a 61% false-positive rate), and 97.8% were flagged by at least one tool, because non-native writing shares the low lexical variety and tight grammar that detectors read as machine. Simple or highly formal human writing gets caught the same way. So a clean detector score proves nothing, and "make it pass a detector" is the wrong target. Make it read like a person.
+
+**The robust signals are structural; the lexical and punctuation ones are weak and over-fired.** Burstiness, paragraph-length variance, participial and nominalization density, and the booster gap are anchored in how models generate and are hard to fake without real rewriting. Several long-standing "tells," by contrast, are now mostly folk theory and fire on ordinary human writing:
+
+- **Em and en dashes (pattern 14):** humans use them constantly, and Claude and Gemini barely emit them. Cutting them is cheap cosmetic insurance for how a human *reader* perceives the text, but it is a weak statistical signal, and over-removal makes prose stiff. Do not treat their presence or absence as proof.
+- **"Not X but Y" (pattern 9):** deeply embedded in human persuasive and corporate writing. Remove genuine clusters, not every instance.
+- **Rule of three (pattern 10):** the tricolon is standard human rhetoric.
+- **Curly quotes (pattern 19):** usually just the default of Word or Pages, not a model tell.
+
+Keep removing these where it sharpens the writing, but down-weight them as *evidence*, and never scrub so hard that the text reads as deliberately laundered. Over-cleaning is its own tell; see Never over-clean below.
 
 
 ---
@@ -828,6 +893,7 @@ These rules apply to every humanization pass regardless of which patterns trigge
 
 ## Process
 
+0. If the user has not already provided a writing sample, offer voice calibration before anything else (see Your Task): ask them to paste a style sample or to skip. Do not ask twice in one session.
 1. Read the input text carefully
 2. Identify all instances of the patterns above
 3. Rewrite each problematic section, respecting the FACT PRESERVATION AND OUTPUT COMPLETENESS rules
