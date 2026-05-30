@@ -2,7 +2,7 @@
 
 A skill for Claude Code and OpenCode that removes signs of AI-generated writing from text, making it sound more natural and human.
 
-> **Fork.** `humanizer-extended` is a fork of [blader/humanizer](https://github.com/blader/humanizer) (original by Siqi Chen, MIT). It diverged after upstream 2.5.1 and adds patterns #30–38 (model-tool markup, hallucinated citations, placeholder leakage, document-internal style shift, aphoristic closer, prestige-metaphor frames, false balance, generic stock examples, nominalization) plus a FACT PRESERVATION section. As of 2.15.0 it also re-incorporates three rules from upstream 2.7.0 (#39 diff-anchored writing, the hard em/en dash cut in #14, and speculative gap-filling in #21). Pattern numbers in this fork do **not** match upstream's.
+> **Fork.** `humanizer-extended` is a fork of [blader/humanizer](https://github.com/blader/humanizer) (original by Siqi Chen, MIT). It diverged after upstream 2.5.1 and adds patterns #30–38 (model-tool markup, hallucinated citations, placeholder leakage, document-internal style shift, aphoristic closer, prestige-metaphor frames, false balance, generic stock examples, nominalization) plus a FACT PRESERVATION section. As of 2.15.0 it also re-incorporates three rules from upstream 2.7.0 (#39 diff-anchored writing, the hard em/en dash cut in #14, and speculative gap-filling in #21). As of 2.16.0 it adds a structural and statistical tells section (#40–43: sentence-length uniformity, paragraph symmetry, hyperconnectivity, sentiment flatness) and a Russian-language section (#44–46: RU vocabulary, syntactic calques, punctuation). Pattern numbers in this fork do **not** match upstream's.
 
 ## Installation
 
@@ -90,7 +90,7 @@ The skill also includes a final "obviously AI generated" audit pass and a second
 
 > "LLMs use statistical algorithms to guess what should come next. The result tends toward the most statistically likely result that applies to the widest variety of cases."
 
-## 39 Patterns Detected (with Before/After Examples)
+## 46 Patterns Detected (with Before/After Examples)
 
 ### Content Patterns
 
@@ -156,6 +156,23 @@ The skill also includes a final "obviously AI generated" audit pass and a second
 | 24 | **Excessive hedging + booster absence** | "this might suggest that the effect may possibly be real" (after three replications) | Cut hedge stacks; if a paragraph stacked evidence, let it commit ("the effect is real") |
 | 25 | **Generic conclusions** | "The future looks bright" | Specific plans or facts |
 
+### Structural and Statistical Patterns
+
+| # | Pattern | Before | After |
+|---|---------|--------|-------|
+| 40 | **Sentence-length uniformity (low burstiness)** | Every sentence 14–20 words, metronomic rhythm | Mix in a 5-word sentence and a 25-word one |
+| 41 | **Paragraph / document symmetry** | Equal paragraphs; default 3- or 5-item lists | Let the important part run long; use the real item count |
+| 42 | **Hyperconnectivity** | "However… Moreover… Consequently…" on every sentence | Drop half the connectors; let juxtaposition carry the logic |
+| 43 | **Sentiment / stance flatness** | Uniform mild positivity, no negative emotion | Allow real irritation, doubt, enthusiasm |
+
+### Russian-Language Patterns (RU)
+
+| # | Pattern | Before | After |
+|---|---------|--------|-------|
+| 44 | **Russian AI vocabulary / frame phrases** | «В современном мире… играет ключевую роль» | State the fact directly |
+| 45 | **Russian syntactic calques from English** | «клиентоориентированно-сервисного результата», forced commas, calqued «однако» | Plain phrasing a person would actually speak |
+| 46 | **Russian punctuation tells** | Capital after colon; тире on every sentence; "curly" quotes | Lowercase after colon; «ёлочки»; reduce тире (do not hard-cut as in #14) |
+
 ## Full Example
 
 **Before (AI-sounding):**
@@ -188,11 +205,16 @@ The skill also includes a final "obviously AI generated" audit pass and a second
 
 - [Wikipedia: Signs of AI writing](https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing) - Primary source
 - [WikiProject AI Cleanup](https://en.wikipedia.org/wiki/Wikipedia:WikiProject_AI_Cleanup) - Maintaining organization
+- [Reinhart et al., *Do LLMs write like humans? Variation in grammatical and rhetorical styles*, PNAS 2025](https://www.pnas.org/doi/10.1073/pnas.2422455122) - structural differences (participle clauses, nominalizations); backs #3, #38, #40–43
+- [Kobak et al., *Delving into LLM-assisted writing in biomedical publications through excess vocabulary*, Science Advances 2025](https://www.science.org/doi/10.1126/sciadv.adt3813) - excess-vocabulary frequency ratios (backs #7: delves r=28.0, underscores r=13.8, showcasing r=10.7)
+- [Muñoz-Ortiz, Gómez-Rodríguez & Vilares, *Contrasting Linguistic Patterns in Human and LLM-Generated News Text*, Artificial Intelligence Review 2024](https://link.springer.com/article/10.1007/s10462-024-10903-2) - human/LLM syntactic contrast
+- Russian-language tells: community write-ups on [Habr](https://habr.com/ru/articles/1022906/) and vc.ru (heuristic, not peer-reviewed) - backs #44–46
 
 ## Version History
 
+- **2.16.0** - Added two new sections and fixed several self-compliance issues. (1) **STRUCTURAL AND STATISTICAL TELLS (#40–43):** sentence-length uniformity / low burstiness, paragraph and document symmetry, hyperconnectivity (a connector on every sentence), and sentiment/stance flatness, plus a structural self-audit checklist with operational targets (e.g. at least one ≤5-word and one ≥25-word sentence per ~5; cut half the connectors). This covers the structural signal a word/phrase blocklist misses. Backed by Reinhart et al. *PNAS* 2025 (present-participle clauses ~2–5× and nominalizations ~1.5–2× the human rate) and an iScience 2026 corpus study (length uniformity, positive-sentiment/certainty skew); detector-evasion research confirms structure survives word-swapping. (2) **RUSSIAN-LANGUAGE TELLS (#44–46):** a Russian vocabulary/frame-phrase list parallel to #7 («важно отметить», «в современном мире», «играет ключевую роль»), a Russian syntactic-calque detector (the highest-value RU-only tell, since it does not depend on vocabulary), and Russian punctuation tells (capital-after-colon, тире reduce-not-cut, «ёлочки»), with a note that the structural patterns (8–13, 24, 28, 33, 36, 38, 40–43) apply to Russian unchanged. Also: softened #14's rationale (the em dash is now a model-dependent, frequently over-fired tell, and Claude/Gemini barely use it) while keeping the hard cut for English output; fixed two dogfooding bugs (em dashes inside the #24 and #34 "After" examples, and in several Rule/Problem prose lines, all of which violated #14); corrected the frontmatter description ("em dash overuse" → "em and en dash removal"); named **Shalevska 2024** as the source for #24's hedge/booster claim instead of the vague "Hedges and Boosters comparative study" (and softened the unverified "twice as many hedges" magnitude); and gave the previously unheadered patterns #30–39 a real section header. Total now 46 patterns.
 - **2.15.0** - Merge pass: brought back three rules from the upstream blader/humanizer 2.7.0 line that this fork had diverged from. (1) Added pattern #39 (diff-anchored writing: prose that narrates a change instead of describing the thing as it is). (2) Hardened pattern #14 from "em dash overuse / prefer commas" to a hard cut — the final rewrite must contain zero em or en dashes, with a scan step before returning. (3) Expanded pattern #21 from bare cutoff disclaimers to also cover speculative gap-filling ("maintains a low profile", "likely grew up..."), cross-referencing the fact-preservation rules. Also fixed the stale "29 patterns" header (this fork has documented 38+ since 2.14.0). Total now 39 patterns. Note: this fork's pattern numbers #30-38 differ from upstream's; #39 is upstream's #30 renumbered to avoid collision.
-- **2.14.1** - Refined pattern #24 (excessive hedging) to cover the *booster-absence* half of the same asymmetry: AI text over-uses hedges (could, might, potentially, possibly, may suggest) *and* under-uses boosters (clearly, definitely, obviously, in fact, indeed). The fix is not just removing hedges; it is letting the paragraph commit when the evidence has already done the work. Added a second before/after showing booster absence after stacked evidence. Backed by Almulla 2025 and the Hedges-and-Boosters 2024 comparative study, both reporting roughly 2× hedge density and a fraction of the booster density in AI essays.
+- **2.14.1** - Refined pattern #24 (excessive hedging) to cover the *booster-absence* half of the same asymmetry: AI text over-uses hedges (could, might, potentially, possibly, may suggest) *and* under-uses boosters (clearly, definitely, obviously, in fact, indeed). The fix is not just removing hedges; it is letting the paragraph commit when the evidence has already done the work. Added a second before/after showing booster absence after stacked evidence. Backed by Almulla 2025 and Shalevska 2024 (*Hedges and Boosters in AI and Human Writing*), both reporting that AI essays badly under-use boosters and lean harder on hedges than comparable human writing (exact magnitudes vary across studies).
 - **2.14.0** - Added pattern #38: nominalization overuse — abstract noun phrases ("the implementation of", "the realization of", "the consideration of") chained with weak linking verbs ("is", "provides", "was conducted"). Asks the rewrite to find the action hidden in the `-tion`/`-ment`/`-ance` noun and turn it back into a verb. Backed by Munoz-Ortiz et al. 2024 and Almulla 2025 corpus studies showing AI text uses more nominalisations than human text. Total now 38 patterns.
 - **2.13.1** - Refined pattern #34 (aphoristic closer): split "Signs to watch" into formal/elevated epigrams *and* folksy analogy closers ("X is basically like Y", "It's like trying to Z", "Бояться X примерно как бояться Y"). Same structural beat in a chatty register; added a note that register doesn't change the move. Updated rule and added a folksy before/after.
 - **2.13.0** - Added a FACT PRESERVATION AND OUTPUT COMPLETENESS section with three rules (never invent facts, never truncate, never over-clean) and a step-10 fact/completeness check in the Process. No new patterns; this guardrail binds the existing ones so pattern removal cannot justify fabrication or content loss.

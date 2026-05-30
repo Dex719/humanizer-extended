@@ -1,13 +1,15 @@
 ---
 name: humanizer-extended
-version: 2.15.0
+version: 2.16.0
 description: |
   Remove signs of AI-generated writing from text. Use when editing or reviewing
   text to make it sound more natural and human-written. Based on Wikipedia's
   comprehensive "Signs of AI writing" guide. Detects and fixes patterns including:
   inflated symbolism, promotional language, superficial -ing analyses, vague
-  attributions, em dash overuse, rule of three, AI vocabulary words, passive
-  voice, negative parallelisms, and filler phrases.
+  attributions, em and en dash removal, rule of three, AI vocabulary words, passive
+  voice, negative parallelisms, and filler phrases. Also covers structural and
+  statistical tells (sentence-length uniformity, over-even transitions) and
+  Russian-language patterns.
 license: MIT
 compatibility: claude-code opencode
 allowed-tools:
@@ -175,11 +177,11 @@ Avoiding AI patterns is only half the job. Sterile, voiceless writing is just as
 
 ### 7. Overused "AI Vocabulary" Words
 
-**High-frequency AI words (tier 1 — the dead giveaways):** Actually, additionally, align with, alignment, commendable, crucial, delve, delving, elevate, emphasizing, empower, enduring, enhance, fostering, garner, garnered, highlight (verb), holistic, interplay, intricate/intricacies, key (adjective), landscape (abstract noun), leverage, meticulous/meticulously, navigate (figurative), nuanced, paramount, pivotal, realm, resonate, robust, seamless, showcase, showcases, showcasing, straightforward, surpass, swiftly, tapestry (abstract noun), testament, underscore, underscores, underscoring, unwavering, valuable, vibrant
+**High-frequency AI words (tier 1, the dead giveaways):** Actually, additionally, align with, alignment, commendable, crucial, delve, delving, elevate, emphasizing, empower, enduring, enhance, fostering, garner, garnered, highlight (verb), holistic, interplay, intricate/intricacies, key (adjective), landscape (abstract noun), leverage, meticulous/meticulously, navigate (figurative), nuanced, paramount, pivotal, realm, resonate, robust, seamless, showcase, showcases, showcasing, straightforward, surpass, swiftly, tapestry (abstract noun), testament, underscore, underscores, underscoring, unwavering, valuable, vibrant
 
-**Tier 2 — common but weaker on their own:** beacon, bolster, bolstering, comprehensive, delineate, discerning, dynamic, elucidate, exemplify, foster, groundbreaking, harness, imperative, noteworthy, notable, notably, odyssey, paradigm, profound, profoundly, quintessential, revolutionize, stalwart, synergy, transformative, unparalleled, whilst
+**Tier 2, common but weaker on their own:** beacon, bolster, bolstering, comprehensive, delineate, discerning, dynamic, elucidate, exemplify, foster, groundbreaking, harness, imperative, noteworthy, notable, notably, odyssey, paradigm, profound, profoundly, quintessential, revolutionize, stalwart, synergy, transformative, unparalleled, whilst
 
-**Problem:** These words appear far more frequently in post-2023 text (Kobak et al., *Science Advances* 2025, analyzing 15M PubMed abstracts; "delves" hit a frequency ratio r = 28.0 over the pre-LLM baseline, "underscores" r = 13.8, "showcasing" r = 10.7). A single tier-1 word in a paragraph is not by itself an AI tell — humans use every one of these. The signal is *clustering*: three or more tier-1 words in the same paragraph, or a tier-1 plus tier-2 pair repeated across paragraphs. Fix the cluster by replacing with plain alternatives; do not scrub every single occurrence or the text turns into a dialect that avoids normal English.
+**Problem:** These words appear far more frequently in post-2023 text (Kobak et al., *Science Advances* 2025, analyzing 15M PubMed abstracts; "delves" hit a frequency ratio r = 28.0 over the pre-LLM baseline, "underscores" r = 13.8, "showcasing" r = 10.7). A single tier-1 word in a paragraph is not by itself an AI tell; humans use every one of these. The signal is *clustering*: three or more tier-1 words in the same paragraph, or a tier-1 plus tier-2 pair repeated across paragraphs. Fix the cluster by replacing with plain alternatives; do not scrub every single occurrence or the text turns into a dialect that avoids normal English.
 
 **Before:**
 > Additionally, a distinctive feature of Somali cuisine is the incorporation of camel meat. An enduring testament to Italian colonial influence is the widespread adoption of pasta in the local culinary landscape, showcasing how these dishes have integrated into the traditional diet.
@@ -266,7 +268,7 @@ Avoiding AI patterns is only half the job. Sterile, voiceless writing is just as
 
 ### 14. Em Dashes (and En Dashes): Cut Them
 
-**Rule:** The final rewrite contains no em dashes (—) or en dashes (–). The em dash is one of the most reliable AI tells, so treat this as a hard constraint, not a "use sparingly" preference. Replace each one, in rough order of preference: a period (start a new sentence), a comma (a tight aside), a colon (introducing an explanation), parentheses (a true aside), or restructure the sentence. Also catch spaced em dashes (` — `) and double hyphens (` -- `) used the same way.
+**Rule:** The final rewrite contains no em dashes (—) or en dashes (–). The em dash is a strong and very common AI tell, though a model-dependent one: some assistants (Claude, Gemini) barely use it, and plenty of humans use it legitimately. Removing it reliably is cheap insurance, so treat this as a hard constraint for English output, not a "use sparingly" preference. Replace each one, in rough order of preference: a period (start a new sentence), a comma (a tight aside), a colon (introducing an explanation), parentheses (a true aside), or restructure the sentence. Also catch spaced em dashes (` — `) and double hyphens (` -- `) used the same way.
 
 **Before:**
 > The term is primarily promoted by Dutch institutions—not by the people themselves. You don't say "Netherlands, Europe" as an address—yet this mislabeling continues—even in official documents.
@@ -402,7 +404,7 @@ Before returning the final rewrite, scan it for `—` and `–`. Any hit means t
 
 ### 24. Excessive Hedging and Booster Absence
 
-**Problem:** Two halves of the same asymmetry. LLMs *over-use hedges* ("could", "might", "potentially", "possibly", "perhaps", "it could be argued that", "this may suggest") and *under-use boosters* — the words humans put in when they actually believe what they just wrote ("clearly", "definitely", "obviously", "in fact", "without question", "of course", "indeed", "certainly"). The cumulative effect: a paragraph stacks evidence, then refuses to commit to what the evidence shows. "Several studies indicate this pattern, which might suggest that LLMs may avoid commitment, possibly because of training objectives" reads as AI even though no individual word is wrong, because the proportion of hedge to booster is wrong. Empirically, AI essays use roughly twice as many hedges as comparable human essays and a fraction of the boosters (Almulla 2025; the *Hedges and Boosters* comparative study 2024).
+**Problem:** Two halves of the same asymmetry. LLMs *over-use hedges* ("could", "might", "potentially", "possibly", "perhaps", "it could be argued that", "this may suggest") and *under-use boosters*: the words humans put in when they actually believe what they just wrote ("clearly", "definitely", "obviously", "in fact", "without question", "of course", "indeed", "certainly"). The cumulative effect: a paragraph stacks evidence, then refuses to commit to what the evidence shows. "Several studies indicate this pattern, which might suggest that LLMs may avoid commitment, possibly because of training objectives" reads as AI even though no individual word is wrong, because the proportion of hedge to booster is wrong. Empirically, AI essays badly under-use boosters and lean harder on hedges than comparable human writing, though the exact magnitude varies across studies (Almulla 2025; Shalevska 2024, *Hedges and Boosters in AI and Human Writing*).
 
 **Before:**
 > It could potentially possibly be argued that the policy might have some effect on outcomes.
@@ -414,9 +416,9 @@ Before returning the final rewrite, scan it for `—` and `–`. Any hit means t
 > Three independent replications recovered the same coefficient. The result might suggest that the effect is real, though it could potentially be explained by other factors that may not have been controlled for.
 
 **After:**
-> Three independent replications recovered the same coefficient. The effect is real. Whether the mechanism is the one proposed is a separate question — the controls are not tight enough to rule out a confound, but the effect itself is not in doubt.
+> Three independent replications recovered the same coefficient. The effect is real. Whether the mechanism is the one proposed is a separate question. The controls are not tight enough to rule out a confound, but the effect itself is not in doubt.
 
-**Rule:** Cut hedge stacks ("could potentially possibly", "might perhaps", "may suggest"). Then check whether the paragraph has earned a booster. If three sentences of evidence end on "this might suggest", the booster was deleted at the wrong step — replace it. Hedges belong on individual claims that are genuinely uncertain; they do not belong on the conclusion of a paragraph that already laid out the proof.
+**Rule:** Cut hedge stacks ("could potentially possibly", "might perhaps", "may suggest"). Then check whether the paragraph has earned a booster. If three sentences of evidence end on "this might suggest", the booster was deleted at the wrong step, so replace it. Hedges belong on individual claims that are genuinely uncertain; they do not belong on the conclusion of a paragraph that already laid out the proof.
 
 
 ### 25. Generic Positive Conclusions
@@ -488,6 +490,8 @@ Before returning the final rewrite, scan it for `—` and `–`. Any hit means t
 > When users hit a slow page, they leave.
 
 
+## SOURCING, ARTIFACT, AND ADVANCED RHETORICAL TELLS
+
 ### 30. Model-Tool Markup Artifacts
 
 **Signs to watch:** `:contentReference[oaicite:N]{index=N}`, `oai_citation`, `contentReference`, `+1` as a trailing citation marker (all ChatGPT); `[attached_file:N]`, `[web:N]` (Perplexity); `<grok-card data-id="...">` (Grok); JSON tails such as `({"attribution":{"attributableIndex":"X-Y"}})`; `turn0search0`-style tags; URLs ending in `?utm_source=chatgpt.com`.
@@ -500,7 +504,7 @@ Before returning the final rewrite, scan it for `—` and `–`. Any hit means t
 **After:**
 > Philip Morris' reputation management later became controversial, and effects are still debated in contemporary regulatory discussions. The 2008 settlement further limited advertising.
 
-**Rule:** Delete the artifact, including any surrounding brackets, backslashes, or whitespace it leaves behind. Strip `?utm_source=chatgpt.com` from URLs. If the artifact was standing in for a real citation, either supply the actual source or remove the claim — never keep the tag.
+**Rule:** Delete the artifact, including any surrounding brackets, backslashes, or whitespace it leaves behind. Strip `?utm_source=chatgpt.com` from URLs. If the artifact was standing in for a real citation, either supply the actual source or remove the claim. Never keep the tag.
 
 
 ### 31. Hallucinated Citations
@@ -516,7 +520,7 @@ Before returning the final rewrite, scan it for `—` and `–`. Any hit means t
 > The mineral has been reported to exhibit unusual magnetic properties, though this has not been independently confirmed.
 
 **After (verified source available):**
-> The mineral exhibits unusual magnetic properties (Ivanov & Petrov, *Am. Mineral.* 108, 2023, 412–417).
+> The mineral exhibits unusual magnetic properties (Ivanov & Petrov, *Am. Mineral.* 108, 2023, 412-417).
 
 **Rule:**
 - Never invent authors, institutions, journal names, DOIs, ISBNs, page numbers, or dates to make a claim sound sourced.
@@ -551,7 +555,7 @@ Before returning the final rewrite, scan it for `—` and `–`. Any hit means t
 
 **Signs to watch:** Sudden register change mid-document (academic → casual or vice versa); tense shift; British ↔ American spelling within the same section (`organisation` next to `color`); point-of-view change (`we` → `you` → `one`); citation-style switch halfway; mixed date formats (`Sept. 15` alongside `September 15th`); abrupt change in paragraph length or list density; one section heavy on tier-1 AI vocabulary while the next uses plain language.
 
-**Problem:** When an LLM regenerates or splices sections, it does not always carry style consistently. A single author writing one document tends to stay in one voice. A hard style shift mid-document — especially when the preceding paragraph was AI-typical and the new one is not, or vice versa — is one of the strongest structural tells. It also makes the document obviously stitched.
+**Problem:** When an LLM regenerates or splices sections, it does not always carry style consistently. A single author writing one document tends to stay in one voice. A hard style shift mid-document is one of the strongest structural tells, especially when the preceding paragraph was AI-typical and the new one is not (or vice versa). It also makes the document obviously stitched.
 
 **Before:**
 > The Second Punic War transformed Roman military doctrine, reshaping tactics and infrastructure across the republic. Several historians have delved into its enduring legacy in the later expansion.
@@ -572,9 +576,9 @@ Before returning the final rewrite, scan it for `—` and `–`. Any hit means t
 
 *Formal/elevated epigrams.* "In the end, it's not X — it's Y.", "And that — that is the real story.", "This isn't just X. It's Y.", "The future belongs to [group].", "And that changes everything.", "X is the new Y.", "X is more than Y. It's Z."
 
-*Folksy analogy closers.* The same compression done as a "down-to-earth" comparison instead of a high-style maxim. "Worrying about X is basically like worrying about Y.", "It's like trying to Z with one hand tied.", "X is just Y wearing a hat.", "Бояться X примерно как бояться Y", "Это как пытаться Z." A street-level register doesn't make the move different; the function — closing on a quotable comparison instead of a fact — is identical.
+*Folksy analogy closers.* The same compression done as a "down-to-earth" comparison instead of a high-style maxim. "Worrying about X is basically like worrying about Y.", "It's like trying to Z with one hand tied.", "X is just Y wearing a hat.", "Бояться X примерно как бояться Y", "Это как пытаться Z." A street-level register doesn't make the move different; the function, closing on a quotable comparison instead of a fact, is identical.
 
-**Problem:** LLMs habitually end essays with a punchline that sounds conclusive but carries no information. It imitates the aesthetic *shape* of a strong ending — short, quotable, paradoxical — without doing the work. The folksy variant is more dangerous than the formal one because it disguises itself as "voice": a chatty analogy reads as human texture, but the structural beat — and its emptiness — is the same. Readers who can feel the essay ending recognize it either way.
+**Problem:** LLMs habitually end essays with a punchline that sounds conclusive but carries no information. It imitates the aesthetic *shape* of a strong ending (short, quotable, paradoxical) without doing the work. The folksy variant is more dangerous than the formal one because it disguises itself as "voice": a chatty analogy reads as human texture, but the structural beat (and its emptiness) is the same. Readers who can feel the essay ending recognize it either way.
 
 **Before (formal):**
 > Developers who pair with these tools ship faster, learn more, and collaborate better. And in the end — that's what great software has always been about: not the code, but the craft.
@@ -586,14 +590,14 @@ Before returning the final rewrite, scan it for `—` and `–`. Any hit means t
 > Fat is not a cosmetic defect or a health threat. It's working material the body uses to build membranes, hormones and nerve tissue. Worrying about dietary fat is basically like worrying about bricks on a construction site.
 
 **After (folksy):**
-> Fat is working material the body uses to build membranes, hormones and nerve tissue. The actually dangerous fats are industrial trans fats — margarine, cheap baked goods, most fast food. Olive oil, fatty fish, and butter in normal amounts are not in the same category.
+> Fat is working material the body uses to build membranes, hormones and nerve tissue. The actually dangerous fats are industrial trans fats: margarine, cheap baked goods, most fast food. Olive oil, fatty fish, and butter in normal amounts are not in the same category.
 
-**Rule:** Cut closing sentences whose content reduces to "X is actually Y", "this changes everything", "the future belongs to Z", *or* "X is basically like Y / X is like Y-ing Z." Register doesn't matter — formal maxim and folksy analogy are the same shape. Either let the final paragraph end on a concrete fact or a specific call, or stop one sentence earlier. An epigram is not an ending; it is decoration over the absence of one.
+**Rule:** Cut closing sentences whose content reduces to "X is actually Y", "this changes everything", "the future belongs to Z", *or* "X is basically like Y / X is like Y-ing Z." Register doesn't matter: formal maxim and folksy analogy are the same shape. Either let the final paragraph end on a concrete fact or a specific call, or stop one sentence earlier. An epigram is not an ending; it is decoration over the absence of one.
 
 
 ### 35. Prestige-Metaphor Nouns Used as Frames
 
-**Signs to watch:** `tapestry`, `mosaic`, `symphony`, `orchestra`, `labyrinth`, `beacon`, `odyssey`, `quilt`, `kaleidoscope`, `crucible`, `constellation`, `fabric`, `thread`, `journey` (figurative), `landscape` (non-geographic) — when they appear as the *organizing frame* of a sentence or paragraph, not as a single decorative word.
+**Signs to watch:** `tapestry`, `mosaic`, `symphony`, `orchestra`, `labyrinth`, `beacon`, `odyssey`, `quilt`, `kaleidoscope`, `crucible`, `constellation`, `fabric`, `thread`, `journey` (figurative), `landscape` (non-geographic), but only when they appear as the *organizing frame* of a sentence or paragraph, not as a single decorative word.
 
 **Problem:** Pattern 7 lists most of these nouns as AI vocabulary. Pattern 35 is about the *structural* abuse: "the tapestry of X", "the mosaic of Y", "a symphony of Z" used to organize a sentence rather than decorate one, often several stacked in the same passage. A human who reaches for one of these metaphors usually commits to it and extends it. LLMs reach for several, mix them (weaving a tapestry while sailing an odyssey), and never develop any.
 
@@ -618,7 +622,7 @@ Before returning the final rewrite, scan it for `—` and `–`. Any hit means t
 **After:**
 > Most tire manufacturers recommend rotation every 5,000 to 8,000 miles because uneven wear shortens tire life by roughly 20%. Skipping it does not destroy the tires, but it shortens their useful life.
 
-**Rule:** Do not manufacture two-sidedness where the evidence is lopsided. If the piece must remain neutral, do not sneak in an opinion — but also do not invent a fake controversy. Cut the "both sides have merit" closer outright.
+**Rule:** Do not manufacture two-sidedness where the evidence is lopsided. If the piece must remain neutral, do not sneak in an opinion, but also do not invent a fake controversy. Cut the "both sides have merit" closer outright.
 
 
 ### 37. Generic Stock Examples
@@ -635,14 +639,14 @@ Before returning the final rewrite, scan it for `—` and `–`. Any hit means t
 >
 > Stripe's engineering blog describes using internal LLM tools to auto-triage support tickets, reducing median tier-3 response time from 72 hours to 4 hours (Stripe Engineering Blog, March 2025).
 
-**Rule:** Delete placeholder names and generic archetypes. Replace them with a real named example or cut the example. If a hypothetical is genuinely necessary, make it specific enough to be obviously hypothetical — not a placeholder wearing a first name. Do not invent fake case studies or fake statistics to replace "Sarah the small business owner"; see also pattern 31.
+**Rule:** Delete placeholder names and generic archetypes. Replace them with a real named example or cut the example. If a hypothetical is genuinely necessary, make it specific enough to be obviously hypothetical, not a placeholder wearing a first name. Do not invent fake case studies or fake statistics to replace "Sarah the small business owner"; see also pattern 31.
 
 
 ### 38. Nominalization Overuse
 
-**Signs to watch:** Sentences front-load abstract nouns derived from verbs — "the implementation of", "the realization of", "the consideration of", "the optimization of", "the integration of", "the evaluation of", "the establishment of", "the utilization of", "the determination of", "the development of". Long noun phrases ("a comprehensive examination of the underlying mechanisms") chained with weak linking verbs (`is`, `provides`, `enables`, `facilitates`). Whole paragraphs in which most main verbs are versions of *to be* or *to provide*, while the actual actions sit inside `-tion` / `-ment` / `-ance` / `-sis` nouns.
+**Signs to watch:** Sentences front-load abstract nouns derived from verbs, such as "the implementation of", "the realization of", "the consideration of", "the optimization of", "the integration of", "the evaluation of", "the establishment of", "the utilization of", "the determination of", "the development of". Long noun phrases ("a comprehensive examination of the underlying mechanisms") chained with weak linking verbs (`is`, `provides`, `enables`, `facilitates`). Whole paragraphs in which most main verbs are versions of *to be* or *to provide*, while the actual actions sit inside `-tion` / `-ment` / `-ance` / `-sis` nouns.
 
-**Problem:** LLM prose hides actors and actions inside abstract nouns. "The implementation of automated testing was conducted by the team" is a sentence with no agent doing anything; the verb has been moved into the noun "implementation" and a placeholder verb ("was conducted") was added back. This is one of the most consistent measured differences between human and LLM text — empirically AI text uses more nominalisations and fewer concrete action verbs (Munoz-Ortiz et al. 2024 contrasted news corpora; Almulla 2025 measured engagement markers; Reinhart 2024 corpus study). It compounds with pattern 13 (passive voice) — the agent disappears twice: once into the passive, once into the noun.
+**Problem:** LLM prose hides actors and actions inside abstract nouns. "The implementation of automated testing was conducted by the team" is a sentence with no agent doing anything; the verb has been moved into the noun "implementation" and a placeholder verb ("was conducted") was added back. This is one of the most consistent measured differences between human and LLM text: empirically AI text uses more nominalisations and fewer concrete action verbs (Munoz-Ortiz et al. 2024 contrasted news corpora; Almulla 2025 measured engagement markers; Reinhart 2024 corpus study). It compounds with pattern 13 (passive voice): the agent disappears twice, once into the passive and once into the noun.
 
 **Before:**
 > The optimization of database queries through the implementation of indexing strategies has been demonstrated to result in significant improvements to overall system performance.
@@ -661,7 +665,7 @@ Before returning the final rewrite, scan it for `—` and `–`. Any hit means t
 
 ### 39. Diff-Anchored Writing
 
-**Signs to watch:** Prose that narrates a *change* rather than describing the thing as it is — "this function was added to replace…", "we updated X to handle Y", "the new approach improves on the old one", "previously this used Z, now it uses W". Common in documentation, code comments, and README prose that was written by a model summarizing a commit.
+**Signs to watch:** Prose that narrates a *change* rather than describing the thing as it is: "this function was added to replace…", "we updated X to handle Y", "the new approach improves on the old one", "previously this used Z, now it uses W". Common in documentation, code comments, and README prose that was written by a model summarizing a commit.
 
 **Problem:** Documentation or comments written as if narrating a change rather than describing the thing as it is. Unless the document is inherently version-scoped (changelogs, release notes, migration guides), it should read coherently without knowing what changed in the last commit. A reader six months later has no memory of the "previous approach"; the diff framing is noise to them.
 
@@ -672,6 +676,124 @@ Before returning the final rewrite, scan it for `—` and `–`. Any hit means t
 > This function uses a hash map for O(1) lookups, avoiding the O(n²) cost of naive iteration.
 
 **Rule:** Describe what the thing *does*, not what changed to produce it. Keep diff framing only where the document is explicitly about a transition (changelog, release notes, migration guide, PR description). Everywhere else, strip "added", "updated", "previously", "now", "new" when they only exist to contrast with an unstated prior state.
+
+
+## STRUCTURAL AND STATISTICAL TELLS
+
+The patterns above are mostly word and phrase lists. The most robust difference between human and AI text is not vocabulary, it is structure, and structure cannot be caught with a word search. Corpus studies measure it directly: instruction-tuned models use present-participle clauses at roughly 2 to 5 times the human rate and nominalizations at roughly 1.5 to 2 times the human rate, and they keep that density even when asked to write casually (Reinhart et al., *PNAS* 2025, arXiv 2410.16107). AI text also clusters tightly around an average length where human text spreads out, and it skews positive and certain where humans allow negative and uncertain emotion (iScience corpus study, 2026). Detector-evasion research from 2025 reaches the same conclusion: swapping words is not enough on its own, the structural signal is what survives. So these tells are handled with a self-audit pass on your own output, not a find and replace.
+
+### 40. Sentence-Length Uniformity (Low Burstiness)
+
+**Signs to watch:** Every sentence lands in the same band of roughly 14 to 20 words. No very short sentences, no long winding ones. Read aloud, the rhythm is metronomic.
+
+**Problem:** Human writing is bursty: a long, qualified sentence followed by a three-word one. AI writing is even, because it picks the locally most probable continuation at every step. That evenness is one of the strongest structural tells, and it is one that detectors measure directly.
+
+**Before:**
+> The system processes requests efficiently and returns results quickly. It handles multiple connections at once without significant slowdown. The architecture scales well under load and remains stable during traffic spikes.
+
+**After:**
+> The system is fast. It holds thousands of connections at once and barely slows under load, which was the whole point: the old version fell over at about 200 concurrent users, and this one has not blinked at 5,000.
+
+**Rule:** After rewriting, vary sentence length on purpose. Across any five sentences, include at least one short one (five words or fewer) and one long one (twenty-five words or more). If every sentence sits between roughly twelve and twenty words, the draft is not done.
+
+### 41. Paragraph and Document Symmetry
+
+**Signs to watch:** Every paragraph is about the same length. Every section has the same number of bullets. Lists default to three or five items regardless of content. The whole document is suspiciously balanced.
+
+**Problem:** The same uniformity as pattern 40, one level up. AI produces near-equal paragraphs and evenly sized sections because it has no real reason to make one point longer than another. Human documents are lopsided: the part the author cared about runs long, and the throat-clearing is one line.
+
+**Before:**
+> The first option offers strong performance and reasonable cost. The second option offers moderate performance and lower cost. The third option offers weak performance and the lowest cost.
+
+**After:**
+> Pick the second option. It is maybe ten percent slower than the first, but it costs a third as much, and at our volume that gap pays a salary. The first is only worth it if latency is the product. The third is a trap.
+
+**Rule:** Let the important part run long and the minor part stay short. Do not pad a thin point to match a fat one. Break the three-bullet and five-bullet reflex; use the number of items the content actually has.
+
+### 42. Hyperconnectivity (Over-Even Transitions)
+
+**Signs to watch:** Almost every sentence opens with an explicit connector: furthermore, moreover, additionally, in addition, consequently, as a result, however, that said. The logic is spelled out at every joint.
+
+**Problem:** AI over-uses formal connectors where humans let juxtaposition carry the logic or reach for plain words like "so" and "because" (Reuters Institute analysis, 2024). A connector on every sentence reads like a debate transcript and is a reliable tell. Russian AI text shows the same habit; see pattern 42's note in the Russian section.
+
+**Before:**
+> The migration was risky. However, the team prepared thoroughly. Moreover, they ran a full rehearsal. Consequently, the cutover went smoothly. In addition, no data was lost.
+
+**After:**
+> The migration was risky, so the team ran a full rehearsal first. The cutover went smoothly and no data was lost.
+
+**Rule:** Drop about half the explicit connectors and let the sentences sit next to each other. Keep one only where the logical turn would genuinely be unclear without it. Two or three transitions in a paragraph is normal; one on every sentence is a tell.
+
+### 43. Sentiment and Stance Flatness
+
+**Signs to watch:** Relentless mild positivity. No strong negative emotion, no irritation, no real enthusiasm, no doubt. Every topic gets the same even, agreeable, slightly upbeat treatment.
+
+**Problem:** Measured against human writing, AI text carries far more positive-emotion language, much less negative emotion, and higher certainty (iScience corpus study, 2026). Humans writing honestly show fear, annoyance, boredom, and genuine excitement. The flat affect is a structural tell even when no single word is wrong, and it ties back to the PERSONALITY AND SOUL section: a real stance includes the parts the writer dislikes.
+
+**Before:**
+> The new framework offers many interesting features and a thoughtful design. It provides a smooth developer experience and integrates well with existing tools. Overall it is a solid choice for modern teams.
+
+**After:**
+> The framework gets one big thing right: the routing is genuinely good. Everything around it annoys me. The config format is its own little language you relearn every six months, and the docs assume you already know the answer. I would still use it, but not happily.
+
+**Rule:** Do not sand every sentiment down to mild approval. If the honest reaction is irritation, boredom, or excitement, let it show. Allow at least some negative or uncertain feeling where it is real. Flat positivity reads as machine-generated; see also pattern 36 (false balance) and the PERSONALITY section. Do not invent feelings you do not have, or facts to justify them; this is about register, not fabrication.
+
+### Structural self-audit (run on your own output)
+
+These cannot be regex-matched, so check them deliberately before returning the final rewrite:
+
+- **Sentence length:** Is there at least one sentence of five words or fewer and one of twenty-five or more per roughly five sentences? If every sentence is mid-length, fix the rhythm.
+- **Paragraph length:** Are the paragraphs visibly different lengths, or suspiciously equal?
+- **Connectors:** Count sentence-opening connectors (furthermore, moreover, additionally, however, consequently). If most sentences have one, cut half.
+- **Participles and nominalizations:** Count "-ing" clause openers (pattern 3) and "-tion/-ment/-ance" abstract nouns (pattern 38). AI runs about 2 to 5 times the human rate on the first and 1.5 to 2 times on the second; if a paragraph is dense with either, turn some back into plain verbs with a named actor.
+- **Affect:** Is there any genuine negative or uncertain emotion, or is it uniformly mild and positive?
+
+
+## RUSSIAN-LANGUAGE TELLS (RU)
+
+The word lists in pattern 7 are English tokens and do not transfer: a Russian text will never say "delve" or "tapestry." But the structural patterns do transfer almost unchanged. Copula avoidance (8), superficial participle chains (3), rule of three (10), synonym cycling (11), negative parallelism (9), excessive hedging (24), signposting (28), style shift (33), false balance (36), nominalization (38), and the structural tells (40 to 43) all show up in Russian AI text in the same shapes. Apply them as written. The patterns below are the Russian-specific additions. Sources here are community-documented (Habr, vc.ru) rather than peer-reviewed, so treat them as strong heuristics, not proven frequencies.
+
+### 44. Russian AI Vocabulary and Frame Phrases
+
+**Signs to watch:** Authority and hedging openers: «Важно отметить, что…», «Важно понимать…», «Следует учитывать…», «Стоит подчеркнуть…», «Нельзя не заметить…». Frame phrases: «В современном мире…», «В условиях…», «В связи с этим…», «На сегодняшний день…», «В заключение…». Calqued significance inflation: «играет ключевую роль», «ключевой момент», «нельзя переоценить важность». Marketing words: «уникальный», «потрясающий», «ведущий», «инновационный», «расположенный в самом сердце». The soft-hedge verb tell: «может стать…», «могут повлиять…» where a person would just state the thing.
+
+**Problem:** These are the Russian equivalents of pattern 7, and the same rule applies: the signal is clustering, not a single word. A paragraph that opens with «В современном мире» and «Важно отметить» and closes with «играет ключевую роль» is the giveaway.
+
+**Before:**
+> В современном мире искусственный интеллект играет ключевую роль. Важно отметить, что данная технология может стать определяющим фактором развития отрасли.
+
+**After:**
+> Искусственный интеллект уже меняет отрасль: на нём работают поиск, перевод и рекомендации. Что будет дальше, пока непонятно.
+
+**Rule:** Cut the frame openers and the calqued significance phrases. State the fact directly. As with pattern 7, remove the cluster, not every occurrence; one «важно» is fine.
+
+### 45. Russian Syntactic Calques from English
+
+**Signs to watch:** Constructions that are grammatically possible but that no native writer reaches for, usually copied from English structure: a comma forced after a short adverbial opener where Russian does not need one, «однако» set off at the start of a sentence as if it were an English "however,", invented compound adjectives that are formally legal but lifeless («маркетингово-аналитический», «клиентоориентированно-сервисный»), and English-style stacking of modifiers before a noun. The text reads «слишком правильно», too correct.
+
+**Problem:** Russian sources describe this as one of the most reliable markers specific to Russian, because it does not depend on vocabulary. The model carries English sentence architecture into Russian. A human writes around it.
+
+**Before:**
+> Благодаря использованию данного подхода, мы, однако, смогли достичь клиентоориентированно-сервисного результата.
+
+**After:**
+> Этот подход сработал: клиентам стало удобнее.
+
+**Rule:** Read for sentences that are correct but that you would never say out loud. Break invented compound adjectives into normal phrases. Remove commas that exist only because of English structure. Prefer the construction a person would actually speak.
+
+### 46. Russian Punctuation Tells
+
+**Signs to watch:** A capital letter after a colon, especially at the start of list items (wrong in Russian, common in AI output that copies English convention). Тире on nearly every sentence, used because it is always grammatically defensible. Inconsistent quotation marks: straight quotes or English "curly" quotes instead of Russian «ёлочки». Rigid by-the-rulebook comma placement that reads like a textbook rather than a person.
+
+**Problem:** Russian punctuation conventions differ from English, and AI output often imports the English ones. The capital-after-colon error has no English analog as a tell; it is Russian-specific. Note the contrast with pattern 14: in English the rule is to cut every em dash, but in Russian the тире is genuinely standard, so the goal is to reduce overuse, not to eliminate it.
+
+**Before:**
+> Преимущества подхода: Высокая скорость, Низкая стоимость, и простота внедрения для любой команды.
+
+**After:**
+> У подхода три преимущества: он быстрый, дешёвый и простой во внедрении.
+
+**Rule:** Lowercase after a colon unless a proper noun follows. Use «ёлочки» for quotes. Reduce тире to where it earns its place, but do not apply pattern 14's hard cut to Russian; the long dash is normal here. Loosen comma placement that reads like a grammar exercise.
 
 
 ---
@@ -691,7 +813,7 @@ These rules apply to every humanization pass regardless of which patterns trigge
 ### Never truncate
 
 - The rewrite must cover everything the input covers. If the input has five paragraphs, the rewrite has at least five paragraphs.
-- Do not silently drop a list item, a section heading, a caveat, or a data point because it was phrased in an AI-sounding way. Rewrite it — do not delete it.
+- Do not silently drop a list item, a section heading, a caveat, or a data point because it was phrased in an AI-sounding way. Rewrite it, do not delete it.
 - A shorter rewrite per sentence is fine. A rewrite that loses *content* is not.
 - If the input is too long for a single pass, ask the user how to split it rather than returning half of the document.
 
@@ -699,7 +821,7 @@ These rules apply to every humanization pass regardless of which patterns trigge
 
 - Pattern removal is a means, not an end. If every tier-1 AI word has been scrubbed but the text now reads like someone avoiding specific vocabulary, it is worse, not better.
 - A single occurrence of `robust`, `nuanced`, or `meticulous` is not by itself an AI tell. The signal is clustering; see pattern 7.
-- Humans do use em dashes, rules of three, and "not X but Y" constructions. Remove the *cluster*, not every instance.
+- Humans do use rules of three and "not X but Y" constructions; the em dash is the one exception we always cut in English (see pattern 14). Remove the *cluster*, not every instance.
 - Do not flatten vivid language just to prove you edited it. Remove tells; keep voice.
 
 ---
@@ -716,6 +838,7 @@ These rules apply to every humanization pass regardless of which patterns trigge
    - Maintains appropriate tone for context
    - Uses simple constructions (is/are/has) where appropriate
    - Contains no em dashes (—) or en dashes (–); scan and replace every one (see pattern 14)
+   - Passes the structural self-audit: varied sentence and paragraph length, trimmed connectors, honest affect (see patterns 40 to 43)
 5. Present a draft humanized version
 6. Prompt: "What makes the below so obviously AI generated?"
 7. Answer briefly with the remaining tells (if any)
