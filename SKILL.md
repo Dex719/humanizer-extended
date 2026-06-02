@@ -1,6 +1,6 @@
 ---
 name: humanizer-extended
-version: 2.18.0
+version: 2.19.0
 description: |
   Remove signs of AI-generated writing from text. Use when editing or reviewing
   text to make it sound more natural and human-written. Based on Wikipedia's
@@ -424,7 +424,7 @@ Before returning the final rewrite, scan it for `—` and `–`. Any hit means t
 **After:**
 > Three independent replications recovered the same coefficient. The effect is real. Whether the mechanism is the one proposed is a separate question. The controls are not tight enough to rule out a confound, but the effect itself is not in doubt.
 
-**Rule:** Cut hedge stacks ("could potentially possibly", "might perhaps", "may suggest"), and if nearly every hedge in a passage is *may*, vary them or drop some. Then check whether the paragraph has earned a booster. If three sentences of evidence end on "this might suggest", the booster was deleted at the wrong step, so replace it. Hedges belong on individual claims that are genuinely uncertain; they do not belong on the conclusion of a paragraph that already laid out the proof.
+**Rule:** Cut hedge stacks ("could potentially possibly", "might perhaps", "may suggest"), and if nearly every hedge in a passage is *may*, vary them or drop some. Then **actively add at least one booster** where the evidence has earned it: "clearly", "definitely", "in fact", "of course", "the real point is", or simply a flat declarative with no hedge at all. This is mandatory, not a check you pass by noticing the absence. AI text measurably contains *zero* boosters, so a finished rewrite that still has zero boosters has not fixed the single most reliable tell. The only exception is a piece that is genuinely uncertain from end to end. If three sentences of evidence end on "this might suggest", the booster was deleted at the wrong step, so replace it. Hedges belong on individual claims that are genuinely uncertain; they do not belong on the conclusion of a paragraph that already laid out the proof.
 
 
 ### 25. Generic Positive Conclusions
@@ -752,7 +752,7 @@ These cannot be regex-matched, so check them deliberately before returning the f
 - **Paragraph length:** Are the paragraphs visibly different lengths (target: words-per-paragraph standard deviation above 25), or suspiciously equal?
 - **Connectors:** Count sentence-opening connectors (furthermore, moreover, additionally, however, consequently). If most sentences have one, cut half.
 - **Participles and nominalizations:** Count "-ing" clause openers (pattern 3) and "-tion/-ment/-ance" abstract nouns (pattern 38). AI runs about 2 to 5 times the human rate on the first and 1.5 to 2 times on the second; aim for fewer than about one trailing participial clause per 250 words, and if a paragraph is dense with either, turn some back into plain verbs with a named actor.
-- **Boosters and the *may* monopoly:** Is there a booster (clearly, definitely, in fact) anywhere the evidence earned one? Is nearly every hedge the word *may*? See pattern 24.
+- **Boosters and the *may* monopoly (must-fix):** The final text must contain at least one booster (clearly, definitely, in fact, of course) somewhere the evidence earned it, unless the piece is genuinely uncertain throughout. Zero boosters is the single most reliable AI tell, so a rewrite with none is not done. Also check: is nearly every hedge the word *may*? See pattern 24.
 - **Affect:** Is there any genuine negative or uncertain emotion, or is it uniformly mild and positive?
 
 
@@ -904,7 +904,7 @@ These rules apply to every humanization pass regardless of which patterns trigge
    - Maintains appropriate tone for context
    - Uses simple constructions (is/are/has) where appropriate
    - Contains no em dashes (—) or en dashes (–); scan and replace every one (see pattern 14)
-   - Passes the structural self-audit: varied sentence and paragraph length, trimmed connectors, honest affect (see patterns 40 to 43)
+   - Passes the structural self-audit: varied sentence and paragraph length, trimmed connectors, honest affect, and at least one booster where the evidence earned it (see patterns 40 to 43 and 24)
 5. Present a draft humanized version
 6. Prompt: "What makes the below so obviously AI generated?"
 7. Answer briefly with the remaining tells (if any)
