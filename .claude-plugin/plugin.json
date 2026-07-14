@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "humanizer-extended",
+  "description": "Remove signs of AI-generated writing from English and Russian text while preserving facts, meaning, and the writer's voice.",
+  "version": "2.20.0",
+  "author": {
+    "name": "Dex719",
+    "url": "https://github.com/Dex719"
+  },
+  "homepage": "https://github.com/Dex719/humanizer-extended",
+  "repository": "https://github.com/Dex719/humanizer-extended",
+  "license": "MIT",
+  "keywords": ["writing", "editing", "humanize", "prose", "style", "russian"]
+}

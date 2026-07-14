@@ -1,0 +1,28 @@
+name: Aggregate regression
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  aggregate-regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Compare aggregate metrics with baseline
+        run: >-
+          python eval/metrics.py aggregate
+          --corpus eval/corpus
+          --check-baseline eval/baseline.json
+          --json

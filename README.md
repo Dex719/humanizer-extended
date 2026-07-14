@@ -1,42 +1,65 @@
 # Humanizer Extended
 
-A skill for Claude Code and OpenCode that removes signs of AI-generated writing from text, making it sound more natural and human.
+A portable agent skill that removes signs of AI-generated writing from English and Russian text, making it sound more natural while preserving the original facts and meaning.
 
-> **Fork.** `humanizer-extended` is a fork of [blader/humanizer](https://github.com/blader/humanizer) (original by Siqi Chen, MIT). It diverged after upstream 2.5.1 and adds patterns #30–38 (model-tool markup, hallucinated citations, placeholder leakage, document-internal style shift, aphoristic closer, prestige-metaphor frames, false balance, generic stock examples, nominalization) plus a FACT PRESERVATION section. As of 2.15.0 it also re-incorporates three rules from upstream 2.7.0 (#39 diff-anchored writing, the hard em/en dash cut in #14, and speculative gap-filling in #21). As of 2.16.0 it adds a structural and statistical tells section (#40–43: sentence-length uniformity, paragraph symmetry, hyperconnectivity, sentiment flatness) and a Russian-language section (#44–46: RU vocabulary, syntactic calques, punctuation). Pattern numbers in this fork do **not** match upstream's.
+> **Fork.** `humanizer-extended` is a fork of [blader/humanizer](https://github.com/blader/humanizer) (original by Siqi Chen, MIT). It diverged after upstream 2.5.1 and adds patterns #30–38 (model-tool markup, hallucinated citations, placeholder leakage, document-internal style shift, aphoristic closer, prestige-metaphor frames, false balance, generic stock examples, nominalization) plus a FACT PRESERVATION section. As of 2.15.0 it also re-incorporates three rules from upstream 2.7.0 (#39 diff-anchored writing, the hard em/en dash cut in #14, and speculative gap-filling in #21). As of 2.16.0 it adds structural and statistical tells (#40–43) and Russian-language rules (#44–46). Version 2.20.0 synchronizes three more upstream 2.8.x patterns as #49–51 and moves conditional detail into `references/`. Pattern numbers in this fork do **not** match upstream's.
 
 ## Installation
 
-### Claude Code
+### Skills CLI
 
-Clone directly into Claude Code's skills directory:
+Install with the cross-agent [skills CLI](https://skills.sh/docs/cli):
+
+```bash
+npx skills add Dex719/humanizer-extended
+```
+
+Update an existing install:
+
+```bash
+npx skills update humanizer-extended
+```
+
+To install into every supported agent harness:
+
+```bash
+npx skills add Dex719/humanizer-extended --agent '*'
+```
+
+To target one configured harness, pass its agent name:
+
+```bash
+npx skills add Dex719/humanizer-extended --agent <agent-name>
+```
+
+### Claude Code plugin marketplace
+
+Claude Code users can also install Humanizer Extended as a plugin:
+
+```text
+/plugin marketplace add Dex719/humanizer-extended
+/plugin install humanizer-extended@humanizer-extended
+```
+
+The plugin exposes the skill as `/humanizer-extended:humanizer-extended`.
+
+### Manual installation
+
+Clone the repository into the skills directory used by your harness. For Claude Code:
 
 ```bash
 mkdir -p ~/.claude/skills
 git clone https://github.com/Dex719/humanizer-extended.git ~/.claude/skills/humanizer-extended
 ```
 
-Or copy the skill file manually if you already have this repo cloned:
-
-```bash
-mkdir -p ~/.claude/skills/humanizer-extended
-cp SKILL.md ~/.claude/skills/humanizer-extended/
-```
-
-### OpenCode
-
-Clone directly into OpenCode's skills directory:
+For OpenCode:
 
 ```bash
 mkdir -p ~/.config/opencode/skills
 git clone https://github.com/Dex719/humanizer-extended.git ~/.config/opencode/skills/humanizer-extended
 ```
 
-Or copy the skill file manually if you already have this repo cloned:
-
-```bash
-mkdir -p ~/.config/opencode/skills/humanizer-extended
-cp SKILL.md ~/.config/opencode/skills/humanizer-extended/
-```
+If the repository is already cloned, copy the complete skill directory rather than only `SKILL.md`; current releases load supporting files under `references/` on demand. The `eval/` directory is for development and is not needed at runtime.
 
 > **Note:** OpenCode also scans `~/.claude/skills/` for compatibility, so a single clone into `~/.claude/skills/humanizer-extended/` works for both tools.
 
@@ -66,7 +89,7 @@ Please humanize this text: [your text]
 
 ### Voice Calibration
 
-As of 2.17.0 the skill offers this automatically at the start of a run (it asks whether you want to provide a sample). You can also provide one up front to match your personal writing style:
+As of 2.17.0 the skill offers this automatically at the start of a run (it asks whether you want to provide a sample). If the current harness does not support `AskUserQuestion`, the skill continues with its default voice without stopping or reporting an error. You can also provide a sample up front to match your personal writing style:
 
 ```
 /humanizer-extended
@@ -90,7 +113,7 @@ The skill also includes a final "obviously AI generated" audit pass and a second
 
 > "LLMs use statistical algorithms to guess what should come next. The result tends toward the most statistically likely result that applies to the widest variety of cases."
 
-## 48 Patterns Detected (with Before/After Examples)
+## 51 Patterns Detected (with Before/After Examples)
 
 ### Content Patterns
 
@@ -125,8 +148,8 @@ The skill also includes a final "obviously AI generated" audit pass and a second
 | 16 | **Inline-header lists** | "**Performance:** Performance improved" | Convert to prose |
 | 17 | **Title Case Headings** | "Strategic Negotiations And Partnerships" | "Strategic negotiations and partnerships" |
 | 18 | **Emojis** | "🚀 Launch Phase: 💡 Key Insight:" | Remove emojis |
-| 19 | **Curly quotes** | `said “the project”` | `said “the project”` |
-| 26 | **Hyphenated word pairs** | “cross-functional, data-driven, client-facing” | Drop hyphens on common word pairs |
+| 19 | **Curly quotes** | `said “the project”` | `said "the project"` |
+| 26 | **Hyphenated word-pair clusters** | "cross-functional, data-driven, client-facing" repeated throughout | Keep required compounds; vary only conspicuous clusters of optional forms |
 | 27 | **Persuasive authority tropes** | "At its core, what matters is..." | State the point directly |
 | 28 | **Signposting announcements** | "Let's dive in", "Here's what you need to know" | Start with the content |
 | 29 | **Fragmented headers** | "## Performance" + "Speed matters." | Let the heading do the work |
@@ -139,7 +162,7 @@ The skill also includes a final "obviously AI generated" audit pass and a second
 
 | # | Pattern | Before | After |
 |---|---------|--------|-------|
-| 20 | **Chatbot artifacts** | "I hope this helps! Let me know if..." | Remove entirely |
+| 20 | **Chatbot and offer-to-continue artifacts** | "I hope this helps! Want me to continue?" | Remove entirely |
 | 21 | **Cutoff disclaimers + gap-filling** | "While details are limited...", "maintains a low profile", "likely grew up..." | Find sources, say what's unknown, or remove; never guess |
 | 22 | **Sycophantic tone** | "Great question! You're absolutely right!" | Respond directly |
 | 30 | **Model-tool markup artifacts** | `settlement:contentReference[oaicite:4]{index=4}`, `[attached_file:1]`, `?utm_source=chatgpt.com` | Delete the artifact and the markup around it |
@@ -153,7 +176,7 @@ The skill also includes a final "obviously AI generated" audit pass and a second
 | # | Pattern | Before | After |
 |---|---------|--------|-------|
 | 23 | **Filler phrases** | "In order to", "Due to the fact that" | "To", "Because" |
-| 24 | **Excessive hedging + booster absence** | "this might suggest that the effect may possibly be real" (after three replications) | Cut hedge stacks; if a paragraph stacked evidence, let it commit ("the effect is real") |
+| 24 | **Excessive hedging + booster absence** | "this might suggest that the effect may possibly be real" (after three replications) | Cut hedge stacks; use earned confidence only when the genre permits it |
 | 25 | **Generic conclusions** | "The future looks bright" | Specific plans or facts |
 
 ### Structural and Statistical Patterns
@@ -173,7 +196,7 @@ The skill also includes a final "obviously AI generated" audit pass and a second
 | 45 | **Russian syntactic calques from English** | «клиентоориентированно-сервисного результата», forced commas, calqued «однако» | Plain phrasing a person would actually speak |
 | 46 | **Russian punctuation tells** | Capital after colon; тире on every sentence; "curly" quotes | Lowercase after colon; «ёлочки»; reduce тире (do not hard-cut as in #14) |
 
-> **Russian inversions:** for Russian text, several English rules flip. Do **not** cut тире (#14 is off), **do** add agentless/impersonal passive (#13 inverts), and do **not** fragment long sentences (#40 softens). See the SKILL.md Russian section.
+> **Russian inversions:** for Russian text, several English rules flip. Do **not** cut тире (#14 is off), **do** add agentless/impersonal passive (#13 inverts), and do **not** fragment long sentences (#40 softens). See [`references/patterns-ru.md`](references/patterns-ru.md).
 
 ### Current-Model and Contextual Patterns
 
@@ -182,35 +205,19 @@ The skill also includes a final "obviously AI generated" audit pass and a second
 | 47 | **Superficial guideline echoing** | "maintains an active social media presence, garnering independent coverage" | State what the subject actually does, with a concrete fact |
 | 48 | **Model-specific signatures** | Claude "belies"; DeepSeek "somewhere a dog howls"; Gemini bullet dumps | Replace the family fingerprint; treat as a lead, not proof |
 
+### Upstream-Synchronized Patterns
+
+| # | Pattern | Before | After |
+|---|---------|--------|-------|
+| 49 | **Manufactured punchlines / staccato drama** | "It had no preference. No prior. No nostalgia." | Connect the routine claim as ordinary prose; preserve only earned emphasis |
+| 50 | **Aphorism formulas** | "Symmetry is the language of trust." | State the precise claim instead of dressing it as a maxim |
+| 51 | **Conversational rhetorical openers** | "Honestly? It depends on how often you'll use it." | "Whether it's worth the price depends on how often you'll use it." |
+
 Plus a non-pattern **Reliability and false positives** section: detectors falsely flag non-native English writers (Liang et al. 2023, ~61% false-positive rate on TOEFL essays), so structural tells are treated as robust while em dashes, "not X but Y", rule of three, and curly quotes are down-weighted as weak, over-fired signals.
 
 ## Full Example
 
-**Before (AI-sounding):**
-> Great question! Here is an essay on this topic. I hope this helps!
->
-> AI-assisted coding serves as an enduring testament to the transformative potential of large language models, marking a pivotal moment in the evolution of software development. In today's rapidly evolving technological landscape, these groundbreaking tools—nestled at the intersection of research and practice—are reshaping how engineers ideate, iterate, and deliver, underscoring their vital role in modern workflows.
->
-> At its core, the value proposition is clear: streamlining processes, enhancing collaboration, and fostering alignment. It's not just about autocomplete; it's about unlocking creativity at scale, ensuring that organizations can remain agile while delivering seamless, intuitive, and powerful experiences to users. The tool serves as a catalyst. The assistant functions as a partner. The system stands as a foundation for innovation.
->
-> Industry observers have noted that adoption has accelerated from hobbyist experiments to enterprise-wide rollouts, from solo developers to cross-functional teams. The technology has been featured in The New York Times, Wired, and The Verge. Additionally, the ability to generate documentation, tests, and refactors showcases how AI can contribute to better outcomes, highlighting the intricate interplay between automation and human judgment.
->
-> - 💡 **Speed:** Code generation is significantly faster, reducing friction and empowering developers.
-> - 🚀 **Quality:** Output quality has been enhanced through improved training, contributing to higher standards.
-> - ✅ **Adoption:** Usage continues to grow, reflecting broader industry trends.
->
-> While specific details are limited based on available information, it could potentially be argued that these tools might have some positive effect. Despite challenges typical of emerging technologies—including hallucinations, bias, and accountability—the ecosystem continues to thrive. In order to fully realize this potential, teams must align with best practices.
->
-> In conclusion, the future looks bright. Exciting times lie ahead as we continue this journey toward excellence. Let me know if you’d like me to expand on any section!
-
-**After (Humanized):**
-> AI coding assistants can speed up the boring parts of the job. They're great at boilerplate: config files and the little glue code you don't want to write. They can also help you sketch a test, but you still have to read it.
->
-> The dangerous part is how confident the suggestions look. I've accepted code that compiled and passed lint, then discovered later it missed the point because I stopped paying attention.
->
-> If you treat it like autocomplete and review every line, it's useful. If you use it to avoid thinking, it will help you ship bugs faster.
->
-> The only real backstop is tests. Without them, you're mostly judging vibes.
+The complete draft-audit-final example lives in [`references/examples.md`](references/examples.md#full-example). Its rewrite keeps every substantive input claim, labels unsupported assertions instead of replacing them with plausible inventions, and adds no person, experience, number, study, quotation, or source.
 
 ## References
 
@@ -227,6 +234,7 @@ Plus a non-pattern **Reliability and false positives** section: detectors falsel
 
 ## Version History
 
+- **2.20.0** - Added three upstream 2.8.x writing-pattern guards, fail-safe voice calibration, genre-aware booster guidance, and stronger fact preservation. Split the large skill into a compact core plus conditional references. Added Russian-aware structural/compliance metrics, a six-genre Russian eval corpus, aggregate baselines, tests, cross-agent skills CLI and Claude Code marketplace packaging, repository hygiene, and CI checks. See [CHANGELOG.md](CHANGELOG.md) for the full release notes.
 - **2.19.0** - Eval-driven fix. Built a deterministic structural-metrics harness (kept local, not shipped) and ran it on a 12-genre before/after corpus. Result: applied to real text, the skill reliably strips em dashes (100%), participial overload (0%→83% pass), nominalizations, and the *may*-heavy hedging, and it *improves* sentence-length variance (17%→83% pass) rather than regressing as one hand-written example had implied. The one systematic gap was boosters: across all 12 rewrites the skill added *zero* boosters, even though booster-absence is the single most reliable AI tell (pattern 24). Hardened pattern 24, the structural self-audit, and the Process so that adding at least one booster (where the evidence earns it) is a mandatory step, not an optional check. No new patterns.
 - **2.18.0** - Folded in three Gemini deep-research reports. Upgraded the structural patterns (#40–43) with measured thresholds: burstiness coefficient ~0.15–0.45 for humans vs ~0 for AI; words-per-paragraph standard deviation >25 separated human from AI at AUC 0.98 (Desaire et al. 2023); transition density ~1.8× the human rate; positive-sentiment inflation 37–54% (Abdulhai et al. 2026). Rewrote #24's hedge claim with resolved numbers (Shalevska 2024: AI hedges ~1.39×, ~84% of them the single word *may*, and *zero* boosters; the booster gap and the *may* monopoly are the real signals, not "twice as many hedges"). Made #7 era-aware (the loud first-wave words like *delve* collapsed in frequency around April 2024 once publicized; second-wave words *significant/potential/findings/crucial* now carry more signal). Added a genre/language caveat to #13 (the agentless passive is the human norm in technical writing and in Russian, and AI under-produces it). Added pattern **#47** (superficial guideline echoing) and **#48** (model-specific signatures: Claude "belies", DeepSeek environmental framing, Gemini bullet reliance). Greatly expanded the Russian section: the «Однако,» calque (highest-confidence RU marker), «Это не про X. Это про Y», «за которым последовало», typographic sterility, and an explicit "Russian inversions" block (for Russian: do not cut тире, do add passive/impersonal forms, do not fragment long sentences). Added a RELIABILITY AND FALSE POSITIVES section (Liang et al. 2023: ~61% false positives on non-native English; structural signals are robust, while em dashes, "not X but Y", rule of three, and curly quotes are weak, over-fired folk theories to down-weight as evidence). Total now 48 patterns plus the structural self-audit and reliability sections.
 - **2.17.0** - Voice calibration is now offered proactively. When the skill is invoked it asks once (via AskUserQuestion) whether you want to paste a short sample of your own writing for style matching, instead of only using a sample if you happened to provide one. If you skip or have no sample, it falls back to the default voice. (Skills are stateless across sessions, so in practice this is offered at the start of each session/run, not literally only the first time ever.) No pattern changes.

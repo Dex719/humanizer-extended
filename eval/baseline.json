@@ -1,0 +1,280 @@
+{
+  "command": "aggregate",
+  "compliance": {
+    "after_score": {
+      "applicable": 35,
+      "passed": 35,
+      "rate": 1.0
+    },
+    "before_score": {
+      "applicable": 35,
+      "passed": 16,
+      "rate": 0.4571
+    },
+    "metrics": {
+      "boosters": {
+        "after_applicable": 5,
+        "after_mean": 1.0,
+        "after_pass_rate": 1.0,
+        "after_passed": 5,
+        "before_applicable": 5,
+        "before_mean": 0.0,
+        "before_pass_rate": 0.0,
+        "before_passed": 0,
+        "delta": 1.0
+      },
+      "curly_quotes": {
+        "after_applicable": 6,
+        "after_mean": 0.0,
+        "after_pass_rate": 1.0,
+        "after_passed": 6,
+        "before_applicable": 6,
+        "before_mean": 0.0,
+        "before_pass_rate": 1.0,
+        "before_passed": 6,
+        "delta": 0.0
+      },
+      "em_dashes": {
+        "after_applicable": 6,
+        "after_mean": 0.5,
+        "after_pass_rate": 1.0,
+        "after_passed": 6,
+        "before_applicable": 6,
+        "before_mean": 0.0,
+        "before_pass_rate": 1.0,
+        "before_passed": 6,
+        "delta": 0.5
+      },
+      "ru_capital_after_colon": {
+        "after_applicable": 6,
+        "after_mean": 0.0,
+        "after_pass_rate": 1.0,
+        "after_passed": 6,
+        "before_applicable": 6,
+        "before_mean": 1.0,
+        "before_pass_rate": 0.0,
+        "before_passed": 0,
+        "delta": -1.0
+      },
+      "ru_odnako_comma": {
+        "after_applicable": 6,
+        "after_mean": 0.0,
+        "after_pass_rate": 1.0,
+        "after_passed": 6,
+        "before_applicable": 6,
+        "before_mean": 1.0,
+        "before_pass_rate": 0.0,
+        "before_passed": 0,
+        "delta": -1.0
+      },
+      "ru_quote_style": {
+        "after_applicable": 6,
+        "after_mean": 0.0,
+        "after_pass_rate": 1.0,
+        "after_passed": 6,
+        "before_applicable": 6,
+        "before_mean": 0.5,
+        "before_pass_rate": 0.6667,
+        "before_passed": 4,
+        "delta": -0.5
+      }
+    },
+    "score_delta": 0.5429
+  },
+  "corpus": {
+    "genres": {
+      "bio": 1,
+      "landing": 1,
+      "readme": 1,
+      "review": 1,
+      "science-pop": 1,
+      "vc-habr": 1
+    },
+    "languages": {
+      "ru": 6
+    },
+    "pairs": 6,
+    "path": "eval/corpus"
+  },
+  "pairs": [
+    {
+      "compliance_after_rate": 1.0,
+      "compliance_before_rate": 0.5,
+      "genre": "bio",
+      "id": "ru-bio-architect",
+      "language": "ru",
+      "structural_after_rate": 0.25,
+      "structural_before_rate": 0.25,
+      "tells_after": 0,
+      "tells_before": 6
+    },
+    {
+      "compliance_after_rate": 1.0,
+      "compliance_before_rate": 0.3333,
+      "genre": "vc-habr",
+      "id": "ru-habr-cache",
+      "language": "ru",
+      "structural_after_rate": 0.75,
+      "structural_before_rate": 0.25,
+      "tells_after": 0,
+      "tells_before": 10
+    },
+    {
+      "compliance_after_rate": 1.0,
+      "compliance_before_rate": 0.5,
+      "genre": "landing",
+      "id": "ru-landing-meals",
+      "language": "ru",
+      "structural_after_rate": 0.75,
+      "structural_before_rate": 0.25,
+      "tells_after": 0,
+      "tells_before": 7
+    },
+    {
+      "compliance_after_rate": 1.0,
+      "compliance_before_rate": 0.4,
+      "genre": "readme",
+      "id": "ru-readme-queue",
+      "language": "ru",
+      "structural_after_rate": 0.5,
+      "structural_before_rate": 0.5,
+      "tells_after": 0,
+      "tells_before": 9
+    },
+    {
+      "compliance_after_rate": 1.0,
+      "compliance_before_rate": 0.5,
+      "genre": "review",
+      "id": "ru-review-reader",
+      "language": "ru",
+      "structural_after_rate": 0.25,
+      "structural_before_rate": 0.5,
+      "tells_after": 0,
+      "tells_before": 7
+    },
+    {
+      "compliance_after_rate": 1.0,
+      "compliance_before_rate": 0.5,
+      "genre": "science-pop",
+      "id": "ru-science-sleep",
+      "language": "ru",
+      "structural_after_rate": 0.5,
+      "structural_before_rate": 0.25,
+      "tells_after": 0,
+      "tells_before": 8
+    }
+  ],
+  "schema_version": 1,
+  "structural": {
+    "after_score": {
+      "applicable": 24,
+      "passed": 12,
+      "rate": 0.5
+    },
+    "before_score": {
+      "applicable": 24,
+      "passed": 8,
+      "rate": 0.3333
+    },
+    "metrics": {
+      "agentless_passive_per_100_words": {
+        "after_applicable": 0,
+        "after_mean": 0.0,
+        "after_pass_rate": null,
+        "after_passed": 0,
+        "before_applicable": 0,
+        "before_mean": 0.0,
+        "before_pass_rate": null,
+        "before_passed": 0,
+        "delta": 0.0
+      },
+      "connector_opener_density": {
+        "after_applicable": 6,
+        "after_mean": 0.0,
+        "after_pass_rate": 1.0,
+        "after_passed": 6,
+        "before_applicable": 6,
+        "before_mean": 0.3518,
+        "before_pass_rate": 0.8333,
+        "before_passed": 5,
+        "delta": -0.3518
+      },
+      "paragraph_length_sd": {
+        "after_applicable": 6,
+        "after_mean": 6.3789,
+        "after_pass_rate": 0.0,
+        "after_passed": 0,
+        "before_applicable": 6,
+        "before_mean": 5.9123,
+        "before_pass_rate": 0.1667,
+        "before_passed": 1,
+        "delta": 0.4666
+      },
+      "participial_clauses_per_250_words": {
+        "after_applicable": 6,
+        "after_mean": 1.3094,
+        "after_pass_rate": 0.5,
+        "after_passed": 3,
+        "before_applicable": 6,
+        "before_mean": 1.6401,
+        "before_pass_rate": 0.1667,
+        "before_passed": 1,
+        "delta": -0.3307
+      },
+      "sentence_length_sd": {
+        "after_applicable": 6,
+        "after_mean": 5.2542,
+        "after_pass_rate": 0.5,
+        "after_passed": 3,
+        "before_applicable": 6,
+        "before_mean": 3.7304,
+        "before_pass_rate": 0.1667,
+        "before_passed": 1,
+        "delta": 1.5238
+      }
+    },
+    "score_delta": 0.1667
+  },
+  "tells": {
+    "after_total": 0,
+    "before_total": 47,
+    "delta": -47,
+    "metrics": {
+      "en_ai_phrases": {
+        "after_mean": 0.0,
+        "after_total": 0,
+        "before_mean": 0.0,
+        "before_total": 0,
+        "delta": 0
+      },
+      "ru_capital_after_colon": {
+        "after_mean": 0.0,
+        "after_total": 0,
+        "before_mean": 1.0,
+        "before_total": 6,
+        "delta": -6
+      },
+      "ru_frame_phrases": {
+        "after_mean": 0.0,
+        "after_total": 0,
+        "before_mean": 5.3333,
+        "before_total": 32,
+        "delta": -32
+      },
+      "ru_non_guillemets": {
+        "after_mean": 0.0,
+        "after_total": 0,
+        "before_mean": 0.5,
+        "before_total": 3,
+        "delta": -3
+      },
+      "ru_odnako_comma": {
+        "after_mean": 0.0,
+        "after_total": 0,
+        "before_mean": 1.0,
+        "before_total": 6,
+        "delta": -6
+      }
+    }
+  }
+}

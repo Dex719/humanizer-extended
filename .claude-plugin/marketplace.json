@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-marketplace-manifest.json",
+  "name": "humanizer-extended",
+  "owner": {
+    "name": "Dex719",
+    "url": "https://github.com/Dex719"
+  },
+  "description": "Humanizer Extended, installable as a Claude Code plugin.",
+  "plugins": [
+    {
+      "name": "humanizer-extended",
+      "source": "./",
+      "description": "Remove signs of AI-generated writing from English and Russian text while preserving facts, meaning, and the writer's voice.",
+      "license": "MIT",
+      "keywords": ["writing", "editing", "humanize", "prose", "style", "russian"]
+    }
+  ]
+}

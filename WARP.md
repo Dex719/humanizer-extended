@@ -3,9 +3,9 @@
 This file provides guidance to WARP (warp.dev) when working with code in this repository.
 
 ## What this repo is
-This repository is a **Claude Code skill** implemented entirely as Markdown.
+This repository is a portable agent skill with a small Python evaluation harness.
 
-The “runtime” artifact is `SKILL.md`: Claude Code reads the YAML frontmatter (metadata + allowed tools) and the prompt/instructions that follow.
+The runtime entry point is `SKILL.md`: compatible agents read its YAML frontmatter and the prompt/instructions that follow. Conditional detail lives under `references/` and is part of the installed skill.
 
 `README.md` is for humans: installation, usage, and a compact overview of the patterns.
 
@@ -16,22 +16,30 @@ The “runtime” artifact is `SKILL.md`: Claude Code reads the YAML frontmatter
   - After the frontmatter is the editor prompt: the canonical, detailed pattern list with examples.
 - `README.md`
   - Installation and usage instructions.
-  - Contains a summarized “48 patterns” table and a short version history.
+  - Contains a summarized pattern table and a short version history.
+- `references/`
+  - Detailed rules, examples, and research that `SKILL.md` loads only when needed.
+- `eval/`
+  - Structural and compliance metrics, the bilingual before/after corpus, tests, and the committed aggregate baseline.
+- `.claude-plugin/`
+  - Claude Code plugin and marketplace manifests.
+- `scripts/check_version_sync.py`
+  - Keeps release versions synchronized across the skill, README, changelog, and plugin manifest.
 
 When changing behavior/content, treat `SKILL.md` as the source of truth, and update `README.md` to stay consistent.
 
 ## Common commands
-### Install the skill into Claude Code
-Recommended (clone directly into Claude Code skills directory):
+### Install with the cross-agent skills CLI
 ```bash
-mkdir -p ~/.claude/skills
-git clone https://github.com/<your-username>/humanizer-extended.git ~/.claude/skills/humanizer-extended
+npx skills add Dex719/humanizer-extended
+npx skills update humanizer-extended
 ```
 
-Manual install/update (only the skill file):
+### Run repository checks
 ```bash
-mkdir -p ~/.claude/skills/humanizer-extended
-cp SKILL.md ~/.claude/skills/humanizer-extended/
+python -m pytest -q
+python eval/metrics.py aggregate --corpus eval/corpus --check-baseline eval/baseline.json --json
+python scripts/check_version_sync.py
 ```
 
 ## How to “run” it (Claude Code)
@@ -42,8 +50,10 @@ Invoke the skill:
 ### Versioning (keep in sync)
 - `SKILL.md` has a `version:` field in its YAML frontmatter.
 - `README.md` has a “Version History” section.
+- `CHANGELOG.md` has the latest released version.
+- `.claude-plugin/plugin.json` has the plugin version.
 
-If you bump the version, update both.
+If you bump the version, update all four. CI enforces this with `scripts/check_version_sync.py`.
 
 ### Editing `SKILL.md`
 - Preserve valid YAML frontmatter formatting and indentation.
