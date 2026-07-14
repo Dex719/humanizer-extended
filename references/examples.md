@@ -14,6 +14,9 @@ Read this file when a compact registry entry in `SKILL.md` is not enough, when a
 - [Structural and statistical tells (40–43)](#structural-and-statistical-tells)
 - [Current-model and contextual tells (47–48)](#current-model-and-contextual-tells-2024-to-2026)
 - [New upstream-synchronized patterns (49–51)](#new-upstream-synchronized-patterns)
+- [Humanizer damage (52–57)](#humanizer-damage-anti-humanization--52-57)
+- [Wikipedia-era and 2025+ tells (58–67)](#wikipedia-era-and-2025-tells--58-67)
+- [Grammar fingerprints (68–69)](#grammar-fingerprints--68-69)
 - [Full Example](#full-example)
 
 The examples illustrate transformations; they are not permission to import their details into user text. Apply every rewrite under the fact-preservation rules in `SKILL.md`.
@@ -761,6 +764,212 @@ The vocabulary and structure tells above are largely model-agnostic. These two a
 > Whether it's worth the price depends on how often you'll use it.
 
 **Rule:** State the point directly. Keep ordinary mid-sentence `honestly` or `look`, a genuine conversational voice from the user's sample, and secondhand text.
+
+## Humanizer damage (anti-humanization) — 52-57
+
+All pairs in patterns 52–69 are synthetic teaching pairs. Never reuse their facts in user text. Within each pair, the rewrite uses only details present in its `Before` or `Original` text.
+
+### ##52 Thesaurus damage
+
+**Signs:** A common word has been replaced by a rare or elevated synonym that breaks collocation or register.
+
+**Test:** Prefer the common counterpart only when it is more natural and does not change meaning. Check the author's voice samples first; some writers genuinely use elevated vocabulary.
+
+**Before:**
+> The municipality's ordinance diminishes discretionary expenditures.
+
+**After:**
+> The municipality's ordinance reduces discretionary spending.
+
+### ##53 Clause atomization
+
+**Signs:** At least four consecutive single-clause sentences have flattened source relations such as cause, concession, or sequence into parataxis.
+
+**Rule:** Restore subordination non-uniformly; do not split the passage further.
+
+**Before:**
+> The study had three phases. Each phase had a focus. The first collected data. The second introduced the intervention. The third measured outcomes.
+
+**After:**
+> The study ran in three phases, each with its own focus: the first collected data, the second introduced the intervention, and the third measured outcomes.
+
+### ##54 Persona injection
+
+**Signs:** The rewrite silently introduces `we`, `I`, or `you` even though the source does not use that grammatical person.
+
+**Rule:** Restore the source person. Do not flag a person consistently used in authentic voice samples.
+
+**Before:**
+> The experiment yielded results. We found the treatment group outperformed control.
+
+**After:**
+> The experiment yielded results: the treatment group outperformed the control.
+
+### ##55 Fake typos / forced slang — HARD BAN
+
+**Signs:** Deliberate misspellings, random slang, or fake informality such as `teh`, `ngl`, or `tbh` in formal prose.
+
+**Rule:** Never inject such features to “humanize” prose. When found, treat them as humanizer damage and repair them. Detectors and readers both treat manufactured errors as evasion artifacts.
+
+### ##56 Hedge stripping
+
+**Signs:** Deleted epistemic hedges turn hypotheses into asserted facts, such as `may reduce` becoming `reduces`.
+
+**Rule:** Restore the original modality. This is a fact-preservation violation, not a style preference.
+
+**Original:**
+> The drug may reduce symptoms in some patients.
+
+**Damaged:**
+> The drug reduces symptoms.
+
+**After:**
+> The drug may reduce symptoms in some patients.
+
+### ##57 Humanizer residue (triage first)
+
+**Signs:** Garbage tokens such as `??????` or `lorem`, inline citations with no bibliography, escaped Markdown outside code, or double-quoted headings such as `## "Title"`.
+
+**Rule:** Clean residue before applying style patterns; do not treat it as authorial voice. Keep legitimate citations when the bibliography is present. If a citation has no reference entry, remove it and note the removal without inventing a source.
+
+## Wikipedia-era and 2025+ tells — 58-67
+
+### ##58 Despite-challenges closer
+
+**Signs:** A closer concedes vague problems and pivots to vague optimism: `Despite its [positive], X faces challenges… Future investments could…` Pattern 25 covers positive spin alone; pattern 58 covers this two-part document structure.
+
+**Gate:** Apply in encyclopedia, wiki, and news prose. Treat press releases and standard limitations sections in technical reports as genre-normal.
+
+**Before:**
+> Despite the gains described above, the program faces scheduling problems, and future investment could improve it.
+
+**After:**
+> The program has made the gains described above but still has scheduling problems. The input does not establish what future investment would change.
+
+### ##59 Notability packing
+
+**Signs:** Meta-claims such as `profiled in leading outlets`, `maintains an active social media presence`, or `garnered significant attention` replace the substance of the coverage.
+
+**Gate:** Apply in encyclopedia and biography prose; treat it as genre-normal in press releases and marketing copy.
+
+**Before:**
+> She has been profiled in leading outlets and maintains an active social-media presence.
+
+**After:**
+> She has received media coverage and uses social media; the input does not name the outlets or say what the coverage established.
+
+### ##60 Hedged inflation
+
+**Signs:** A hedge and an inflated importance claim appear together, as in `Though it saw only limited application, it contributes to the broader history of…`. Flag only when both parts occur in the same sentence or paragraph.
+
+**Gate:** Apply in encyclopedia and academic prose; treat the frame as genre-normal in grant proposals.
+
+**Before:**
+> Though it saw only limited application, the technique contributes to the broader history of the field.
+
+**After:**
+> The technique saw limited use. The input does not establish its broader historical impact.
+
+### ##61 Specificity erosion
+
+**Signs:** A rare, specific fact has been replaced by generic praise.
+
+**Rule:** Treat this as a fact-preservation violation and restore the source fact in every genre, especially biography and history.
+
+**Original:**
+> She invented the Janney coupler.
+
+**Damaged:**
+> She was a revolutionary titan of industry.
+
+**After:**
+> She invented the Janney coupler.
+
+### ##62 Inanimate rhetorical agent (EN+RU)
+
+**Signs:** An inanimate subject performs a speech act: `The fact underscores…`, `This event highlights…`, `сам факт подчёркивает`, or `событие отражает`. Useful heuristic subjects include `fact`, `event`, `study`, `finding`, `data`, `trend`, `факт`, `событие`, and `данные`; verbs include `underscores`, `highlights`, `emphasizes`, `reflects`, `подчёркивает`, `отражает`, and `свидетельствует`.
+
+**Gate:** Apply in academic, news, and encyclopedia prose; preserve deliberate literary personification.
+
+**Before:**
+> The report says R&D spending increased. This fact underscores the organization's commitment to innovation.
+
+**After:**
+> The report says R&D spending increased. The increase alone does not establish the claimed commitment to innovation.
+
+### ##63 Markdown skeleton
+
+**Signs:** A separator before every heading, H1-to-H3 jumps, two-to-four-row micro-tables, escaped Markdown outside code, or placeholder dates such as `2025-xx-xx`.
+
+**Rule:** Fix each artifact independently. Convert a trivial table to prose, but do not flatten a table that genuinely helps comparison. Never fill a placeholder date by guessing.
+
+### ##64 “Refers to” lead
+
+**Signs:** An opening such as `X refers to…` or `Термин X обозначает…` treats a descriptive title as a proper name.
+
+**Gate:** Treat the form as neutral in dictionaries and encyclopedia leads; flag it elsewhere.
+
+**Before:**
+> A catchment area refers to the geographic area from which a health service draws patients.
+
+**After:**
+> A catchment area is the geographic area from which a health service draws patients.
+
+### ##65 Manufactured broader debate
+
+**Signs:** `Has generated debate about…` or `вызвало дискуссию о…` appears without named participants or positions.
+
+**Rule:** Name only positions and sources already supplied. Otherwise retain the claim as unsupported or remove it when coverage permits.
+
+**Before:**
+> The decision has generated debate about access.
+
+**After:**
+> The input claims that the decision generated debate about access but does not name participants or positions.
+
+### ##66 Named-source misattribution (RAG-era; upgrades pattern 5)
+
+**Signs:** A generic attribution is attached to a real name without a verifiable source, such as `Roger Ebert highlighted the lasting influence of…`.
+
+**Rule:** Verify every `[Name] emphasized/noted/highlighted` claim against a source. If it cannot be verified, remove the attribution or flag it; never replace it with an invented quotation.
+
+### ##67 Source-quantity exaggeration
+
+**Signs:** `Several scholars`, `multiple studies`, or `ряд исследователей` is backed by one citation.
+
+**Rule:** Recount and make the quantifier match the actual supplied source count.
+
+**Before:**
+> Several scholars have argued the model is flawed (Smith 2023).
+
+**After:**
+> Smith (2023) has argued that the model is flawed.
+
+## Grammar fingerprints — 68-69
+
+### ##68 Present-participial stacking (genre-gated)
+
+**Signs:** At least two present-participial V-ing clauses occur in one sentence.
+
+**Evidence and gate:** Reinhart et al. (PNAS 2025) found LLM participial-clause rates two to five times the human rate, with the signal surviving synonym replacement. Zamaraeva et al. (arXiv:2506.01407, HPSG on *The New York Times*) found the reverse in news: humans used more participials. Flag academic, blog, and creative prose at two per sentence; treat news and journalism as neutral; flag technical documentation at three. Always require two other pattern families before aggressive rewriting.
+
+**Before:**
+> The algorithm, leveraging parallel processing, optimizing memory allocation, and reducing latency, achieves sub-millisecond response times.
+
+**After:**
+> The algorithm uses parallel processing, optimizes memory allocation, and reduces latency to achieve sub-millisecond response times.
+
+### ##69 That-clause subjects (genre-gated)
+
+**Signs:** `That [clause] is/was…` acts as the sentence subject more than once per 500 words, or more than twice in academic prose. Treat formal argumentative use as neutral.
+
+**Evidence:** Reinhart et al. found the construction at 2.6 times the human rate in GPT-4o output.
+
+**Before:**
+> That the model generalizes well is encouraging. That training stayed under two hours is notable.
+
+**After:**
+> The model generalizes well, which is encouraging. The training time, under two hours, is also notable.
 
 ## Full Example
 

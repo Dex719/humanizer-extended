@@ -7,6 +7,10 @@ Read this file whenever the input or requested output is predominantly Russian. 
 - [44. Russian AI vocabulary and frame phrases](#44-russian-ai-vocabulary-and-frame-phrases)
 - [45. Russian syntactic calques from English](#45-russian-syntactic-calques-from-english)
 - [46. Russian punctuation tells](#46-russian-punctuation-tells)
+- [70. Висячий деепричастный оборот](#70-висячий-деепричастный-оборот)
+- [71. Дидактические дисклеймеры](#71-дидактические-дисклеймеры)
+- [72. Формульные зачины](#72-формульные-зачины)
+- [73. Формульное «Заключение»](#73-формульное-заключение)
 - [Russian inversions of global rules](#russian-inversions-of-global-rules)
 - [RU self-audit](#ru-self-audit)
 
@@ -25,6 +29,16 @@ Read this file whenever the input or requested output is predominantly Russian. 
 > Инструмент может сделать работу организации эффективнее и помочь ей развиваться.
 
 **Rule:** Delete the frame and keep the claim. Prefer a concrete subject and a direct verb. Replace `данный` with `этот` or omit it; replace `осуществляет обработку` with `обрабатывает`; replace `позволяет обеспечить повышение` with the result the input actually supports. Do not manufacture a concrete result when the input supplies none: hedge it or say it is not documented.
+
+**Morphosyntactic checks and genre gate:** In addition to the word list, count action nominalizations used instead of verbs, genitive chains longer than three nouns, `является` used as a weak copula, and avoidable passive. Flag a cluster at two or more features per 500 words. Treat official, administrative, and legal prose as neutral; in scientific prose require more than three features per 500 words; in blogs, news, and literary prose flag more than one per 500.
+
+**Synthetic teaching pair (do not reuse its facts):**
+
+**Before:**
+> Данный метод осуществляет обработку данных в рамках системы оценки эффективности соответствующих показателей.
+
+**After:**
+> Этот метод обрабатывает данные в системе, которая оценивает эффективность по соответствующим показателям.
 
 ## 45. Russian syntactic calques from English
 
@@ -71,6 +85,58 @@ Read this file whenever the input or requested output is predominantly Russian. 
 - Remove the English serial comma before a lone `и` when Russian syntax does not require it.
 - Keep тире where Russian grammar or emphasis earns it. Reduce repetitive stylistic dashes, but never apply the English zero-dash scan.
 - Match informal typography when a supplied author sample consistently does so; flawless typography is not a goal by itself.
+
+## Additional Russian patterns (70–73)
+
+The pairs below are synthetic teaching pairs. Never reuse their facts in user text; every rewrite must preserve the details and modality of its own `Before` text.
+
+### ##70 Висячий деепричастный оборот
+
+**Признаки:** субъект деепричастия не совпадает с субъектом главного предложения: `Используя этот метод, результаты были улучшены`. Это грамматическая ошибка, а не стилистический выбор, поэтому правило действует во всех жанрах без гейта.
+
+Не путать с корректным оборотом: `Используя этот метод, мы улучшили результаты`.
+
+**До:**
+> Используя этот метод, результаты были улучшены на 15%.
+
+**После:**
+> При использовании этого метода результаты улучшились на 15%.
+
+### ##71 Дидактические дисклеймеры
+
+**Признаки:** `важно отметить`, `стоит учесть`, `следует помнить`, `значения могут отличаться…`.
+
+**Граница:** отличать эти рамки от эпистемических хеджей `возможно` и `вероятно`. Хеджи и модальность сохранять по правилу 56.
+
+**Порог и гейт:** флаговать не менее двух оборотов на 500 слов в научном, новостном или художественном тексте; учебный и справочный текст считать нейтральным.
+
+**До:**
+> Важно отметить, что значения могут отличаться по регионам. Стоит учесть, что результаты зависят от методики.
+
+**После:**
+> Значения могут отличаться по регионам, а результаты зависят от методики.
+
+### ##72 Формульные зачины
+
+**Признаки:** `В данной работе…`, `Настоящее исследование посвящено…`, `В данном исследовании рассматривается…` в первых двух предложениях.
+
+**Доказательная база:** AINL-Eval 2025 (arXiv:2508.09622) относит этот зачин к устойчивым признакам сгенерированного русского научного текста, сохраняющимся после явных запретов в промпте.
+
+**Гейт:** стандартную форму аннотации считать нейтральной. Не флаговать зачин, если автор систематически использует его в подлинных образцах голоса.
+
+**До:**
+> В данной работе рассматривается проблема классификации текстов.
+
+**После:**
+> Предмет работы — проблема классификации текстов.
+
+### ##73 Формульное «Заключение»
+
+**Признаки:** заключение только пересказывает текст с рамками `Таким образом, в данной работе было показано…` или `Подводя итог, можно отметить…`, но не синтезирует следствия.
+
+**Гейт:** флаговать только заключение, состоящее целиком из пересказа. Сам раздел `Заключение` — нормальная часть научной статьи.
+
+**Правка:** заменить рамку на следствие, уже подтверждённое результатами во входном тексте. Если такого следствия нет, закончить конкретным подтверждённым результатом или удалить повтор. Не добавлять проценты, размеры выборок, практические выводы или другие детали, отсутствующие во входе.
 
 ## Russian inversions of global rules
 

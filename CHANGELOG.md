@@ -6,6 +6,28 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [2.21.0] - 2026-07-14
+
+### Added
+
+- Twenty-two patterns (#52–73) covering humanizer damage, 2025+ sourcing and rhetoric, genre-gated English grammar fingerprints, and additional Russian grammar and framing problems.
+- Neurodivergent, translation, genre, short-text, convergence, post-paraphrase, and no-model-attribution guards, plus explicit anti-humanization prohibitions.
+- Specific-author voice anchoring using at least three authentic samples and a residue-first, fact-lock-first seven-step process.
+- Standard-library diagnostics for immutable-token integrity, human-marker floors, punctuation entropy, windowed type-token ratio, content/function ratio, digit density, participial stacks, `That`-clause subjects, and dangling Russian adverbial participles.
+- A verified v2.21 evidence register, evaluation methodology notes, length-mismatch warnings, and one English plus one Russian corpus pair.
+
+### Changed
+
+- Demoted negative parallelism (#9) and em/en-dash frequency (#14) to LEGACY corroboration-only signals; absence is no longer evidence of human authorship, and English dash counts no longer receive a pass/fail metric target.
+- Made vocabulary rule #7 era-stratified and expanded Russian rule #44 with action nominalizations, long genitive chains, weak `является`, avoidable passive, and genre-specific thresholds.
+- Integrated all v2.21 diagnostics into profile, compare, and aggregate output while preserving additive schema version 1 compatibility.
+- Capped the aggregate structural regression target at the v2.20 rate of `0.50` so heuristic optimization does not become a writing objective.
+
+### Fixed
+
+- Reworked new teaching and corpus pairs so they preserve names, numbers, modality, person, and source coverage instead of inventing specifics.
+- Replaced the non-canonical CoAT identifier with the publisher's canonical DOI and removed unsupported detector and contraction claims from the evidence notes.
+
 ## [2.20.0] - 2026-07-14
 
 ### Added
@@ -32,5 +54,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Fixed corpus path resolution, sentence splitting around common abbreviations, and the false positive for the month "May".
 - Ignored Python caches and local Claude settings, and enforced LF line endings.
 
-[Unreleased]: https://github.com/Dex719/humanizer-extended/compare/v2.20.0...HEAD
+[Unreleased]: https://github.com/Dex719/humanizer-extended/compare/v2.21.0...HEAD
+[2.21.0]: https://github.com/Dex719/humanizer-extended/compare/v2.20.0...v2.21.0
 [2.20.0]: https://github.com/Dex719/humanizer-extended/compare/v2.19.0...v2.20.0

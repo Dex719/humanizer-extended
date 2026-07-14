@@ -2,7 +2,7 @@
 
 A portable agent skill that removes signs of AI-generated writing from English and Russian text, making it sound more natural while preserving the original facts and meaning.
 
-> **Fork.** `humanizer-extended` is a fork of [blader/humanizer](https://github.com/blader/humanizer) (original by Siqi Chen, MIT). It diverged after upstream 2.5.1 and adds patterns #30–38 (model-tool markup, hallucinated citations, placeholder leakage, document-internal style shift, aphoristic closer, prestige-metaphor frames, false balance, generic stock examples, nominalization) plus a FACT PRESERVATION section. As of 2.15.0 it also re-incorporates three rules from upstream 2.7.0 (#39 diff-anchored writing, the hard em/en dash cut in #14, and speculative gap-filling in #21). As of 2.16.0 it adds structural and statistical tells (#40–43) and Russian-language rules (#44–46). Version 2.20.0 synchronizes three more upstream 2.8.x patterns as #49–51 and moves conditional detail into `references/`. Pattern numbers in this fork do **not** match upstream's.
+> **Fork.** `humanizer-extended` is a fork of [blader/humanizer](https://github.com/blader/humanizer) (original by Siqi Chen, MIT). It diverged after upstream 2.5.1 and adds patterns #30–38 (model-tool markup, hallucinated citations, placeholder leakage, document-internal style shift, aphoristic closer, prestige-metaphor frames, false balance, generic stock examples, nominalization) plus a FACT PRESERVATION section. Version 2.20.0 synchronizes upstream 2.8.x patterns as #49–51 and moves conditional detail into `references/`. Version 2.21.0 adds anti-humanization damage, current-era, grammar, and Russian patterns #52–73; it also demotes the old hard em-dash and negative-parallelism signals to LEGACY. Pattern numbers in this fork do **not** match upstream's.
 
 ## Installation
 
@@ -132,7 +132,7 @@ The skill also includes a final "obviously AI generated" audit pass and a second
 |---|---------|--------|-------|
 | 7 | **AI vocabulary** | "Actually... additionally... testament... landscape... showcasing" | "also... remain common" |
 | 8 | **Copula avoidance** | "serves as... features... boasts" | "is... has" |
-| 9 | **Negative parallelisms / tailing negations** | "It's not just X, it's Y", "..., no guessing" | State the point directly |
+| 9 | **Negative parallelisms / tailing negations (LEGACY)** | Repeated "not just X, but Y" and clipped negation tails | Reduce mechanical clusters; absence is not evidence of human authorship |
 | 10 | **Rule of three** | "innovation, inspiration, and insights" | Use natural number of items |
 | 11 | **Synonym cycling** | "protagonist... main character... central figure... hero" | "protagonist" (repeat when clearest) |
 | 12 | **False ranges** | "from the Big Bang to dark matter" | List topics directly |
@@ -143,7 +143,7 @@ The skill also includes a final "obviously AI generated" audit pass and a second
 
 | # | Pattern | Before | After |
 |---|---------|--------|-------|
-| 14 | **Em/en dashes** | "institutions—not the people—yet this continues—" | Cut them entirely: periods, commas, colons, or parentheses (hard constraint) |
+| 14 | **Em/en dashes (LEGACY)** | Mechanical dash clusters in English with no matching voice habit | Recast only the mechanical uses; frequency is corroboration, not a pass/fail signal |
 | 15 | **Boldface overuse** | "**OKRs**, **KPIs**, **BMC**" | "OKRs, KPIs, BMC" |
 | 16 | **Inline-header lists** | "**Performance:** Performance improved" | Convert to prose |
 | 17 | **Title Case Headings** | "Strategic Negotiations And Partnerships" | "Strategic negotiations and partnerships" |
@@ -213,7 +213,16 @@ The skill also includes a final "obviously AI generated" audit pass and a second
 | 50 | **Aphorism formulas** | "Symmetry is the language of trust." | State the precise claim instead of dressing it as a maxim |
 | 51 | **Conversational rhetorical openers** | "Honestly? It depends on how often you'll use it." | "Whether it's worth the price depends on how often you'll use it." |
 
-Plus a non-pattern **Reliability and false positives** section: detectors falsely flag non-native English writers (Liang et al. 2023, ~61% false-positive rate on TOEFL essays), so structural tells are treated as robust while em dashes, "not X but Y", rule of three, and curly quotes are down-weighted as weak, over-fired signals.
+### v2.21 Pattern Families
+
+| # | Family | What it covers |
+|---|--------|----------------|
+| 52–57 | **Humanizer damage** | Thesaurus damage, clause atomization, persona injection, fake errors, hedge stripping, and residue cleanup |
+| 58–67 | **Current-era and sourcing tells** | Formulaic closers, notability packing, specificity loss, Markdown skeletons, unsupported debate, misattribution, and source-count exaggeration |
+| 68–69 | **Genre-gated grammar fingerprints** | Present-participial stacks and sentence-subject `That` clauses, with news and formal-register exceptions |
+| 70–73 | **Additional Russian patterns** | Dangling adverbial participles, didactic disclaimers, formulaic openings, and recap-only conclusions |
+
+The **Reliability and false positives** section now includes neurodivergent, translation, genre, short-text, post-paraphrase, and no-model-attribution guards. Aggressive rewriting requires convergence across independent pattern families. Em dashes and negative parallelism remain LEGACY corroboration only; their absence never proves human authorship.
 
 ## Full Example
 
@@ -231,9 +240,11 @@ The complete draft-audit-final example lives in [`references/examples.md`](refer
 - Shalevska 2024, *Hedges and Boosters in AI and Human Writing* - resolved hedge/booster frequencies; backs #24
 - Geng & Trotta 2025 ([arXiv 2502.09606](https://arxiv.org/abs/2502.09606)) - AI vocabulary timeline and the April 2024 "delve" collapse; backs #7
 - Russian-language tells: community write-ups on [Habr](https://habr.com/ru/articles/1022906/) and vc.ru (heuristic, not peer-reviewed) - backs #44–46
+- [v2.21 evidence register](references/research.md#v221-evidence-register) - verified primary links and bounded claims for patterns #52–73, reliability guards, and evaluation methodology
 
 ## Version History
 
+- **2.21.0** - Added patterns #52–73, evidence-backed reliability guards, specific-author voice anchoring, residue-first fact locking, nine stdlib diagnostics, two corpus pairs, and length/integrity reporting. Demoted #9 and #14 to LEGACY and expanded Russian канцелярит and grammar checks. See [CHANGELOG.md](CHANGELOG.md) for the full release notes.
 - **2.20.0** - Added three upstream 2.8.x writing-pattern guards, fail-safe voice calibration, genre-aware booster guidance, and stronger fact preservation. Split the large skill into a compact core plus conditional references. Added Russian-aware structural/compliance metrics, a six-genre Russian eval corpus, aggregate baselines, tests, cross-agent skills CLI and Claude Code marketplace packaging, repository hygiene, and CI checks. See [CHANGELOG.md](CHANGELOG.md) for the full release notes.
 - **2.19.0** - Eval-driven fix. Built a deterministic structural-metrics harness (kept local, not shipped) and ran it on a 12-genre before/after corpus. Result: applied to real text, the skill reliably strips em dashes (100%), participial overload (0%→83% pass), nominalizations, and the *may*-heavy hedging, and it *improves* sentence-length variance (17%→83% pass) rather than regressing as one hand-written example had implied. The one systematic gap was boosters: across all 12 rewrites the skill added *zero* boosters, even though booster-absence is the single most reliable AI tell (pattern 24). Hardened pattern 24, the structural self-audit, and the Process so that adding at least one booster (where the evidence earns it) is a mandatory step, not an optional check. No new patterns.
 - **2.18.0** - Folded in three Gemini deep-research reports. Upgraded the structural patterns (#40–43) with measured thresholds: burstiness coefficient ~0.15–0.45 for humans vs ~0 for AI; words-per-paragraph standard deviation >25 separated human from AI at AUC 0.98 (Desaire et al. 2023); transition density ~1.8× the human rate; positive-sentiment inflation 37–54% (Abdulhai et al. 2026). Rewrote #24's hedge claim with resolved numbers (Shalevska 2024: AI hedges ~1.39×, ~84% of them the single word *may*, and *zero* boosters; the booster gap and the *may* monopoly are the real signals, not "twice as many hedges"). Made #7 era-aware (the loud first-wave words like *delve* collapsed in frequency around April 2024 once publicized; second-wave words *significant/potential/findings/crucial* now carry more signal). Added a genre/language caveat to #13 (the agentless passive is the human norm in technical writing and in Russian, and AI under-produces it). Added pattern **#47** (superficial guideline echoing) and **#48** (model-specific signatures: Claude "belies", DeepSeek environmental framing, Gemini bullet reliance). Greatly expanded the Russian section: the «Однако,» calque (highest-confidence RU marker), «Это не про X. Это про Y», «за которым последовало», typographic sterility, and an explicit "Russian inversions" block (for Russian: do not cut тире, do add passive/impersonal forms, do not fragment long sentences). Added a RELIABILITY AND FALSE POSITIVES section (Liang et al. 2023: ~61% false positives on non-native English; structural signals are robust, while em dashes, "not X but Y", rule of three, and curly quotes are weak, over-fired folk theories to down-weight as evidence). Total now 48 patterns plus the structural self-audit and reliability sections.

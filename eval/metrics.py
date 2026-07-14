@@ -10,6 +10,15 @@ Public API:
 * ``detect_language(text)`` -> ``"en"`` or ``"ru"``
 * ``split_sentences(text)`` -> list of sentences
 * ``count_phrases(text, phrases)`` -> phrase occurrence count
+* ``immutable_token_audit(before, after)`` -> fact-lock diagnostic
+* ``human_marker_floor(text, language)`` -> language-gated marker count
+* ``punctuation_entropy(text, language)`` -> punctuation Shannon entropy
+* ``windowed_ttr(text)`` -> non-overlapping 100-token TTR windows
+* ``content_function_ratio(text, language)`` -> stdlib Biber approximation
+* ``digit_density(text, language, genre)`` -> scientific-genre digit density
+* ``participial_stack_rate(text, genre, language)`` -> gated EN -ing stacks
+* ``that_clause_subject_rate(text, genre, language)`` -> gated EN subjects
+* ``dangling_russian_participle(text, language)`` -> RU grammar heuristic
 * ``metrics(text, genre=None, language=None)`` -> stable profile dictionary
 * ``compare_texts(before, after, ...)`` -> grouped before/after comparison
 * ``aggregate_corpus(path)`` -> aggregate for JSON corpus pairs
@@ -41,6 +50,8 @@ EVAL_DIR = Path(__file__).resolve().parent
 DEFAULT_CORPUS = EVAL_DIR / "corpus"
 DEFAULT_BASELINE = EVAL_DIR / "baseline.json"
 CYRILLIC_THRESHOLD = 0.30
+SHORT_TEXT_WORDS = 100
+LENGTH_MISMATCH_THRESHOLD = 0.35
 
 
 EN_CONNECTORS = (
@@ -174,10 +185,136 @@ NEUTRAL_BOOSTER_GENRES = {
     "энциклопедия",
 }
 
+# A lexical booster is a meaningful compliance target only in voice-led genres.
+# In neutral or unknown genres, forcing one would manufacture stance rather than
+# measure editing quality.
+BOOSTER_TARGET_GENRES = frozenset(
+    {
+        "blog",
+        "commentary",
+        "essay",
+        "opinion",
+        "personal-blog",
+        "review",
+        "блог",
+        "мнение",
+        "обзор",
+        "эссе",
+    }
+)
+
 _WORD_RE = re.compile(r"[A-Za-zА-Яа-яЁё]+(?:[-'][A-Za-zА-Яа-яЁё]+)*|\d+(?:[.,]\d+)*")
 _CYRILLIC_RE = re.compile(r"[А-Яа-яЁё]")
 _LETTER_RE = re.compile(r"[A-Za-zА-Яа-яЁё]")
 _PROTECTED_DOT = "\ue000"
+
+
+# These lists intentionally approximate function-word classes without claiming
+# POS accuracy.  They are kept explicit and deterministic so corpus baselines do
+# not depend on a tagger version or a network resource.
+EN_FUNCTION_WORDS = frozenset(
+    """
+    a an the and or but nor so yet if because although though while whereas
+    as than that whether when whenever where wherever why how of to in on at
+    by for from with without into onto over under between among through during
+    before after above below about against around near since until within
+    i me my mine myself we us our ours ourselves you your yours yourself
+    yourselves he him his himself she her hers herself it its itself they them
+    their theirs themselves this these those who whom whose which what
+    am is are was were be been being have has had having do does did doing
+    can could may might must shall should will would not no nor never
+    here there then also only even very too just more most less least much many
+    some any each every either neither both all few several own same such
+    """.split()
+)
+
+RU_FUNCTION_WORDS = frozenset(
+    """
+    а без более бы был была были было быть в во вот вы да даже для до его её ее
+    если есть ещё еще же за и из или им их к как ко когда кто ли либо мне может
+    мы на над не него неё нее нет ни но ну о об от по под при про с со так также
+    такой там те тем то того тоже той только том тут ты у уже хотя чем что чтобы
+    эта эти это этой этот я он она оно они мы вы ты вас вам ваш ваша ваши наше
+    наш нас мне меня мой моя мои ему ей их ими который которая которые которых
+    который где куда откуда почему потому пока после перед между через около
+    можно нельзя нужно следует должен должна должны мог могла могли могут
+    """.split()
+)
+
+FUNCTION_WORDS = {"en": EN_FUNCTION_WORDS, "ru": RU_FUNCTION_WORDS}
+
+EN_HUMAN_MARKERS = (
+    "well",
+    "no answer is complete without",
+    "the manner in which",
+    "though",
+    "after all",
+    "for one thing",
+    "mind you",
+)
+
+RU_HUMAN_MARKERS = (
+    "впрочем",
+    "ведь",
+    "пожалуй",
+    "в конце концов",
+    "между прочим",
+)
+
+HUMAN_MARKERS = {"en": EN_HUMAN_MARKERS, "ru": RU_HUMAN_MARKERS}
+
+SCIENTIFIC_DIGIT_GENRES = frozenset(
+    {
+        "academic",
+        "experiment",
+        "methodology",
+        "research",
+        "science",
+        "science-pop",
+        "scientific",
+        "scientific-methods",
+        "technical-report",
+        "научный",
+        "исследование",
+        "методология",
+    }
+)
+
+PARTICIPIAL_NEUTRAL_GENRES = frozenset(
+    {
+        "journalism",
+        "news",
+        "press-news",
+        "resume",
+        "résumé",
+        "cv",
+        "cover-letter",
+        "журналистика",
+        "новости",
+        "резюме",
+    }
+)
+
+PARTICIPIAL_TECH_GENRES = frozenset(
+    {
+        "documentation",
+        "docs",
+        "readme",
+        "technical",
+        "technical-documentation",
+        "tech-docs",
+    }
+)
+
+THAT_SUBJECT_NEUTRAL_GENRES = frozenset(
+    {
+        "argumentative",
+        "formal-argumentative",
+        "legal",
+        "официально-деловой",
+        "юридический",
+    }
+)
 
 
 def _rounded(value: float, digits: int = 4) -> float:
@@ -253,6 +390,662 @@ def count_phrases(text: str, phrases: Iterable[str]) -> int:
     """Return the total occurrences of ``phrases`` in ``text``."""
 
     return sum(count_phrase_details(text, phrases).values())
+
+
+def _resolve_language(text: str, language: str | None) -> str:
+    chosen = detect_language(text) if language in (None, "auto") else language
+    if chosen not in {"en", "ru"}:
+        raise ValueError("language must be 'en', 'ru', 'auto', or None")
+    return chosen
+
+
+def _abstained(word_count: int, reason: str, **values: Any) -> dict[str, Any]:
+    """Build the common, JSON-stable abstention envelope."""
+
+    return {
+        "abstained": True,
+        "reason": reason,
+        "word_count": word_count,
+        **values,
+    }
+
+
+_URL_RE = re.compile(r"https?://[^\s<>\[\]{}]+", re.IGNORECASE)
+_NUMBER_DATE_RE = re.compile(
+    r"(?<![\w])(?:[+-]?\d{1,4}(?:[./-]\d{1,4}){1,2}|[+-]?\d+(?:[.,]\d+)?%?)(?![\w])"
+)
+_CAPITALIZED_RE = re.compile(r"(?<!\w)[A-ZА-ЯЁ][a-zа-яё]{2,}(?!\w)")
+_MULTI_NAME_RE = re.compile(
+    r"(?<!\w)(?:[A-ZА-ЯЁ][a-zа-яё]+[ \t]+){1,3}"
+    r"[A-ZА-ЯЁ][a-zа-яё]+(?!\w)"
+)
+_ACRONYM_RE = re.compile(r"(?<!\w)[A-ZА-ЯЁ]{2,}(?:-[A-ZА-ЯЁ0-9]{2,})?(?!\w)")
+_QUOTED_NAME_RE = re.compile(
+    r"[«“\"]\s*(?P<name>[A-ZА-ЯЁ][^»”\"\n]{0,79}?)\s*[»”\"]"
+)
+
+_NEGATION_PATTERNS = {
+    "en": ("not", "no", "never", "neither", "nor", "without"),
+    "ru": ("не", "ни", "нет", "никогда", "без", "нельзя"),
+}
+_MODALITY_PATTERNS = {
+    "en": (
+        "may",
+        "might",
+        "could",
+        "can",
+        "must",
+        "should",
+        "shall",
+        "will",
+        "would",
+        "ought to",
+        "perhaps",
+        "possibly",
+        "probably",
+        "likely",
+        "appears to",
+        "seems to",
+    ),
+    "ru": (
+        "может",
+        "могут",
+        "мог",
+        "могла",
+        "могло",
+        "могли",
+        "можно",
+        "возможно",
+        "вероятно",
+        "по-видимому",
+        "предположительно",
+        "должен",
+        "должна",
+        "должно",
+        "должны",
+        "следует",
+        "нужно",
+        "необходимо",
+    ),
+}
+
+
+def _trim_url(value: str) -> str:
+    return value.rstrip(".,;:!?)]}»”\"'")
+
+
+def _immutable_inventory(text: str) -> dict[str, Counter[str]]:
+    """Extract a conservative multiset for the fact-lock audit.
+
+    The name rule intentionally favors precision: acronyms and multi-token names
+    are always kept, while a single capitalized token is kept only away from a
+    sentence boundary.  This avoids treating every sentence opener as a person.
+    """
+
+    urls = [_trim_url(match.group(0)) for match in _URL_RE.finditer(text)]
+    without_urls = list(text)
+    for match in _URL_RE.finditer(text):
+        without_urls[match.start() : match.end()] = " " * (match.end() - match.start())
+    number_source = "".join(without_urls)
+    numbers_dates = [match.group(0) for match in _NUMBER_DATE_RE.finditer(number_source)]
+
+    quoted_matches = list(_QUOTED_NAME_RE.finditer(text))
+    names: list[str] = [match.group("name").strip().casefold() for match in quoted_matches]
+    names.extend(match.group(0).casefold() for match in _MULTI_NAME_RE.finditer(text))
+    names.extend(match.group(0).casefold() for match in _ACRONYM_RE.finditer(text))
+    occupied = [(match.start(), match.end()) for match in _MULTI_NAME_RE.finditer(text)]
+    occupied.extend((match.start(), match.end()) for match in _ACRONYM_RE.finditer(text))
+    occupied.extend((match.start(), match.end()) for match in quoted_matches)
+    for match in _CAPITALIZED_RE.finditer(text):
+        if any(start <= match.start() < end for start, end in occupied):
+            continue
+        line_start = text.rfind("\n", 0, match.start()) + 1
+        line_prefix = text[line_start : match.start()]
+        if re.fullmatch(r"\s*(?:#{1,6}\s*|[-*+]\s+|\d+[.)]\s+)?", line_prefix):
+            continue
+        prefix = text[: match.start()].rstrip()
+        if not prefix or prefix[-1:] in ".!?…\n:;,«“\"":
+            continue
+        names.append(match.group(0).casefold())
+
+    language = detect_language(text)
+    negations = count_phrase_details(text, _NEGATION_PATTERNS[language])
+    # English contracted negation is not covered by word-boundary phrase lists.
+    if language == "en":
+        contracted = len(re.findall(r"\b[A-Za-z]+n't\b", text, flags=re.IGNORECASE))
+        if contracted:
+            negations["n't"] = contracted
+    modality = count_phrase_details(text, _MODALITY_PATTERNS[language])
+
+    def present(details: Mapping[str, int]) -> Counter[str]:
+        return Counter({key.casefold(): 1 for key, value in details.items() if value})
+
+    return {
+        "urls": Counter(urls),
+        "numbers_dates": Counter(numbers_dates),
+        # Presence semantics avoid treating harmless repetition compaction as a
+        # factual change. Numbers, dates, and URLs remain multisets because each
+        # repeated occurrence may encode a separate datum.
+        "names": Counter(set(names)),
+        "negations": present(negations),
+        "modality": present(modality),
+    }
+
+
+def _counter_json(counter: Counter[str]) -> dict[str, int]:
+    return dict(sorted((key, value) for key, value in counter.items() if value))
+
+
+def immutable_token_audit(before: str, after: str) -> dict[str, Any]:
+    """Audit numbers/dates, URLs, names, negations, and modality after editing.
+
+    The source text controls the short-text gate.  A long source that was
+    accidentally truncated must still be audited rather than hidden by an
+    after-text abstention. Numbers, dates, and URLs use multiset occurrences;
+    names, negation forms, and modality forms use normalized presence so normal
+    deduplication does not become a false integrity failure.
+    """
+
+    before_word_count = len(words(before))
+    after_word_count = len(words(after))
+    if before_word_count < SHORT_TEXT_WORDS:
+        return _abstained(
+            before_word_count,
+            f"source has fewer than {SHORT_TEXT_WORDS} words",
+            before_word_count=before_word_count,
+            after_word_count=after_word_count,
+            categories={},
+            total_violations=0,
+        )
+
+    before_inventory = _immutable_inventory(before)
+    after_inventory = _immutable_inventory(after)
+    categories: dict[str, Any] = {}
+    total = 0
+    for name in ("numbers_dates", "urls", "names", "negations", "modality"):
+        before_values = before_inventory[name]
+        after_values = after_inventory[name]
+        missing = before_values - after_values
+        added = after_values - before_values
+        violations = sum(missing.values()) + sum(added.values())
+        total += violations
+        categories[name] = {
+            "before": _counter_json(before_values),
+            "after": _counter_json(after_values),
+            "missing": _counter_json(missing),
+            "added": _counter_json(added),
+            "violations": violations,
+        }
+    return {
+        "abstained": False,
+        "reason": None,
+        "word_count": before_word_count,
+        "before_word_count": before_word_count,
+        "after_word_count": after_word_count,
+        "categories": categories,
+        "total_violations": total,
+        "passed": total == 0,
+    }
+
+
+def human_marker_floor(text: str, language: str | None = "auto") -> dict[str, Any]:
+    """Count a small EN/RU set of discourse markers associated with human prose.
+
+    This is an observational corroboration feature, never an authorship verdict.
+    It abstains below 100 words and uses only the list for the selected language.
+    """
+
+    chosen = _resolve_language(text, language)
+    word_count = len(words(text))
+    if word_count < SHORT_TEXT_WORDS:
+        return _abstained(
+            word_count,
+            f"text has fewer than {SHORT_TEXT_WORDS} words",
+            language=chosen,
+            count=0,
+            markers={},
+            density_per_1000=0.0,
+            floor_count=None,
+            meets_floor=None,
+        )
+    details = count_phrase_details(text, HUMAN_MARKERS[chosen])
+    if chosen == "ru":
+        particle_to = len(re.findall(r"(?<=[А-Яа-яЁё])-(?:то)\b", text, flags=re.IGNORECASE))
+        if particle_to:
+            details["-то"] = particle_to
+    details = dict(sorted(details.items()))
+    count = sum(details.values())
+    floor_count = max(1, math.ceil(word_count / 500))
+    return {
+        "abstained": False,
+        "reason": None,
+        "word_count": word_count,
+        "language": chosen,
+        "count": count,
+        "markers": details,
+        "density_per_1000": _rounded(count * 1000 / word_count),
+        "floor_count": floor_count,
+        "meets_floor": count >= floor_count,
+    }
+
+
+def punctuation_entropy(text: str, language: str | None = "auto") -> dict[str, Any]:
+    """Return base-2 Shannon entropy over coarse punctuation categories."""
+
+    chosen = _resolve_language(text, language)
+    word_count = len(words(text))
+    if word_count < SHORT_TEXT_WORDS:
+        return _abstained(
+            word_count,
+            f"text has fewer than {SHORT_TEXT_WORDS} words",
+            language=chosen,
+            entropy=0.0,
+            punctuation_total=0,
+            distribution={},
+        )
+    # URLs have their own punctuation conventions and would otherwise inflate a
+    # prose-style metric.  ASCII hyphens inside words are excluded for the same
+    # reason.
+    cleaned = _URL_RE.sub("", text)
+    distribution: Counter[str] = Counter()
+    categories = {
+        ".": "period",
+        "…": "ellipsis",
+        ",": "comma",
+        ";": "semicolon",
+        ":": "colon",
+        "?": "question",
+        "!": "exclamation",
+        "—": "dash",
+        "–": "dash",
+        "(": "parenthesis",
+        ")": "parenthesis",
+        "[": "bracket",
+        "]": "bracket",
+        "{": "brace",
+        "}": "brace",
+        '"': "quote",
+        "'": "quote",
+        "«": "quote",
+        "»": "quote",
+        "“": "quote",
+        "”": "quote",
+        "„": "quote",
+        "‘": "quote",
+        "’": "quote",
+    }
+    for char in cleaned:
+        if char in categories:
+            distribution[categories[char]] += 1
+    distribution["dash"] += len(re.findall(r"(?<!\w)-(?!\w)", cleaned))
+    if not distribution["dash"]:
+        del distribution["dash"]
+    total = sum(distribution.values())
+    entropy = (
+        -sum((count / total) * math.log2(count / total) for count in distribution.values())
+        if total
+        else 0.0
+    )
+    return {
+        "abstained": False,
+        "reason": None,
+        "word_count": word_count,
+        "language": chosen,
+        "entropy": _rounded(entropy),
+        "punctuation_total": total,
+        "distribution": _counter_json(distribution),
+    }
+
+
+def windowed_ttr(
+    text: str,
+    window_size: int = 100,
+    step: int | None = None,
+) -> dict[str, Any]:
+    """Compute case-folded TTR over deterministic full token windows.
+
+    The default uses non-overlapping 100-token windows.  A partial tail is not a
+    window because its systematically higher TTR would create a length confound.
+    """
+
+    if window_size <= 0:
+        raise ValueError("window_size must be positive")
+    if step is None:
+        step = window_size
+    if step <= 0:
+        raise ValueError("step must be positive")
+    token_list = [token.casefold() for token in words(text)]
+    word_count = len(token_list)
+    if word_count < SHORT_TEXT_WORDS or word_count < window_size:
+        return _abstained(
+            word_count,
+            f"text has fewer than {max(SHORT_TEXT_WORDS, window_size)} words",
+            window_size=window_size,
+            step=step,
+            num_windows=0,
+            windows=[],
+            mean_ttr=0.0,
+            ttr_sd=0.0,
+        )
+    values = [
+        _rounded(len(set(token_list[start : start + window_size])) / window_size)
+        for start in range(0, word_count - window_size + 1, step)
+    ]
+    return {
+        "abstained": False,
+        "reason": None,
+        "word_count": word_count,
+        "window_size": window_size,
+        "step": step,
+        "num_windows": len(values),
+        "windows": values,
+        "mean_ttr": _mean(values),
+        "ttr_sd": _pstdev(values),
+        "min_ttr": min(values),
+        "max_ttr": max(values),
+    }
+
+
+def content_function_ratio(text: str, language: str | None = "auto") -> dict[str, Any]:
+    """Approximate content/function ratio with explicit stdlib word lists.
+
+    This is not a true POS/Biber feature.  Alphabetic tokens absent from the
+    selected function-word list are treated as content words.
+    """
+
+    chosen = _resolve_language(text, language)
+    token_list = [token.casefold() for token in words(text) if token[0].isalpha()]
+    word_count = len(words(text))
+    if word_count < SHORT_TEXT_WORDS:
+        return _abstained(
+            word_count,
+            f"text has fewer than {SHORT_TEXT_WORDS} words",
+            language=chosen,
+            ratio=None,
+            content_words=0,
+            function_words=0,
+        )
+    function_count = sum(1 for token in token_list if token in FUNCTION_WORDS[chosen])
+    content_count = len(token_list) - function_count
+    if function_count == 0:
+        return _abstained(
+            word_count,
+            "no recognized function words",
+            language=chosen,
+            ratio=None,
+            content_words=content_count,
+            function_words=0,
+        )
+    return {
+        "abstained": False,
+        "reason": None,
+        "word_count": word_count,
+        "language": chosen,
+        "ratio": _rounded(content_count / function_count),
+        "content_words": content_count,
+        "function_words": function_count,
+        "classified_words": len(token_list),
+        "approximation": "explicit function-word list; no POS tagger",
+    }
+
+
+def _normalized_genre(genre: str | None) -> str | None:
+    return genre.casefold().strip() if genre else None
+
+
+def digit_density(
+    text: str,
+    language: str | None = "auto",
+    genre: str | None = None,
+) -> dict[str, Any]:
+    """Measure digit characters per 1,000 words in scientific genres only."""
+
+    chosen = _resolve_language(text, language)
+    word_count = len(words(text))
+    normalized_genre = _normalized_genre(genre)
+    base = {
+        "language": chosen,
+        "genre": genre,
+        "digit_count": 0,
+        "numeric_token_count": 0,
+        "density_per_1000": 0.0,
+    }
+    if word_count < SHORT_TEXT_WORDS:
+        return _abstained(
+            word_count, f"text has fewer than {SHORT_TEXT_WORDS} words", **base
+        )
+    if normalized_genre not in SCIENTIFIC_DIGIT_GENRES:
+        return _abstained(word_count, "genre gate: scientific genres only", **base)
+    digit_count = sum(char.isdigit() for char in text)
+    numeric_tokens = sum(1 for token in words(text) if token[0].isdigit())
+    return {
+        "abstained": False,
+        "reason": None,
+        "word_count": word_count,
+        "language": chosen,
+        "genre": genre,
+        "digit_count": digit_count,
+        "numeric_token_count": numeric_tokens,
+        "density_per_1000": _rounded(digit_count * 1000 / word_count),
+        "zero_digit_signal": digit_count == 0,
+    }
+
+
+def participial_stack_rate(
+    text: str,
+    genre: str | None = None,
+    language: str | None = "auto",
+) -> dict[str, Any]:
+    """Count EN sentences with multiple comma-linked present participles.
+
+    News/journalism and résumé genres abstain.  Technical documentation uses the
+    stricter three-clause threshold required by pattern ##68; other genres use
+    two.  Russian abstains because ``-ing`` is an English-only fingerprint.
+    """
+
+    chosen = _resolve_language(text, language)
+    word_count = len(words(text))
+    normalized_genre = _normalized_genre(genre)
+    stack_threshold = 3 if normalized_genre in PARTICIPIAL_TECH_GENRES else 2
+    base = {
+        "language": chosen,
+        "genre": genre,
+        "stack_threshold": stack_threshold,
+        "clause_count": 0,
+        "stack_count": 0,
+        "rate_per_500": 0.0,
+        "sentence_clause_counts": [],
+        "flagged": None,
+    }
+    if word_count < SHORT_TEXT_WORDS:
+        return _abstained(
+            word_count, f"text has fewer than {SHORT_TEXT_WORDS} words", **base
+        )
+    if chosen != "en":
+        return _abstained(word_count, "language gate: English only", **base)
+    if normalized_genre in PARTICIPIAL_NEUTRAL_GENRES:
+        return _abstained(word_count, "genre gate: neutral participial rate", **base)
+
+    sentence_counts: list[int] = []
+    pattern = re.compile(
+        r"(?:^|[,;:]\s+)(?:(?:by|while|when|thereby)\s+)?[A-Za-z]+ing\b",
+        flags=re.IGNORECASE,
+    )
+    for sentence in split_sentences(text):
+        sentence_counts.append(len(pattern.findall(sentence)))
+    clause_count = sum(sentence_counts)
+    stack_count = sum(1 for count in sentence_counts if count >= stack_threshold)
+    return {
+        "abstained": False,
+        "reason": None,
+        "word_count": word_count,
+        "language": chosen,
+        "genre": genre,
+        "stack_threshold": stack_threshold,
+        "clause_count": clause_count,
+        "stack_count": stack_count,
+        "rate_per_500": _rounded(stack_count * 500 / word_count),
+        "sentence_clause_counts": sentence_counts,
+        "flagged": stack_count > 0,
+    }
+
+
+def that_clause_subject_rate(
+    text: str,
+    genre: str | None = None,
+    language: str | None = "auto",
+) -> dict[str, Any]:
+    """Count sentence-initial English ``That [clause] is/was ...`` subjects."""
+
+    chosen = _resolve_language(text, language)
+    word_count = len(words(text))
+    normalized_genre = _normalized_genre(genre)
+    threshold_per_500 = 2.0 if normalized_genre in {"academic", "scientific"} else 1.0
+    base = {
+        "language": chosen,
+        "genre": genre,
+        "count": 0,
+        "rate_per_500": 0.0,
+        "threshold_per_500": threshold_per_500,
+        "flagged": None,
+    }
+    if word_count < SHORT_TEXT_WORDS:
+        return _abstained(
+            word_count, f"text has fewer than {SHORT_TEXT_WORDS} words", **base
+        )
+    if chosen != "en":
+        return _abstained(word_count, "language gate: English only", **base)
+    if normalized_genre in THAT_SUBJECT_NEUTRAL_GENRES:
+        return _abstained(word_count, "genre gate: formal argumentative register", **base)
+
+    pattern = re.compile(
+        r"^\s*[\"'“‘(\[]*That\s+"
+        r"(?:[A-Za-z][A-Za-z'-]*\s+){2,20}"
+        r"(?:is|are|was|were|seems|appears|remains)\b",
+        flags=re.IGNORECASE,
+    )
+    count = sum(1 for sentence in split_sentences(text) if pattern.search(sentence))
+    rate = _rounded(count * 500 / word_count)
+    return {
+        "abstained": False,
+        "reason": None,
+        "word_count": word_count,
+        "language": chosen,
+        "genre": genre,
+        "count": count,
+        "rate_per_500": rate,
+        "threshold_per_500": threshold_per_500,
+        "flagged": rate > threshold_per_500,
+    }
+
+
+_RU_GERUND_LEAD_RE = re.compile(
+    r"^\s*[«\"“'(\[]*(?:не\s+)?"
+    r"(?P<gerund>[А-ЯЁа-яё-]{3,})\b"
+    r"(?P<modifier>[^,]{0,160}),\s*(?P<main>.+)$",
+    flags=re.IGNORECASE,
+)
+_RU_GERUND_SUFFIX_RE = re.compile(
+    r"(?:[аяеиоуыю]в(?:ши)?(?:сь)?|ши(?:сь)?|уя(?:сь)?|яя(?:сь)?|"
+    r"учи(?:сь)?|ючи(?:сь)?)$",
+    flags=re.IGNORECASE,
+)
+_RU_COMMON_GERUNDS = frozenset(
+    {
+        "благодаря",
+        "ведя",
+        "глядя",
+        "говоря",
+        "делая",
+        "идя",
+        "исходя",
+        "лежа",
+        "начиная",
+        "неся",
+        "сидя",
+        "стоя",
+        "судя",
+    }
+)
+_RU_ANIMATE_MAIN_RE = re.compile(
+    r"^(?:я|мы|ты|вы|он|она|они|автор(?:ы)?|команда|исследовател[ьи]|"
+    r"участни(?:к|ки)|разработчи(?:к|ки)|редактор(?:ы)?|врач(?:и)?|учён(?:ый|ые)|учен(?:ый|ые))\b",
+    flags=re.IGNORECASE,
+)
+_RU_INANIMATE_MAIN_RE = re.compile(
+    r"^(?:результат(?:ы)?|эффективность|значени[ея]|данные|метод|методика|"
+    r"система|показател[ьи]|точность|скорость|качество|уровень|ошибк[аи]|"
+    r"выборка|гипотеза|задача|модель|таблица|оценка|производительность)\b",
+    flags=re.IGNORECASE,
+)
+_RU_IMPERSONAL_RE = re.compile(
+    r"\b(?:можно|нужно|необходимо|следует|удалось|оказалось|получилось|"
+    r"был[аио]?|были|будет|будут)\b|\b[а-яё]+(?:ется|ются)\b",
+    flags=re.IGNORECASE,
+)
+
+
+def dangling_russian_participle(
+    text: str,
+    language: str | None = "auto",
+) -> dict[str, Any]:
+    """Flag likely dangling Russian adverbial-participle constructions.
+
+    Unlike distributional style metrics, this local grammar check deliberately
+    does not abstain below 100 words: pattern ##70 applies to a single sentence
+    in every genre.  It still has a hard language gate and reports evidence so a
+    reviewer can dismiss false positives.
+    """
+
+    chosen = _resolve_language(text, language)
+    word_count = len(words(text))
+    if chosen != "ru":
+        return _abstained(
+            word_count,
+            "language gate: Russian only",
+            language=chosen,
+            count=0,
+            matches=[],
+        )
+
+    matches: list[dict[str, Any]] = []
+    for index, sentence in enumerate(split_sentences(text), start=1):
+        match = _RU_GERUND_LEAD_RE.match(sentence)
+        if not match:
+            continue
+        gerund = match.group("gerund")
+        if not (
+            _RU_GERUND_SUFFIX_RE.search(gerund)
+            or gerund.casefold() in _RU_COMMON_GERUNDS
+        ):
+            continue
+        main = match.group("main").strip()
+        if _RU_ANIMATE_MAIN_RE.match(main):
+            continue
+        inanimate = _RU_INANIMATE_MAIN_RE.match(main)
+        impersonal = _RU_IMPERSONAL_RE.search(main)
+        if not inanimate and not impersonal:
+            continue
+        matches.append(
+            {
+                "sentence_index": index,
+                "gerund": gerund,
+                "main_clause": main,
+                "reason": (
+                    "inanimate matrix subject"
+                    if inanimate
+                    else "impersonal/passive matrix clause"
+                ),
+            }
+        )
+    return {
+        "abstained": False,
+        "reason": None,
+        "word_count": word_count,
+        "language": chosen,
+        "count": len(matches),
+        "matches": matches,
+    }
 
 
 def _protect_abbreviations(text: str) -> str:
@@ -458,10 +1251,8 @@ def _check_score(checks: Mapping[str, Mapping[str, Any]]) -> dict[str, Any]:
 def metrics(text: str, genre: str | None = None, language: str | None = None) -> dict[str, Any]:
     """Profile one text and return a stable JSON-serializable dictionary."""
 
-    if language in (None, "auto"):
-        language = detect_language(text)
-    if language not in {"en", "ru"}:
-        raise ValueError("language must be 'en', 'ru', 'auto', or None")
+    language = _resolve_language(text, language)
+    normalized_genre = _normalized_genre(genre)
 
     sentence_list = split_sentences(text)
     paragraph_list = split_paragraphs(text)
@@ -526,9 +1317,20 @@ def metrics(text: str, genre: str | None = None, language: str | None = None) ->
         "participial_clauses_per_250_words": _check(
             participial_rate,
             "<=",
-            1.5 if language == "ru" else 1.0,
-            applicable=word_count >= 40,
-            description="trailing participial/deverbal clauses per 250 words",
+            1.5
+            if language == "ru" or normalized_genre in PARTICIPIAL_TECH_GENRES
+            else 1.0,
+            applicable=(
+                word_count >= 40
+                and not (
+                    language == "en"
+                    and normalized_genre in PARTICIPIAL_NEUTRAL_GENRES
+                )
+            ),
+            description=(
+                "trailing participial/deverbal clauses per 250 words; "
+                "English news, journalism, résumés, and cover letters are neutral"
+            ),
         ),
         "agentless_passive_per_100_words": _check(
             passive_rate,
@@ -550,18 +1352,18 @@ def metrics(text: str, genre: str | None = None, language: str | None = None) ->
     en_ai_phrases = count_phrases(text, EN_AI_PHRASES) if language == "en" else 0
     tell_total = ru_odnako + ru_colon_capital + ru_non_guillemets + ru_frames + en_ai_phrases
 
-    normalized_genre = genre.casefold().strip() if genre else None
-    booster_applicable = normalized_genre not in NEUTRAL_BOOSTER_GENRES
+    booster_applicable = normalized_genre in BOOSTER_TARGET_GENRES
     ru_dash_limit = max(1, math.ceil(max(sentence_count, 1) * 0.75))
     compliance_checks = {
         "em_dashes": _check(
             em_dashes,
             "<=",
-            ru_dash_limit if language == "ru" else 0,
+            ru_dash_limit if language == "ru" else None,
+            applicable=language == "ru",
             description=(
                 "Russian dashes are allowed up to an overuse guard"
                 if language == "ru"
-                else "skill rule: no em/en dashes without a calibrated voice sample"
+                else "legacy corroboration only for English; no pass/fail target"
             ),
         ),
         "curly_quotes": _check(
@@ -576,7 +1378,7 @@ def metrics(text: str, genre: str | None = None, language: str | None = None) ->
             1,
             applicable=booster_applicable,
             description=(
-                "genre-gated confidence marker; neutral/reference genres are exempt"
+                "genre-gated confidence marker; only voice-led genres are scored"
             ),
         ),
         "ru_quote_style": _check(
@@ -600,6 +1402,18 @@ def metrics(text: str, genre: str | None = None, language: str | None = None) ->
             applicable=language == "ru",
             description="sentence-initial «Однако» is not followed by a comma",
         ),
+    }
+
+    diagnostics = {
+        "short_text_abstention": word_count < SHORT_TEXT_WORDS,
+        "human_marker_floor": human_marker_floor(text, language),
+        "punctuation_entropy": punctuation_entropy(text, language),
+        "windowed_ttr": windowed_ttr(text),
+        "content_function_ratio": content_function_ratio(text, language),
+        "digit_density": digit_density(text, language, genre),
+        "participial_stack_rate": participial_stack_rate(text, genre, language),
+        "that_clause_subject_rate": that_clause_subject_rate(text, genre, language),
+        "dangling_russian_participle": dangling_russian_participle(text, language),
     }
 
     return {
@@ -658,6 +1472,9 @@ def metrics(text: str, genre: str | None = None, language: str | None = None) ->
             "checks": compliance_checks,
             "score": _check_score(compliance_checks),
         },
+        # Additive schema-v1 diagnostics: existing structural/compliance keys and
+        # score semantics remain unchanged, so v2.20 baselines stay comparable.
+        "diagnostics": diagnostics,
     }
 
 
@@ -697,6 +1514,49 @@ def _comparison_block(
     }
 
 
+_DIAGNOSTIC_VALUE_FIELDS = {
+    "human_marker_floor": "count",
+    "punctuation_entropy": "entropy",
+    "windowed_ttr": "mean_ttr",
+    "content_function_ratio": "ratio",
+    "digit_density": "density_per_1000",
+    "participial_stack_rate": "rate_per_500",
+    "that_clause_subject_rate": "rate_per_500",
+    "dangling_russian_participle": "count",
+}
+
+
+def _diagnostic_comparison(
+    before_diagnostics: Mapping[str, Any],
+    after_diagnostics: Mapping[str, Any],
+) -> dict[str, Any]:
+    result: dict[str, Any] = {}
+    for name, value_field in _DIAGNOSTIC_VALUE_FIELDS.items():
+        before = before_diagnostics[name]
+        after = after_diagnostics[name]
+        before_value = before.get(value_field)
+        after_value = after.get(value_field)
+        applicable = (
+            not before.get("abstained", False)
+            and not after.get("abstained", False)
+            and before_value is not None
+            and after_value is not None
+        )
+        delta = (
+            _rounded(float(after_value) - float(before_value)) if applicable else None
+        )
+        result[name] = {
+            "value_field": value_field,
+            "applicable": applicable,
+            "before_value": before_value,
+            "after_value": after_value,
+            "delta": delta,
+            "before": before,
+            "after": after,
+        }
+    return result
+
+
 def compare_texts(
     before: str,
     after: str,
@@ -707,9 +1567,10 @@ def compare_texts(
 ) -> dict[str, Any]:
     """Compare two texts using one detected/forced language and grouped blocks."""
 
-    chosen_language = detect_language(before + "\n" + after) if language in (None, "auto") else language
+    chosen_language = _resolve_language(before + "\n" + after, language)
     before_profile = metrics(before, genre=genre, language=chosen_language)
     after_profile = metrics(after, genre=genre, language=chosen_language)
+    immutable_audit = immutable_token_audit(before, after)
     tell_names = sorted(set(before_profile["tells"]) | set(after_profile["tells"]))
     tells = {
         name: {
@@ -736,6 +1597,10 @@ def compare_texts(
         ),
         "compliance": _comparison_block(
             before_profile["compliance"]["checks"], after_profile["compliance"]["checks"]
+        ),
+        "integrity": {"immutable_token_audit": immutable_audit},
+        "diagnostics": _diagnostic_comparison(
+            before_profile["diagnostics"], after_profile["diagnostics"]
         ),
         "tells": tells,
         "profiles": {"before": before_profile, "after": after_profile},
@@ -818,6 +1683,45 @@ def _aggregate_check_block(comparisons: Sequence[Mapping[str, Any]], block_name:
     }
 
 
+def _aggregate_diagnostic_block(comparisons: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
+    """Aggregate applicable diagnostic values without inventing pass targets."""
+
+    result: dict[str, Any] = {}
+    for name, value_field in _DIAGNOSTIC_VALUE_FIELDS.items():
+        entries = [comparison["diagnostics"][name] for comparison in comparisons]
+        paired_entries = [entry for entry in entries if entry["applicable"]]
+        before_values = [
+            entry["before_value"]
+            for entry in entries
+            if not entry["before"].get("abstained", False)
+            and entry["before_value"] is not None
+        ]
+        after_values = [
+            entry["after_value"]
+            for entry in entries
+            if not entry["after"].get("abstained", False)
+            and entry["after_value"] is not None
+        ]
+        before_mean = _mean(before_values)
+        after_mean = _mean(after_values)
+        result[name] = {
+            "value_field": value_field,
+            "before_mean": before_mean,
+            "after_mean": after_mean,
+            # Compute change only on pairs for which both sides are applicable;
+            # otherwise short-text or genre abstention would confound the delta.
+            "delta": _mean([entry["delta"] for entry in paired_entries])
+            if paired_entries
+            else None,
+            "paired_applicable": len(paired_entries),
+            "before_applicable": len(before_values),
+            "after_applicable": len(after_values),
+            "before_abstained": len(comparisons) - len(before_values),
+            "after_abstained": len(comparisons) - len(after_values),
+        }
+    return result
+
+
 def aggregate_corpus(corpus: str | Path = DEFAULT_CORPUS) -> dict[str, Any]:
     """Aggregate all JSON pairs in ``corpus`` with separate metric families."""
 
@@ -851,6 +1755,41 @@ def aggregate_corpus(corpus: str | Path = DEFAULT_CORPUS) -> dict[str, Any]:
     before_tells = sum(comparison["tells"]["total"]["before"] for comparison in comparisons)
     after_tells = sum(comparison["tells"]["total"]["after"] for comparison in comparisons)
 
+    length_matching: list[dict[str, Any]] = []
+    warnings: list[str] = []
+    for comparison in comparisons:
+        before_words = comparison["counts"]["before_words"]
+        after_words = comparison["counts"]["after_words"]
+        denominator = max(before_words, after_words)
+        difference_ratio = (
+            _rounded(abs(before_words - after_words) / denominator) if denominator else 0.0
+        )
+        if difference_ratio > LENGTH_MISMATCH_THRESHOLD:
+            item = {
+                "id": comparison["id"],
+                "before_words": before_words,
+                "after_words": after_words,
+                "difference_ratio": difference_ratio,
+                "threshold": LENGTH_MISMATCH_THRESHOLD,
+            }
+            length_matching.append(item)
+            warnings.append(
+                f"{comparison['id']}: length mismatch {difference_ratio:.1%} > "
+                f"{LENGTH_MISMATCH_THRESHOLD:.0%} "
+                f"(before={before_words}, after={after_words} words)"
+            )
+
+    audits = [comparison["integrity"]["immutable_token_audit"] for comparison in comparisons]
+    applicable_audits = [audit for audit in audits if not audit["abstained"]]
+    integrity = {
+        "immutable_token_audit": {
+            "applicable": len(applicable_audits),
+            "abstained": len(audits) - len(applicable_audits),
+            "passed": sum(1 for audit in applicable_audits if audit["passed"]),
+            "total_violations": sum(audit["total_violations"] for audit in applicable_audits),
+        }
+    }
+
     pair_summaries = [
         {
             "id": comparison["id"],
@@ -860,6 +1799,12 @@ def aggregate_corpus(corpus: str | Path = DEFAULT_CORPUS) -> dict[str, Any]:
             "structural_after_rate": comparison["structural"]["after_score"]["rate"],
             "compliance_before_rate": comparison["compliance"]["before_score"]["rate"],
             "compliance_after_rate": comparison["compliance"]["after_score"]["rate"],
+            "immutable_token_violations": comparison["integrity"]["immutable_token_audit"][
+                "total_violations"
+            ],
+            "immutable_token_audit_abstained": comparison["integrity"][
+                "immutable_token_audit"
+            ]["abstained"],
             "tells_before": comparison["tells"]["total"]["before"],
             "tells_after": comparison["tells"]["total"]["after"],
         }
@@ -876,6 +1821,12 @@ def aggregate_corpus(corpus: str | Path = DEFAULT_CORPUS) -> dict[str, Any]:
         },
         "structural": _aggregate_check_block(comparisons, "structural"),
         "compliance": _aggregate_check_block(comparisons, "compliance"),
+        "integrity": integrity,
+        "diagnostics": {
+            "metrics": _aggregate_diagnostic_block(comparisons),
+            "length_matching": length_matching,
+        },
+        "warnings": warnings,
         "tells": {
             "before_total": before_tells,
             "after_total": after_tells,
@@ -901,9 +1852,13 @@ def check_baseline(current: Mapping[str, Any], baseline_path: str | Path) -> dic
         regressions.append(
             f"corpus pairs {current['corpus']['pairs']} < baseline {baseline['corpus']['pairs']}"
         )
+    target_overrides = baseline.get("targets", {})
     for block_name in ("structural", "compliance"):
         actual = current[block_name]["after_score"]["rate"]
-        expected = baseline[block_name]["after_score"]["rate"]
+        expected = target_overrides.get(
+            f"{block_name}_after_score_rate",
+            baseline[block_name]["after_score"]["rate"],
+        )
         if actual + 1e-9 < expected:
             regressions.append(f"{block_name} after score {actual} < baseline {expected}")
         baseline_metrics = baseline[block_name].get("metrics", {})
@@ -918,6 +1873,13 @@ def check_baseline(current: Mapping[str, Any], baseline_path: str | Path) -> dic
                 regressions.append(
                     f"{block_name}.{name} after pass rate {actual_rate} < baseline {expected_rate}"
                 )
+    integrity_limit = target_overrides.get("immutable_token_violations_max")
+    if integrity_limit is not None:
+        actual_integrity = current["integrity"]["immutable_token_audit"]["total_violations"]
+        if actual_integrity > integrity_limit:
+            regressions.append(
+                f"immutable-token violations {actual_integrity} > target {integrity_limit}"
+            )
     actual_tells = current["tells"]["after_total"]
     expected_tells = baseline["tells"]["after_total"]
     if actual_tells > expected_tells:
@@ -966,6 +1928,14 @@ def format_profile(profile: Mapping[str, Any]) -> str:
             f"  tells={profile['tells']['total']} ({profile['tells']})",
         ]
     )
+    diagnostics = profile.get("diagnostics", {})
+    if diagnostics:
+        lines.extend(["", "V2.21 DIAGNOSTICS"])
+        for name, value_field in _DIAGNOSTIC_VALUE_FIELDS.items():
+            item = diagnostics[name]
+            value = item.get(value_field)
+            status = f"abstain: {item['reason']}" if item["abstained"] else str(value)
+            lines.append(f"  {name}: {status}")
     return "\n".join(lines)
 
 
@@ -991,6 +1961,21 @@ def format_compare(comparison: Mapping[str, Any]) -> str:
     lines.extend(["", "TELLS"])
     for name, item in comparison["tells"].items():
         lines.append(f"  {name}: {item['before']} -> {item['after']} (delta {item['delta']:+d})")
+    audit = comparison.get("integrity", {}).get("immutable_token_audit")
+    if audit:
+        status = "abstained" if audit["abstained"] else str(audit["total_violations"])
+        lines.extend(["", "INTEGRITY", f"  immutable_token_audit: {status}"])
+    diagnostics = comparison.get("diagnostics", {})
+    if diagnostics:
+        lines.extend(["", "V2.21 DIAGNOSTICS"])
+        for name, item in diagnostics.items():
+            if item["applicable"]:
+                lines.append(
+                    f"  {name}: {item['before_value']} -> {item['after_value']} "
+                    f"(delta {item['delta']:+g})"
+                )
+            else:
+                lines.append(f"  {name}: n/a (abstained or gated)")
     return "\n".join(lines)
 
 
@@ -1022,6 +2007,35 @@ def format_aggregate(aggregate: Mapping[str, Any]) -> str:
             f"  total: {tells['before_total']} -> {tells['after_total']} (delta {tells['delta']:+d})",
         ]
     )
+    integrity = aggregate.get("integrity", {}).get("immutable_token_audit")
+    if integrity:
+        lines.extend(
+            [
+                "",
+                "INTEGRITY",
+                f"  immutable_token_audit: {integrity['passed']}/{integrity['applicable']} pass; "
+                f"violations={integrity['total_violations']}; abstained={integrity['abstained']}",
+            ]
+        )
+    diagnostics = aggregate.get("diagnostics", {}).get("metrics", {})
+    if diagnostics:
+        lines.extend(["", "V2.21 DIAGNOSTICS"])
+        for name, item in diagnostics.items():
+            before = (
+                str(item["before_mean"])
+                if item["before_applicable"]
+                else "n/a"
+            )
+            after = str(item["after_mean"]) if item["after_applicable"] else "n/a"
+            delta = f"{item['delta']:+g}" if item["delta"] is not None else "n/a"
+            lines.append(
+                f"  {name}: mean {before} -> {after}; "
+                f"paired delta {delta} (n={item['paired_applicable']}); "
+                f"applicable {item['before_applicable']} -> {item['after_applicable']}"
+            )
+    if aggregate.get("warnings"):
+        lines.extend(["", "WARNINGS"])
+        lines.extend(f"  - {warning}" for warning in aggregate["warnings"])
     if "baseline_check" in aggregate:
         check = aggregate["baseline_check"]
         lines.extend(["", f"BASELINE: {'PASS' if check['passed'] else 'FAIL'} ({check['path']})"])

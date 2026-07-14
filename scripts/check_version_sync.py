@@ -77,12 +77,25 @@ def plugin_version() -> str:
     return version
 
 
+def marketplace_version() -> str:
+    path = ROOT / ".claude-plugin" / "marketplace.json"
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        raise ValueError(f"invalid JSON in {path.relative_to(ROOT)}: {exc}") from exc
+    version = data.get("version")
+    if not isinstance(version, str) or re.fullmatch(SEMVER, version) is None:
+        raise ValueError(".claude-plugin/marketplace.json must contain a semantic version")
+    return version
+
+
 def main() -> int:
     readers = {
         "SKILL.md frontmatter": skill_version,
         "README.md Version History": readme_version,
         "CHANGELOG.md latest release": changelog_version,
         ".claude-plugin/plugin.json": plugin_version,
+        ".claude-plugin/marketplace.json": marketplace_version,
     }
     versions: dict[str, str] = {}
     try:

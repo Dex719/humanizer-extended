@@ -1,6 +1,6 @@
 ---
 name: humanizer-extended
-version: 2.20.0
+version: 2.21.0
 description: |
   Remove signs of AI-generated writing while preserving facts, coverage, register,
   and the author's voice. Use when rewriting or reviewing English or Russian prose
@@ -56,12 +56,12 @@ Keep this file as the operating core. Load only the reference needed for the cur
 
 ## Voice calibration and genre gate
 
-1. Check whether the user already supplied a writing sample. If not, offer once to match a sample of two or three paragraphs or to use the default voice.
-2. Use `AskUserQuestion` only when it is available in the current harness. If it is unavailable or unsupported, continue immediately with the default voice without asking, failing, or reporting an error. Do not block or ask twice in one session.
-3. When a sample exists, analyze sentence length, vocabulary, paragraph openings, punctuation, recurring phrases, transitions, and register. Replace AI patterns with the writer's own patterns rather than with a generic “human” style.
-4. Let the sample override generic cleanup preferences. In particular, if it systematically uses em or en dashes, preserve that habit at a comparable frequency. Pattern 14's hard cut applies only to English output with no sample. Russian punctuation follows the RU reference regardless.
-5. Choose the genre before adding personality. Apply PERSONALITY AND SOUL only to genres where an authored stance belongs: personal blogs, essays, opinion, reviews, and similar voice-led prose. Do **not** inject opinions, first person, jokes, uncertainty, or feelings into neutral references, encyclopedic text, documentation, methodology, legal writing, or other genres where plain neutrality is the human voice.
-6. When personality is appropriate, vary rhythm, allow genuine complexity, use first person only if the input or authorial context supports it, and keep real asides or self-corrections. Never manufacture affect to satisfy this step.
+1. Calibrate on at least three authentic samples from the same author: compare sentence-length distribution, lexical register, paragraph structure, punctuation, openings, transitions, and recurring phrases. Do not smooth away distinctive habits.
+2. If the user has not supplied three samples, offer voice matching once. Use `AskUserQuestion` only when available; otherwise continue with a genre-appropriate default, without blocking, and avoid aggressive voice normalization.
+3. Anchor edits to that specific author, never to an abstract “human” voice. Generic humanizing remains distinguishable as sample size grows (arXiv:2505.14608); post-editing toward a specific writer's style is more effective (arXiv:2604.24444).
+4. Let authentic samples override generic cleanup preferences. If they systematically use em or en dashes, preserve that habit at a comparable rate. Pattern 14's default applies only to English output without samples; Russian punctuation follows the RU reference.
+5. Treat a human-edited AI draft as an editing task, not an attribution task. Preserve the author's own wording even when it is statistically AI-like.
+6. Choose the genre before adding personality. Add no opinions, first person, jokes, uncertainty, or feelings to neutral reference, technical, legal, or methodology prose. In voice-led prose, preserve supported stance, asymmetry, asides, and self-corrections without manufacturing affect.
 
 ## Compact pattern registry
 
@@ -73,11 +73,11 @@ Use the registry to scan. Open the examples reference for complete signs, explan
 2. **Undue emphasis on notability and media coverage:** stop listing outlets, followers, or “independent coverage” without saying what was actually reported and why it matters.
 3. **Superficial analyses with -ing endings:** cut trailing participial clauses that add fake depth; state the supported relationship as a normal clause.
 4. **Promotional and advertisement-like language:** replace “vibrant,” “breathtaking,” “renowned,” and similar sales copy with neutral, specific description.
-5. **Vague attributions and weasel words:** name a supplied, verifiable source or honestly hedge, flag, or remove the unsupported claim; never invent a source.
+5. **Vague attributions and weasel words:** name a supplied, verifiable source or honestly hedge, flag, or remove the unsupported claim; never invent a source. In RAG-era prose, generic `-ing` tails can attach to real names, so apply pattern 66 before trusting the attribution.
 6. **Outline-like challenges and future prospects:** replace stock “Despite these challenges…” sections with documented problems, actions, and outcomes.
-7. **Overused AI vocabulary:** edit clusters of tier-1/tier-2 words, not every occurrence; prefer plain wording without creating an unnatural avoidance dialect.
+7. **Overused AI vocabulary (era-stratified):** treat 2023–24 words (`delve`, `tapestry`, `testament`) as deprecated solo signals, 2024–25 vocabulary as transitional, and 2025+ clusters (`emphasizing`, `enhance`, `highlighting`, `showcasing`, notability language) as current leads. Watch the shift from superlatives to evaluatives such as `notable`, `considerable`, `meaningful`, `robust`, and `nuanced`. Vocabulary from any era requires corroboration from another pattern family.
 8. **Copula avoidance:** replace ornamental “serves as,” “stands as,” “boasts,” and “features” with `is`, `are`, or `has` where accurate.
-9. **Negative parallelisms and tailing negations:** reduce clustered “not only…but,” “not X, but Y,” and clipped “no guessing” tails; keep a legitimate isolated contrast.
+9. **Negative parallelisms and tailing negations (LEGACY):** use clustered “not only…but,” “not X, but Y,” and clipped “no guessing” tails only as corroboration; humanizers actively remove them, so absence is not evidence of human authorship. Keep a legitimate isolated contrast.
 10. **Rule-of-three overuse:** use the number of items the content requires instead of forcing repeated tricolons.
 11. **Elegant variation:** repeat the correct noun when synonym cycling makes one subject look like several.
 12. **False ranges:** replace “from X to Y” when the endpoints do not share a meaningful scale.
@@ -85,7 +85,7 @@ Use the registry to scan. Open the examples reference for complete signs, explan
 
 ### Style, communication, and filler
 
-14. **Em and en dashes:** for English with no voice sample, replace every em/en dash with punctuation or a recast sentence; with a sample, calibration wins, and for Russian load the RU override.
+14. **Em and en dashes (LEGACY):** when editing English without a voice sample, replace mechanical em/en dashes with punctuation or recast sentences; with samples, calibration wins, and Russian uses its RU override. Humanizers actively remove dashes, so their absence is not evidence of human authorship.
 15. **Overuse of boldface:** remove mechanical emphasis and keep bold only where the document's format needs it.
 16. **Inline-header vertical lists:** turn repeated bold-label bullets into prose or a genuinely useful list.
 17. **Title Case in headings:** use the heading convention of the language, style guide, or author instead of automatic English Title Case.
@@ -118,7 +118,7 @@ Use the registry to scan. Open the examples reference for complete signs, explan
 41. **Paragraph and document symmetry:** let important material run longer and stop padding sections or lists to matching sizes.
 42. **Hyperconnectivity:** remove redundant sentence-opening connectors and let clear adjacent sentences carry their own logic.
 43. **Sentiment and stance flatness:** where the genre and source voice permit, preserve real irritation, doubt, excitement, or mixed feelings; never invent them.
-44. **Russian AI vocabulary and frame phrases:** for Russian, remove clusters of bureaucratic calques and stock frames using the RU reference.
+44. **Russian AI vocabulary, frame phrases, and канцелярит:** use the RU reference to check stock frames plus action nominalizations, genitive chains longer than three, `является` as a weak copula, and avoidable passive. Flag at least 2 features per 500 words; official/legal prose is neutral, and scientific prose requires more than 3 per 500.
 45. **Russian syntactic calques from English:** rewrite imported English architecture into spoken, idiomatic Russian; follow the inversion rules in the RU reference.
 46. **Russian punctuation tells:** lowercase ordinary text after a colon, use Russian quotation conventions, and reduce rather than eliminate legitimate тире.
 47. **Superficial guideline echoing:** delete claims that merely recite platform criteria; state the supplied concrete fact and let it demonstrate relevance.
@@ -127,25 +127,85 @@ Use the registry to scan. Open the examples reference for complete signs, explan
 50. **Aphorism formulas:** replace mid-text “X is the language/currency/architecture of Y” and “X becomes a trap” formulas with the precise claim they gesture at.
 51. **Conversational rhetorical openers:** remove fake-candid hooks such as “Honestly?”, “Look,” “Here's the thing,” and “Real talk” when they stage a routine point; do not flag ordinary mid-sentence use.
 
+### Humanizer damage (anti-humanization)
+
+52. **Thesaurus damage:** restore a common word when a rare synonym breaks collocation or register; check authentic voice samples first. See [`references/examples.md`](references/examples.md#52-thesaurus-damage).
+53. **Clause atomization:** when at least four consecutive single-clause sentences have lost meaningful subordination, reconnect them non-uniformly; never split them further. See [`references/examples.md`](references/examples.md#53-clause-atomization).
+54. **Persona injection:** restore the source's grammatical person after an unsupported shift to `we`, `I`, or `you`; do not flag a person used in authentic voice samples. See [`references/examples.md`](references/examples.md#54-persona-injection).
+55. **Fake typos or forced slang:** never inject typos, slang, or fake informality. Treat found instances as damage and repair them. See [`references/examples.md`](references/examples.md#55-fake-typos--forced-slang--hard-ban).
+56. **Hedge stripping:** restore deleted epistemic modality that turned a hypothesis into a fact; treat this as a fact-preservation violation. See [`references/examples.md`](references/examples.md#56-hedge-stripping).
+57. **Humanizer residue:** clean garbage tokens, dangling citations, and escaped Markdown before any style work. See [`references/examples.md`](references/examples.md#57-humanizer-residue-triage-first).
+
+### Wikipedia-era and 2025+ tells
+
+58. **Despite-challenges closer:** replace a vague concede-then-optimism document closer with supported specifics; standard report limitations sections are neutral. See [`references/examples.md`](references/examples.md#58-despite-challenges-closer).
+59. **Notability packing:** replace meta-claims about leading outlets, attention, or social presence with verifiable specifics; treat them as genre-normal in marketing copy. See [`references/examples.md`](references/examples.md#59-notability-packing).
+60. **Hedged inflation:** when a hedge and inflated historical-importance claim occur together, state the supported impact or cut it; grant proposals are genre-gated. See [`references/examples.md`](references/examples.md#60-hedged-inflation).
+61. **Specificity erosion:** restore a rare, concrete source fact replaced by generic praise; this is a fact-preservation violation. See [`references/examples.md`](references/examples.md#61-specificity-erosion).
+62. **Inanimate rhetorical agent:** replace “the fact underscores” or `сам факт подчёркивает` with an animate agent or plain supported verb; preserve deliberate literary personification. See [`references/examples.md`](references/examples.md#62-inanimate-rhetorical-agent-enru).
+63. **Markdown skeleton:** fix repeated separators, heading-level jumps, micro-tables, escaped Markdown, and placeholder dates independently. See [`references/examples.md`](references/examples.md#63-markdown-skeleton).
+64. **“Refers to” lead:** open with what the subject is or does instead of treating a descriptive title as a proper name; dictionary definitions are neutral. See [`references/examples.md`](references/examples.md#64-refers-to-lead).
+65. **Manufactured broader debate:** name supplied participants and positions or remove an unsupported claim that something “generated debate.” See [`references/examples.md`](references/examples.md#65-manufactured-broader-debate).
+66. **Named-source misattribution:** verify generic `-ing` tails attached to real names; remove an unverifiable attribution rather than inventing a quote. See [`references/examples.md`](references/examples.md#66-named-source-misattribution-rag-era-upgrades-pattern-5).
+67. **Source-quantity exaggeration:** make `several`, `multiple`, or `ряд исследователей` match the actual cited source count. See [`references/examples.md`](references/examples.md#67-source-quantity-exaggeration).
+
+### Grammar fingerprints (genre-gated)
+
+68. **Present-participial stacking:** flag at least 2 V-ing clauses per sentence in academic, blog, or creative prose and at least 3 in technical documentation; treat news and journalism as neutral because the direction reverses there. Require two other pattern families before aggressive rewriting. See [`references/examples.md`](references/examples.md#68-present-participial-stacking-genre-gated).
+69. **That-clause subjects:** flag more than 1 sentence-subject `That [clause] is/was` per 500 words, or more than 2 in academic prose; formal argumentative use is neutral. See [`references/examples.md`](references/examples.md#69-that-clause-subjects-genre-gated).
+
+### Additional Russian patterns
+
+70. **Висячий деепричастный оборот:** перестроить фразу, если субъект деепричастия не совпадает с субъектом главной части; это грамматическая ошибка во всех жанрах. См. [`references/patterns-ru.md`](references/patterns-ru.md#70-висячий-деепричастный-оборот).
+71. **Дидактические дисклеймеры:** убрать кластер из двух и более оборотов вроде `важно отметить` или `стоит учесть` на 500 слов; учебный и справочный тексты нейтральны. См. [`references/patterns-ru.md`](references/patterns-ru.md#71-дидактические-дисклеймеры).
+72. **Формульные зачины:** переписать `В данной работе…` и аналоги в первых двух предложениях; стандартные аннотации и подтверждённая авторская привычка нейтральны. См. [`references/patterns-ru.md`](references/patterns-ru.md#72-формульные-зачины).
+73. **Формульное «Заключение»:** заменить заключение, состоящее только из пересказа, на подтверждённый входом синтез следствий или удалить повтор; сам раздел `Заключение` нейтрален. См. [`references/patterns-ru.md`](references/patterns-ru.md#73-формульное-заключение).
+
 ## Reliability and false-positive guards
 
-- Rank structural clusters, internal style shifts, sourcing artifacts, and repeated rhetoric above isolated vocabulary or punctuation.
-- Down-weight em dashes, curly quotes, hyphenation, rules of three, negative parallelism, common transitions, and a single short sentence as evidence. Edit them only when the applicable style rule calls for it or when they form a cluster.
-- Preserve secondhand text: quotations, titles, proper names, citations, source excerpts, code, and examples under discussion do not trigger a rewrite merely by containing a watched phrase.
-- Respect genre and language inversions. Academic methods can prefer agentless passive; Russian allows long sentences, impersonal constructions, and grammatical тире.
-- Do not equate non-native, simple, formal, bland, polished, or consistently formatted prose with AI authorship.
-- Preserve hard-to-fabricate specifics, unresolved tension, era-bound references, genuine asides, and intentional choices. Consult the research reference for evidence strength and detailed guards.
+Rank structural clusters, internal style shifts, sourcing artifacts, and repeated rhetoric above isolated vocabulary or punctuation. Preserve quotations, titles, proper names, citations, code, and examples under discussion. Preserve hard-to-fabricate specifics and intentional choices.
+
+### Neurodivergent writing guard
+
+Do not “repair” directness without hedges, terminology repetition, low pronoun density, structural regularity, or hyper-precise factual language as AI tells. Require at least two non-stylistic signals, such as sourcing artifacts, chatbot framing, or fabricated citations, before aggressive rewriting (Chambers & Kelley, AIED 2025).
+
+### Translation guard
+
+Machine translation is a major false-positive class (Weber-Wulff et al., 2023). When calques or foreign word order indicate translation, disable lexical and uniformity patterns and edit only for natural target-language usage.
+
+### Genre calibration
+
+Demote these signals to neutral: vocabulary pattern 7, dash pattern 14, and participial pattern 68 in résumés and cover letters; patterns 9 and 44 in legal prose; patterns 58 and 59 in press releases; pattern 72 in standard abstracts. False-positive rates vary sharply by genre (Jabarian & Imas, BFI 2025).
+
+### Short-text abstention
+
+For texts under 100 words, abstain from AI-authorship or pattern-based verdicts. Still repair clear grammar or residue and perform specific user-requested edits under the preservation constraints; do not perform an aggressive detector-driven rewrite.
+
+### Convergence requirement
+
+Require at least three independent pattern families (lexical, structural, grammatical, sourcing) before aggressive rewriting. A single family drifts as LLM language enters human usage.
+
+### Post-paraphrase abstention
+
+If pattern 57 suggests a prior humanizer or paraphraser, absence of AI tells does not prove human authorship (Nature, 2026). Switch from detection to edit quality and fact checking; never conclude `likely human` from that absence.
+
+### No model attribution
+
+Do not conclude that prose “sounds like Claude” or “sounds like GPT.” Statistical model fingerprints exist (Sun et al., ICML 2025), but pattern 48 remains a low-confidence editing lead, not an attribution method.
+
+### Anti-humanization prohibitions
+
+Never insert typos, slang, fake informality, a new grammatical person, reduced epistemic modality, or sentence splits designed to game uniformity metrics. Repair such damage under patterns 52–57.
 
 ## Process
 
-0. Offer optional voice calibration once. If `AskUserQuestion` is unavailable, silently use the genre-appropriate default.
-1. Determine the language and genre. For Russian, load the RU reference before applying any global rule.
-2. Read the whole input and inventory its claims, caveats, structure, terminology, and supplied voice markers.
-3. Scan for clusters from the registry. Protect quotations and other secondhand text before editing.
-4. Write a draft that rewrites each problem while preserving facts and coverage.
-5. Ask internally: **“What makes the below so obviously AI generated?”** List the remaining tells briefly.
-6. Revise into the final version. Do not expose chain-of-thought; provide only the brief diagnostic bullets requested by the output format.
-7. Compare final against input claim by claim. Remove every new specific and restore every dropped item.
+1. **Residue cleanup:** repair patterns 57 and 63 before any stylistic work.
+2. **Fact lock:** inventory claims and lock numbers, dates, URLs, names, negations, and modality. After editing, run `immutable_token_audit` when available and target zero violations; otherwise compare them manually.
+3. **Genre gate:** determine language and genre, load the RU reference for Russian, and apply every relevant guard.
+4. **Voice anchor:** calibrate on at least three authentic samples or avoid aggressive voice rewriting.
+5. **Pattern pass:** protect secondhand text, scan patterns 1–73 under their gates and convergence requirement, write a fact-preserving draft, ask internally **“What makes the below so obviously AI generated?”**, and revise. Do not expose chain-of-thought.
+6. **Anti-humanization check:** confirm that the edit introduced none of patterns 52–56.
+7. **Structural and integrity audit:** apply the v2.21 metrics and abstention conditions when available, then compare the final version against the input claim by claim. Remove every new specific and restore every dropped item.
 
 ## Structural self-audit
 
@@ -157,7 +217,7 @@ Check deliberately rather than chasing a detector score:
 - **Hedges and boosters:** Remove hedge stacks and diversify repeated `may`. Treat zero boosters as actionable only when the evidence supports confidence and the genre permits an authored stance. Zero is acceptable in neutral reference, encyclopedic, methodology, and genuinely uncertain text.
 - **Affect:** Add no emotion. Preserve or clarify only the stance supported by the input, sample, and genre.
 - **Rhetorical drama:** Check for staccato runs, aphorism formulas, and a manufactured closer after varying rhythm.
-- **Dashes:** With no sample, scan English output for `—` and `–` and replace each. With a sample, match its punctuation. For Russian, follow the RU reference.
+- **Dashes:** Treat English dash frequency as weak, legacy corroboration rather than a pass/fail signal. Rewrite only mechanical clusters unless a supplied style guide says otherwise; with voice samples, match their punctuation. For Russian, follow the RU reference.
 - **Integrity:** Confirm that no fact, citation, name, number, quotation, placeholder value, or personal experience was invented and no input content was lost.
 
 ## Output format

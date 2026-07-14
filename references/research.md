@@ -16,6 +16,7 @@ Read this file when a rewrite needs evidence weighting, a quantitative self-audi
 - [Signal ranking](#signal-ranking)
 - [Detailed false-positive guards](#detailed-false-positive-guards)
 - [Human signals worth preserving](#human-signals-worth-preserving)
+- [v2.21 evidence register](#v221-evidence-register)
 - [Reference basis](#reference-basis)
 
 ## How to use the evidence
@@ -153,7 +154,7 @@ Use these only as leads after a stronger cluster appears. A single family-associ
 
 ### Weaker, down-weighted signals
 
-- **Em and en dashes:** humans use them often, while some assistants, including Claude and Gemini in the fork's notes, use them sparingly. Apply the English no-sample style rule when required, but do not treat the character as proof.
+- **Em and en dashes:** humans use them often, while some assistants, including Claude and Gemini in the fork's notes, use them sparingly. Treat frequency as legacy corroboration and rewrite only mechanical clusters when the voice and genre call for it; do not treat the character as proof.
 - **Negative parallelism:** `not X but Y` is established human rhetoric. Edit clusters, not every contrast.
 - **Rule of three:** the tricolon predates LLMs and remains ordinary human rhetoric.
 - **Curly quotation marks:** Word, Pages, Google Docs, CMS software, and operating systems commonly create them automatically.
@@ -177,7 +178,7 @@ Do not flag these on their own:
 - clean, complex formatting produced by a template or visual editor;
 - watched wording inside secondhand text.
 
-**Secondhand-text guard:** do not rewrite a watched phrase when it appears inside a quotation, title, proper name, citation, source excerpt, code sample, or example where the phrase is being discussed rather than asserted. First determine whether the user's task includes editing the quoted material. This guard applies to all 51 patterns.
+**Secondhand-text guard:** do not rewrite a watched phrase when it appears inside a quotation, title, proper name, citation, source excerpt, code sample, or example where the phrase is being discussed rather than asserted. First determine whether the user's task includes editing the quoted material. This guard applies to all 73 patterns.
 
 When uncertain, inspect clusters. An em dash plus a repeated rule of three, prestige metaphors, promotional language, and a formulaic conclusion is meaningful in a way that one dash is not.
 
@@ -190,6 +191,39 @@ When uncertain, inspect clusters. An em dash plus a repeated rule of three, pres
 - Natural variation in sentence and paragraph length.
 - Genuine asides, parentheticals, and self-corrections.
 - Text demonstrably written or edited before ChatGPT's public launch on November 30, 2022, except for rare later interpolation.
+
+## v2.21 evidence register
+
+Primary landing pages, proceedings, DOI records, and arXiv records were checked on 2026-07-14. `A` marks peer-reviewed corpus or proceedings evidence, `B` marks a preprint, working paper, or small-sample observational result, and `C` marks contextual reporting rather than a controlled study. These tiers describe the evidence basis and scope, not the certainty of an authorship judgment.
+
+| ID | Source and primary link | Tier | Verified finding and bounded use |
+|---|---|:---:|---|
+| R1 | Reinhart et al., *Do LLMs write like humans? Variation in grammatical and rhetorical styles*, PNAS 2025 ([DOI](https://doi.org/10.1073/pnas.2422455122); [arXiv](https://arxiv.org/abs/2410.16107)) | A | Instruction-tuned models used present-participial clauses at roughly 2–5× the human rate; GPT-4o used them at 5.3× and `that` clauses as subjects at 2.6× in the study's parallel corpora. Supports inspection rules ##68–69, subject to model and genre gates. |
+| R2 | Zamaraeva et al., *Comparing LLM-generated and human-authored news text using formal syntactic theory*, ACL 2025 ([proceedings](https://aclanthology.org/2025.acl-long.443/); [arXiv](https://arxiv.org/abs/2506.01407)) | A | In the NYT-style sample, participial clauses were more frequent in human text (1,736) than in the six-model mean (1,116). This directly motivates the news exception for ##68; it does not contradict R1 outside that genre. |
+| R3 | Masrour, Emi & Spero, *DAMAGE: Detecting Adversarially Modified AI Generated Text*, GenAIDetect 2025 ([proceedings](https://aclanthology.org/2025.genaidetect-1.9/); [arXiv](https://arxiv.org/abs/2501.03437)) | A | The authors audited 19 humanizers/paraphrasers and documented synonym replacement, changes in structural continuity and writing level, nonsensical residue, and hallucinated citations. Directly supports ##52, ##53, and ##57; it supplies general anti-humanization context, not quantitative validation for every rule in ##54–56. |
+| R4 | Edward Chen, *‘Humanizer’ tool can erase signs of AI-written text — alarming scientists*, Nature, 7 July 2026 ([article](https://www.nature.com/articles/d41586-026-02105-3)) | C | Reports that a current academic-humanizer instruction set explicitly removes em dashes and `not just X, but Y` constructions. This supports demoting §9 and §14 to LEGACY and treating their absence after paraphrasing as non-evidence; the article does not measure population prevalence. |
+| R5 | Chambers & Kelley, *The Misclassification of Autistic Writing as AI-Generated*, AIED 2025 ([DOI](https://doi.org/10.1007/978-3-031-98420-4_7)) | A | In about 60,000 Reddit posts, fewer than 2% of either subcorpus were flagged by the tested GPT-2 detector, but the likely-autistic subcorpus was flagged significantly more often. Supports a neurodivergent false-positive guard, not a deterministic checklist of autistic writing traits. |
+| R6 | Weber-Wulff et al., *Testing of detection tools for AI-generated text*, 2023 ([DOI](https://doi.org/10.1007/s40979-023-00146-z)) | A | Detector accuracy on human-written documents dropped by 20 percentage points after machine translation to English, and the authors warn of translation-related false accusations. Supports the translation guard. |
+| R7 | Jabarian & Imas, *Artificial Writing and Automated Detection*, BFI Working Paper 2025-116 ([primary page](https://bfi.uchicago.edu/working-papers/artificial-writing-and-automated-detection/); [PDF](https://bfi.uchicago.edu/wp-content/uploads/2025/09/BFI_WP_2025-116.pdf)) | B | The 1,992-passage benchmark covers six genres. Detector-optimal thresholds and false-positive rates vary by genre, with especially large variation for the open-source baseline. Supports genre-stratified calibration; it does not show that every detector fails equally in every genre. |
+| R8 | Sun et al., *Idiosyncrasies in Large Language Models*, ICML 2025 ([arXiv](https://arxiv.org/abs/2502.12150)) | A | Reports 97.1% held-out accuracy for five-way classification among ChatGPT, Claude, Grok, Gemini, and DeepSeek, with idiosyncrasies rooted in word distributions. This is group-level experimental evidence, not permission to attribute an arbitrary passage to a named model. The unrelated `99.88%` claim is not used. |
+| R9 | Batura et al., *AINL-Eval 2025 Shared Task: Detection of AI-Generated Scientific Abstracts in Russian* ([MathNet](https://www.mathnet.ru/eng/znsl7629); [arXiv](https://arxiv.org/abs/2508.09622); [repository](https://github.com/iis-research-team/AINL-Eval-2025)) | A | The dataset has 52,305 abstracts across 12 domains and five generators. Its prompt forbade one formulaic opening, yet the authors still post-processed model-specific beginnings. Human abstracts averaged 126.4 words versus 49.6–85.7 tokens for model outputs. Supports ##72 as an inspection lead and requires length matching; neither result is a universal threshold. |
+| R10 | Shamardina et al., *CoAT: Corpus of artificial texts* ([canonical DOI](https://doi.org/10.1017/nlp.2024.38); [repository](https://github.com/RussianNLP/CoAT); [dataset](https://huggingface.co/datasets/RussianNLP/coat)) | A | CoAT covers six Russian domains and outputs from 13 generation models; published experiments report weak transfer to unseen models and domains. Supports the proposed per-domain human false-positive regression protocol. `S2977042424000384` is the Cambridge article/PDF identifier; the publisher displays `10.1017/nlp.2024.38` as the canonical DOI. |
+| R11 | Rallapalli et al., *Interpretable Stylistic Variation in Human and LLM Writing Across Genres, Models, and Decoding Strategies* ([arXiv](https://arxiv.org/abs/2604.14111)) | B | Analyzes 11 LLMs, eight genres, and four decoding strategies; the abstract reports genre as a stronger influence on style than source. Supports genre gating. It does not support the categorical claim that LLMs “cannot use contractions,” so that claim is excluded. |
+| R12 | El Attar et al., *A Systematic Analysis of Linguistic Features in AI-Generated Text Detection Across Domains and Models* ([arXiv](https://arxiv.org/abs/2606.04177)) | B | Evaluates 284 interpretable features, 27 LLMs, and ten domains. Many proposed indicators are context-dependent; lexical-richness measures generalize more consistently. Supports exploratory `human_marker_floor` and content/function measures only as heuristics, with no paper-derived universal thresholds. |
+| R13 | Baumler et al., *Can You Make It Sound Like You? Post-Editing LLM-Generated Text for Personal Style* ([arXiv](https://arxiv.org/abs/2604.24444)) | B | In a preregistered study (`n=81`), post-editing increased similarity to participants' unassisted writing and reduced similarity to raw LLM output, but edited text remained closer to LLM text and less stylistically diverse than unassisted human text. Supports anchoring to real author samples without claiming perfect imitation. |
+| R14 | Rivera Soto, Chen & Andrews, arXiv:2505.14608, currently titled *Attacks on Machine-Text Detectors Retain Stylistic Fingerprints* ([arXiv](https://arxiv.org/abs/2505.14608)) | B | Earlier versions used the title *Language Models Optimized to Fool Detectors Still Have a Distinct Style (And How to Change It)*. A style-aware attack evaded the tested detectors for a single document, but human and machine distributions separated as more documents were aggregated. Supports single-document abstention and author-specific rather than generic style calibration. |
+| R15 | Осетрова Е. В., Седова А. В., «Характеристики сгенерированного текста: языковой и социально-коммуникативный анализ», 2025 №2(31), pp. 45–55 ([journal](https://sibfil.ru/index.php/sibfil/article/view/413); [DOI](https://doi.org/10.24412/2587-7844-2025-2-45-55)) | B | The study applies grammatical, theme-rheme, semantic, and genre analysis to 12 ChatGPT-4 school essays on one topic and reports five added characteristics. Theme-rheme monotony remains a small-sample, tier-B observation; no stdlib metric or general detector threshold is claimed. |
+
+### Claim hygiene for v2.21
+
+- A pattern may be useful for editing without being a validated authorship feature. The registry therefore requires genre gates, convergence across independent families, and abstention on short or already-humanized text.
+- Nature R4 documents what one tool removes; it does not establish that §9 or §14 were never common in model output. LEGACY means corroboration-only, and absence never counts as evidence of human authorship.
+- DAMAGE R3 does not directly validate persona injection, deliberate typo insertion, or hedge stripping as population-level signatures. Those remain quality and fact-preservation prohibitions.
+- Chambers & Kelley R5 supports a false-positive guard. The specific traits listed by the skill must not be presented as a diagnostic profile of autistic authors.
+- AINL-Eval's length difference is a dataset confound to control, not a human-versus-model target. The corpus must report or warn about mismatched lengths.
+- The v2.21 regex/stdlib metrics are transparent approximations. R11 and R12 motivate feature families, not their implementation thresholds.
+- The old `Copyleaks 99.88%` figure is removed because it is not in Sun et al. R8. The verified result is 97.1% on that paper's five-way task.
+- The categorical contraction claim is removed because R11 supports genre/model/decoding variation, not inability.
 
 ## Reference basis
 
