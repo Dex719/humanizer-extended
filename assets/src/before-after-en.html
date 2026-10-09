@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #f2f4f7; font-family: "Segoe UI", system-ui, sans-serif; color: #101828; }
+  .card { margin: 24px; background: #fff; border-radius: 16px; padding: 28px 32px 22px;
+          box-shadow: 0 1px 3px rgba(16,24,40,.08), 0 8px 24px rgba(16,24,40,.06); }
+  header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 14px; }
+  h1 { font-size: 22px; margin: 0; letter-spacing: -.01em; }
+  .model { font-size: 13px; color: #667085; }
+  .legend { display: flex; flex-wrap: wrap; gap: 8px 16px; margin-bottom: 18px; font-size: 13px; color: #344054; }
+  .chip i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; border: 1.5px solid; margin-right: 6px; vertical-align: -1px; }
+  .cols { display: grid; grid-template-columns: 1.15fr 1fr; gap: 20px; }
+  .col { border: 1px solid #eaecf0; border-radius: 12px; padding: 16px 20px; }
+  .col h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; margin: 0 0 8px; color: #667085; }
+  .after { background: #f6fef9; border-color: #abefc6; }
+  .after h2 { color: #067647; }
+  p { font-size: 15.5px; line-height: 1.55; margin: 0 0 10px; }
+  mark { color: inherit; border-radius: 3px; padding: 0 2px; }
+  footer { margin-top: 16px; font-size: 13px; color: #475467; }
+</style></head>
+<body><div class="card" id="card">
+  <header><h1>Before and after</h1><span class="model">Unedited output, Claude Sonnet 5.5</span></header>
+  <div class="legend"><span class="chip"><i style="background:#dbeafe;border-color:#1d4ed8"></i>Chatbot residue / run-up</span><span class="chip"><i style="background:#fde2e1;border-color:#b42318"></i>Not X but Y</span><span class="chip"><i style="background:#fef0c7;border-color:#b54708"></i>Closer / fragments</span><span class="chip"><i style="background:#d1fadf;border-color:#067647"></i>Arguing with no one</span><span class="chip"><i style="background:#ece4fd;border-color:#6941c6"></i>Inflation</span></div>
+  <div class="cols">
+    <section class="col"><h2>Before</h2><p><mark style="background:#dbeafe;box-shadow:inset 0 -2px 0 #1d4ed8">Great question! Here&#x27;s a look at</mark> why our team switched to weekly releases.</p><p>Shipping weekly <mark style="background:#fde2e1;box-shadow:inset 0 -2px 0 #b42318">isn&#x27;t just a process change — it&#x27;s a cultural shift</mark>. When we moved from monthly to weekly releases in March, <mark style="background:#fde2e1;box-shadow:inset 0 -2px 0 #b42318">the goal wasn&#x27;t speed. It was predictability.</mark></p><p><mark style="background:#dbeafe;box-shadow:inset 0 -2px 0 #1d4ed8">The results speak for themselves.</mark> Rollbacks dropped from 9 in the first quarter to 2 in the second, and the average pull request now waits 1.5 days for review instead of 4. <mark style="background:#fef0c7;box-shadow:inset 0 -2px 0 #b54708">Faster feedback. Smaller diffs. Fewer surprises.</mark></p><p><mark style="background:#d1fadf;box-shadow:inset 0 -2px 0 #067647">To be clear,</mark> <mark style="background:#fde2e1;box-shadow:inset 0 -2px 0 #b42318">this isn&#x27;t about working harder. It&#x27;s about</mark> working in smaller steps — <mark style="background:#ece4fd;box-shadow:inset 0 -2px 0 #6941c6">a pivotal shift that underscores our commitment to quality, fostering trust across the team.</mark></p><p><mark style="background:#fef0c7;box-shadow:inset 0 -2px 0 #b54708">And that&#x27;s the real win.</mark></p><p><mark style="background:#dbeafe;box-shadow:inset 0 -2px 0 #1d4ed8">I hope this helps! Let me know if you&#x27;d like a template for your own release calendar.</mark></p></section>
+    <section class="col after"><h2>After · humanizer-slim</h2><p>When we moved from monthly to weekly releases in March, the goal was predictability. Shipping weekly has been a cultural shift for the team.</p><p>Rollbacks dropped from 9 in the first quarter to 2 in the second, and the average pull request now waits 1.5 days for review instead of 4. Feedback is faster, diffs are smaller, and there are fewer surprises. We work in smaller steps now.</p></section>
+  </div>
+  <footer>Kept: March, monthly → weekly, 9 → 2 rollbacks, 1.5 vs 4 days, faster feedback, smaller diffs, fewer surprises, smaller steps. Added: nothing.</footer>
+</div></body></html>

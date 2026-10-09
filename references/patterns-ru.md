@@ -4,6 +4,7 @@ Read this file whenever the input or requested output is predominantly Russian. 
 
 ## Contents
 
+- [9-RU. Контрастные рамки «не X, а Y»](#9-ru-контрастные-рамки-не-x-а-y)
 - [44. Russian AI vocabulary and frame phrases](#44-russian-ai-vocabulary-and-frame-phrases)
 - [45. Russian syntactic calques from English](#45-russian-syntactic-calques-from-english)
 - [46. Russian punctuation tells](#46-russian-punctuation-tells)
@@ -14,9 +15,39 @@ Read this file whenever the input or requested output is predominantly Russian. 
 - [Russian inversions of global rules](#russian-inversions-of-global-rules)
 - [RU self-audit](#ru-self-audit)
 
+## 9-RU. Контрастные рамки «не X, а Y»
+
+Это русская форма самого сильного признака (паттерн 9 в `SKILL.md`). Правило срабатывает с одного вхождения.
+
+**Признаки:**
+
+- `не просто X, а Y`; `не только X, но и Y`, когда оборот добавляет вес, а не перечисляет два факта;
+- `Это не про X. Это про Y.`; `Речь не о X, а о Y`; `Дело не в X. Дело в Y.`; `Вопрос не в X`;
+- `X — это не Y, а Z`; `X — это не Y. Это Z.`;
+- отрицательный хвост: `…, без лишних догадок`, `…, никакой магии`;
+- оборот разнесён на два абзаца: первый опровергает то, чего никто не утверждал, второй даёт «настоящий» ответ.
+
+**Проблема:** первая половина опровергает мнение, которого никто не высказывал, чтобы вторая звучала значительнее. Русская Википедия перечисляет этот приём среди признаков сгенерированного текста («Параллелизмы с уточнениями»), а редакторы на Хабре и vc.ru называют его одним из самых узнаваемых.
+
+**Правка:** сказать Y прямо. Оставить контраст можно, только если первая половина исправляет мнение, которое читатель действительно разделяет или которое есть в источнике, либо если обе половины несут факт (`встреча перенесена не на май, а на июнь`). Нельзя заменять одну формулу другой: `не столько X, сколько Y`, `скорее Y, чем X` и `X — это скорее Y` сохраняют тот же приём.
+
+**До:**
+> Кэш — это не просто оптимизация, а архитектурное решение. Это не про скорость. Это про предсказуемость.
+
+**После:**
+> Кэш влияет на архитектуру: от него зависит, насколько предсказуемо ведёт себя система.
+
+**До:**
+> Наш сервис — не просто доставка еды. Это забота о вашем времени.
+
+**После:**
+> Сервис доставляет еду.
+
+(Если во входном тексте есть конкретика, например время доставки, напишите её вместо «заботы». Если её нет, не придумывайте.)
+
 ## 44. Russian AI vocabulary and frame phrases
 
-**Words and phrases to watch:** `в современном мире`, `в эпоху цифровизации`, `в условиях стремительных изменений`, `данный` instead of `этот`, `является` where a dash or no copula would do, `осуществлять` instead of a direct verb, `позволяет обеспечить`, `способствует повышению`, `представляет собой`, `играет ключевую роль`, `неотъемлемая часть`, `актуальная задача`, `комплексный подход`, `следует отметить`, `необходимо подчеркнуть`, `важно понимать`, `открывает новые возможности`, `выводит на новый уровень`, `вектор развития`, `точка роста`, `драйвер изменений`, `синергетический эффект`, and bureaucratic noun chains such as `осуществление реализации мероприятий`.
+**Words and phrases to watch:** `в современном мире`, `в эпоху цифровизации`, `в условиях стремительных изменений`, `данный` instead of `этот`, `является` where a dash or no copula would do, `осуществлять` instead of a direct verb, `позволяет обеспечить`, `способствует повышению`, `представляет собой`, `играет ключевую роль`, `неотъемлемая часть`, `актуальная задача`, `комплексный подход`, `следует отметить`, `необходимо подчеркнуть`, `важно понимать`, `открывает новые возможности`, `выводит на новый уровень`, `вектор развития`, `точка роста`, `драйвер изменений`, `синергетический эффект`, `в рамках`, `в целях реализации`, `с развитием технологий`, `подводя итог`, vague attributions such as `эксперты считают`, `специалисты отмечают`, `по мнению аналитиков` with no named source, and bureaucratic noun chains such as `осуществление реализации мероприятий`.
 
 **Problem:** Russian LLM prose mixes translated English AI vocabulary with Soviet administrative language. The result sounds simultaneously like a corporate press release and a ministry circular. A single ordinary word is not evidence; a cluster of frames is.
 
@@ -28,7 +59,7 @@ Read this file whenever the input or requested output is predominantly Russian. 
 
 > Инструмент может сделать работу организации эффективнее и помочь ей развиваться.
 
-**Rule:** Delete the frame and keep the claim. Prefer a concrete subject and a direct verb. Replace `данный` with `этот` or omit it; replace `осуществляет обработку` with `обрабатывает`; replace `позволяет обеспечить повышение` with the result the input actually supports. Do not manufacture a concrete result when the input supplies none: hedge it or say it is not documented.
+**Rule:** Delete the frame and keep the claim. For an unnamed `эксперты считают`, name the source if the input supplies one; otherwise hedge honestly or remove the claim. Never invent the expert. Prefer a concrete subject and a direct verb. Replace `данный` with `этот` or omit it; replace `осуществляет обработку` with `обрабатывает`; replace `позволяет обеспечить повышение` with the result the input actually supports. Do not manufacture a concrete result when the input supplies none: hedge it or say it is not documented.
 
 **Morphosyntactic checks and genre gate:** In addition to the word list, count action nominalizations used instead of verbs, genitive chains longer than three nouns, `является` used as a weak copula, and avoidable passive. Flag a cluster at two or more features per 500 words. Treat official, administrative, and legal prose as neutral; in scientific prose require more than three features per 500 words; in blogs, news, and literary prose flag more than one per 500.
 
@@ -57,8 +88,9 @@ Read this file whenever the input or requested output is predominantly Russian. 
 **Rule:**
 
 - Write sentence-initial `Однако` without a following comma when it functions as a conjunction.
-- Rewrite `Это не про X, это про Y` as an idiomatic contrast such as `дело не столько в X, сколько в Y`, when that meaning is actually intended.
+- Rewrite `Это не про X, это про Y` by stating Y directly (see 9-RU). Do not swap in another contrast formula such as `дело не столько в X, сколько в Y`; it keeps the tell.
 - Replace `за которым последовало` with `после чего` or a plain verb chain.
+- Replace corporate calques with what a Russian speaker would say: `культура команды`, `смена культуры` → what actually changed in how people work (`команда стала работать иначе`), or cut it when the input gives nothing concrete; `адресовать проблему` → `заняться проблемой`; `это имеет смысл` → `это разумно`; `экспертиза` (expertise) → `опыт`, `знания`; `вызов` (challenge) → `трудность`, `задача`; `в конце дня` → `в итоге`. A calque copied from the source into the rewrite is still a miss.
 - Break invented compound adjectives into ordinary noun phrases.
 - Remove commas that exist only because of English structure.
 - Vary word order to put known information before new emphasis rather than forcing English SVO order.
@@ -154,8 +186,9 @@ Several English rules reverse or soften for Russian. Do not apply them blindly:
 Before returning Russian output:
 
 1. Scan for clusters of the frames in pattern 44 and convert abstract noun chains into direct verbs.
-2. Read each sentence aloud for English architecture, especially `Однако,`, `Это не про X`, rigid SVO order, and unnatural compound adjectives.
-3. Check lowercase after colons and Russian quotation marks without “correcting” protected quotations or titles.
-4. Inspect тире for repetition, not absence. Keep grammatical marks.
-5. Preserve long clauses, agentless passive, and impersonal constructions when the genre makes them natural.
-6. Compare every claim and detail with the input; never make an abstract claim concrete by inventing a Russian-sounding example.
+2. Search again for every 9-RU contrast frame, including ones split across sentences, and state the positive claim directly.
+3. Read each sentence aloud for English architecture, especially `Однако,`, rigid SVO order, and unnatural compound adjectives.
+4. Check lowercase after colons and Russian quotation marks without “correcting” protected quotations or titles.
+5. Inspect тире for repetition, not absence. Keep grammatical marks.
+6. Preserve long clauses, agentless passive, and impersonal constructions when the genre makes them natural.
+7. Compare every claim and detail with the input; never make an abstract claim concrete by inventing a Russian-sounding example.

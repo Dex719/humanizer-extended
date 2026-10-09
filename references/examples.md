@@ -17,6 +17,7 @@ Read this file when a compact registry entry in `SKILL.md` is not enough, when a
 - [Humanizer damage (52–57)](#humanizer-damage-anti-humanization--52-57)
 - [Wikipedia-era and 2025+ tells (58–67)](#wikipedia-era-and-2025-tells--58-67)
 - [Grammar fingerprints (68–69)](#grammar-fingerprints--68-69)
+- [Arguing with no one and writing for the wrong reader (74–75)](#arguing-with-no-one-and-writing-for-the-wrong-reader--74-75)
 - [Full Example](#full-example)
 
 The examples illustrate transformations; they are not permission to import their details into user text. Apply every rewrite under the fact-preservation rules in `SKILL.md`.
@@ -156,9 +157,15 @@ The rewrite changes rhythm and keeps the tension, but adds no sleeping humans, c
 > Gallery 825 is LAAA's exhibition space for contemporary art. It has four spaces totaling over 3,000 square feet.
 
 
-### 9. Negative Parallelisms and Tailing Negations
+### 9. Not X but Y (Contrastive Staging) — Strongest Tell
 
-**Problem:** Constructions like "Not only...but..." or "It's not just about..., it's..." are overused. So are clipped tailing-negation fragments such as "no guessing" or "no wasted motion" tacked onto the end of a sentence instead of written as a real clause.
+**Forms to watch:** not X but Y; not just, not only, not merely, or not simply X, but Y; it's not X, it's Y; less about X, more about Y; the reversed X rather than Y; the contrast split across sentences ("This isn't about X. It's about Y.", "This does not mean X. It means Y."); a clipped negative tail ("…, no guessing", "no wasted motion"). The same shape appears in every language. Russian forms: `не просто X, а Y`; `не только X, но и Y` used for weight; `Это не про X. Это про Y.`; `Речь не о X, а о Y`; `Дело не в X. Дело в Y.`; `X — это не Y, а Z`.
+
+**Problem:** The negative half names something nobody claimed, so the positive half sounds larger. The sentence adds weight without adding a claim. It is the most visible tell in current model prose in both English and Russian, and it survives sentence-level cleanup because it often spans two sentences or a whole paragraph.
+
+**Act on one sighting.** State the positive claim directly. Keep a contrast only when the negative half corrects a belief the reader actually holds or the source states, or when both halves carry information ("The meeting moved not to May but to June"). Do not replace one contrast formula with another (`не столько X, сколько Y`, "X rather than Y"); that keeps the tell. Legal prose is exempt under the genre guard.
+
+**Why humanizers strip it:** humanizer tools remove this shape on purpose (see `research.md`, R4). That makes its absence useless as evidence of human authorship. It does not make its presence acceptable.
 
 **Before:**
 > It's not just about the beat riding under the vocals; it's part of the aggression and atmosphere. It's not merely a song, it's a statement.
@@ -172,6 +179,18 @@ The rewrite changes rhythm and keeps the tension, but adds no sleeping humans, c
 **After:**
 > The options come from the selected item without forcing the user to guess.
 
+**Before (split across sentences):**
+> This does not mean every choice is equal. It means there is no external system that confirms which choice is right.
+
+**After:**
+> No external system confirms which choice is right, although the choices still have different consequences.
+
+**Before (Russian):**
+> Кэш — это не просто оптимизация, а архитектурное решение. Это не про скорость. Это про предсказуемость.
+
+**After:**
+> Кэш влияет на архитектуру: от него зависит, насколько предсказуемо ведёт себя система.
+
 
 ### 10. Rule of Three Overuse
 
@@ -184,9 +203,11 @@ The rewrite changes rhythm and keeps the tension, but adds no sleeping humans, c
 > The event includes talks and panels. There's also time for informal networking between sessions.
 
 
-### 11. Elegant Variation (Synonym Cycling)
+### 11. Elegant Variation (Synonym Cycling) — Retired in 2.22
 
-**Problem:** AI has repetition-penalty code causing excessive synonym substitution.
+**Status:** Wikipedia's "Signs of AI writing" no longer lists synonym cycling as a current AI sign. Do not act on it alone. Fix it only when the synonyms make one subject look like several, as below.
+
+**Problem:** Synonym substitution can make one subject look like several.
 
 **Before:**
 > The protagonist faces many challenges. The main character must overcome obstacles. The central figure eventually triumphs. The hero returns home.
@@ -195,9 +216,11 @@ The rewrite changes rhythm and keeps the tension, but adds no sleeping humans, c
 > The protagonist faces many challenges but eventually triumphs and returns home.
 
 
-### 12. False Ranges
+### 12. False Ranges — Retired in 2.22
 
-**Problem:** LLMs use "from X to Y" constructions where X and Y aren't on a meaningful scale.
+**Status:** Upstream humanizer 3.0 dropped this pattern after Wikipedia stopped treating it as a current sign. Do not act on one alone; treat a clear case as inflation (pattern 1) or a prestige frame (pattern 35).
+
+**Problem:** A "from X to Y" construction where X and Y are not on a meaningful scale.
 
 **Before:**
 > Our journey through the universe has taken us from the singularity of the Big Bang to the grand cosmic web, from the birth and death of stars to the enigmatic dance of dark matter.
@@ -616,7 +639,7 @@ Before returning English output with no sample, scan for `—` and `–`. With a
 **Rule:** When a sentence's main verb is `is` / `provides` / `enables` / `facilitates` / `was conducted` / `has been demonstrated`, find the abstract noun that holds the real action and turn it back into a verb. *The implementation of indexing* → *we indexed*. *Conducted an evaluation* → *evaluated*. *The realization of improvements* → *improved*. Then ask whether the agent ("we", "the team", a named person) belongs back in. Two or three nominalisations in a paragraph is normal; six is a tell. Do not chase every `-tion`; the signal, like §7, is *clustering*.
 
 
-### 39. Diff-Anchored Writing
+### 39. Writing About the Document Instead of Its Subject
 
 **Signs to watch:** Prose that narrates a *change* rather than describing the thing as it is: "this function was added to replace…", "we updated X to handle Y", "the new approach improves on the old one", "previously this used Z, now it uses W". Common in documentation, code comments, and README prose that was written by a model summarizing a commit.
 
@@ -629,6 +652,14 @@ Before returning English output with no sample, scan for `—` and `–`. With a
 > This function avoids the O(n²) performance caused by iterating through all items.
 
 **Rule:** Describe what the thing *does*, not what changed to produce it. Keep diff framing only where the document is explicitly about a transition (changelog, release notes, migration guide, PR description). Everywhere else, strip "added", "updated", "previously", "now", "new" when they only exist to contrast with an unstated prior state.
+
+**Wider form: the text narrates itself.** The same move appears when the text describes how it was assembled or sourced ("compiled from", "anything we could not confirm is flagged rather than guessed") or a layout the reader can already see ("the table below compares", "this section is organized by owner"). Keep a source credit the reader can follow and a caveat that changes what the reader should do; cut the account of how you worked. State a convention only when the reader cannot infer it, and state it once. One such sentence is weak alone.
+
+**Before (method narration):**
+> The figures below are drawn from each vendor's published pricing; anything we could not confirm is flagged rather than guessed.
+
+**After:**
+> Prices are each vendor's published rate. Unconfirmed prices are marked.
 
 
 ## STRUCTURAL AND STATISTICAL TELLS
@@ -725,9 +756,11 @@ The vocabulary and structure tells above are largely model-agnostic. These two a
 
 ## New upstream-synchronized patterns
 
-### 49. Manufactured Punchlines and Staccato Drama
+### 49. One-Line Closers, Punchlines, and Staccato Drama — Act on One Sighting
 
-**Problem:** LLMs often make every sentence land like a quotable closer, then stack short declarative fragments to manufacture drama. One short sentence for emphasis is fine; a run of them sounds engineered.
+**Watch for:** a one-sentence paragraph that restates the paragraph before it; "That is the real win.", "That distinction matters.", "Read that again.", "Let that sink in."; the same closer after several sections; a last line that echoes the opening line; a sentence after an example, scene, or number that names what it showed ("This shows the importance of…", "The message was clear:", "It was a lesson in patience."); a row of fragments; one word in ALL CAPS or `every. single. day.` Russian: `И это важно.`, `Вот и всё.`, `Именно в этом и суть.`, `Звучит просто? Так и есть.`
+
+**Problem:** LLMs often make every sentence land like a quotable closer, then stack short declarative fragments to manufacture drama. The line asks the reader to pause on a claim instead of adding to it. One short sentence can carry emphasis when it carries a new fact; a run of them sounds engineered.
 
 **Before:**
 > Then AlphaEvolve arrived. It had no preference for symmetry. No aesthetic prior. No nostalgia for human taste. The old rules were gone.
@@ -735,7 +768,21 @@ The vocabulary and structure tells above are largely model-agnostic. These two a
 **After:**
 > AlphaEvolve changed the search because it did not favor symmetry or human-looking designs. That made some of the older assumptions less useful.
 
-**Rule:** Join a run of dramatic fragments into ordinary connected prose. Preserve one short sentence when the surrounding rhythm and content earn it. Do not “fix” sentence uniformity by manufacturing a new short-long-short template.
+**Before (repeated closer):**
+> Caching cuts repeat work.
+>
+> That is the real win.
+>
+> Retries hide brief outages.
+>
+> That is the real win.
+
+**After:**
+> Caching cuts repeat work.
+>
+> Retries hide brief outages.
+
+**Rule:** Join a run of dramatic fragments into ordinary connected prose. Cut a closer that repeats, including one that explains an example the reader just saw; keep it when it adds a fact or consequence the example does not show. Do not “fix” sentence uniformity by manufacturing a new short-long-short template.
 
 ### 50. Aphorism Formulas
 
@@ -970,6 +1017,46 @@ All pairs in patterns 52–69 are synthetic teaching pairs. Never reuse their fa
 
 **After:**
 > The model generalizes well, which is encouraging. The training time, under two hours, is also notable.
+
+## Arguing with no one and writing for the wrong reader — 74-75
+
+### 74. Re-explaining what the reader knows
+
+**Signs:** a short reply that restates the problem, walks through the diagnosis, and lays out the evidence before it reaches the decision; a restatement of what the other person just wrote ("You mentioned that…", `Как вы верно заметили…`); a query, command, or set of numbers included to prove a plan will work; the answer sitting in the last line.
+
+**Gate:** act only when you can see the surrounding conversation or the text is plainly a reply. If you cannot tell, leave the text alone. Standalone documents are out of scope.
+
+**Problem:** A model writes for a reader who shares no context. In a reply the reader already has the context, so rebuilding it buries the point. Each sentence can read fine on its own, so this survives sentence-level cleanup.
+
+**Before:**
+> Yeah, you're right, this works around the issue rather than fixing it. The real fix is in `MergeService`: when we move a child under a new parent, it should update `pipeline_id` along with `parent_id`. Since `MergeService` is shared and not specific to this account, I'd rather open a separate ticket than widen this PR. The fallback here is fine to keep until then.
+
+**After:**
+> Agreed, this is a workaround. The proper fix in `MergeService` touches shared code, so I'd rather open a separate ticket than widen this PR, and keep the fallback until then.
+
+### 75. Arguing with no one
+
+**Signs:** This isn't (mainly) about, I'm not saying, To be clear, Don't get me wrong, This is not to say, Some might say… but, A tempting approach would be, One might be tempted to, You might think… but, It would be easy to just. Russian: `Я не говорю, что…`, `Это не значит, что…`, `Кто-то скажет, что…, но`, `Можно было бы…, но`, `Казалось бы…`.
+
+**Problem:** The text answers an objection or rejects an option that appears nowhere else, usually a leftover from an earlier draft or a staging device. Remove the defense; if it holds a real claim, state the claim. Keep an objection the text attributes or answers in full, and keep an option a reader would actually weigh. Several unrelated rejections in a row are a stronger sign than one.
+
+**Before:**
+> This isn't mainly about prompt length, and I'm not arguing that documentation doesn't matter. The issue is whether the agent can use the instruction when it acts.
+
+**After:**
+> The issue is whether the agent can use the instruction when it acts.
+
+**Before (fake alternative):**
+> Session tokens are rotated every 24 hours. A tempting approach would be to rotate them by restarting the auth service on a cron job, but that would drop every active session. Rotation happens in place, and clients refresh transparently.
+
+**After:**
+> Session tokens are rotated every 24 hours, in place, and clients refresh transparently.
+
+**Before (Russian):**
+> Я не говорю, что тесты не нужны. Можно было бы покрыть всё юнит-тестами, но это заняло бы месяцы. Мы проверяем только платёжный модуль.
+
+**After:**
+> Мы проверяем только платёжный модуль: полное покрытие юнит-тестами заняло бы месяцы.
 
 ## Full Example
 

@@ -144,6 +144,8 @@ Use these only as leads after a stronger cluster appears. A single family-associ
 
 ### Stronger editing leads
 
+- **`not X but Y` contrastive staging (pattern 9), including the split, reversed (`Y rather than X`), and Russian forms.** Wikipedia's current guide lists negative parallelisms as a live sign with three subtypes and calls the reversed form "particularly common in recent LLM output" (R16). Act on one sighting unless the negative half corrects a belief the reader actually holds;
+- one-line closers, staged run-ups, and defenses against objections nobody raised (patterns 49, 28/51, 75);
 - repeated structural uniformity across sentences and paragraphs;
 - dense participial or nominalized constructions;
 - over-even connectors;
@@ -154,8 +156,7 @@ Use these only as leads after a stronger cluster appears. A single family-associ
 
 ### Weaker, down-weighted signals
 
-- **Em and en dashes:** humans use them often, while some assistants, including Claude and Gemini in the fork's notes, use them sparingly. Treat frequency as legacy corroboration and rewrite only mechanical clusters when the voice and genre call for it; do not treat the character as proof.
-- **Negative parallelism:** `not X but Y` is established human rhetoric. Edit clusters, not every contrast.
+- **Em and en dashes:** Wikipedia moved "Overuse of em dashes (2022–September 2026)" to its historical indicators in October 2026 because the newest models suppress dashes; the same note says their output now leans on commas and periods instead (marked citation-needed there) (R16). Treat dash frequency as legacy corroboration, rewrite only mechanical clusters, and do not replace every dash with a comma.
 - **Rule of three:** the tricolon predates LLMs and remains ordinary human rhetoric.
 - **Curly quotation marks:** Word, Pages, Google Docs, CMS software, and operating systems commonly create them automatically.
 - **Hyphenated word pairs:** standard attributive compounds are grammatical. Keep `a high-quality report`; only optional, machine-uniform treatment deserves attention.
@@ -178,7 +179,7 @@ Do not flag these on their own:
 - clean, complex formatting produced by a template or visual editor;
 - watched wording inside secondhand text.
 
-**Secondhand-text guard:** do not rewrite a watched phrase when it appears inside a quotation, title, proper name, citation, source excerpt, code sample, or example where the phrase is being discussed rather than asserted. First determine whether the user's task includes editing the quoted material. This guard applies to all 73 patterns.
+**Secondhand-text guard:** do not rewrite a watched phrase when it appears inside a quotation, title, proper name, citation, source excerpt, code sample, or example where the phrase is being discussed rather than asserted. First determine whether the user's task includes editing the quoted material. This guard applies to every pattern.
 
 When uncertain, inspect clusters. An em dash plus a repeated rule of three, prestige metaphors, promotional language, and a formulaic conclusion is meaningful in a way that one dash is not.
 
@@ -214,10 +215,27 @@ Primary landing pages, proceedings, DOI records, and arXiv records were checked 
 | R14 | Rivera Soto, Chen & Andrews, arXiv:2505.14608, currently titled *Attacks on Machine-Text Detectors Retain Stylistic Fingerprints* ([arXiv](https://arxiv.org/abs/2505.14608)) | B | Earlier versions used the title *Language Models Optimized to Fool Detectors Still Have a Distinct Style (And How to Change It)*. A style-aware attack evaded the tested detectors for a single document, but human and machine distributions separated as more documents were aggregated. Supports single-document abstention and author-specific rather than generic style calibration. |
 | R15 | Осетрова Е. В., Седова А. В., «Характеристики сгенерированного текста: языковой и социально-коммуникативный анализ», 2025 №2(31), pp. 45–55 ([journal](https://sibfil.ru/index.php/sibfil/article/view/413); [DOI](https://doi.org/10.24412/2587-7844-2025-2-45-55)) | B | The study applies grammatical, theme-rheme, semantic, and genre analysis to 12 ChatGPT-4 school essays on one topic and reports five added characteristics. Theme-rheme monotony remains a small-sample, tier-B observation; no stdlib metric or general detector threshold is claimed. |
 
+### v2.22 additions
+
+Checked on 2026-10-10 against the live pages. Tiers as above.
+
+| ID | Source and primary link | Tier | Verified finding and bounded use |
+|---|---|:---:|---|
+| R16 | Wikipedia, *Signs of AI writing* ([page](https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing); [history](https://en.wikipedia.org/w/index.php?title=Wikipedia:Signs_of_AI_writing&action=history)) | C | The current page lists "Negative parallelisms" with subsections *Not just X, but also Y*, *Not X, but Y*, and *Y rather than X*, and notes the construction is common in human "myths busted" writing but stereotypically an AI sign. "Overuse of em dashes (2022–September 2026)" and "Lexical diversity/elegant variation" sit under Historical indicators; false ranges no longer appear. Supports promoting pattern 9, keeping 14 as legacy, and retiring 11–12. |
+| R17 | Wikipedia (ru), *Признаки сгенерированности текста* ([page](https://ru.wikipedia.org/wiki/Википедия:Признаки_сгенерированности_текста)) | C | Lists «Параллелизмы с уточнениями» («Не только… но и…», «Это не просто о…, это…»), the rule of three, vague wording, and heavy bold. Its examples are translated from the English page, so it supports the shape, not Russian-specific frequencies. |
+| R18 | Oremus, *The Most Famous AI Writing Tic Is Also the Most Mysterious*, The Atlantic, 12 July 2026 ([article](https://www.theatlantic.com/technology/2026/07/ai-chatbot-writing-tic-negative-parallelism/687892/); summarized in [Negative parallelism](https://en.wikipedia.org/wiki/Negative_parallelism)) | C | Reports a detector vendor's (Pangram) estimate that chatbots use negative parallelism at about three times the human rate and that all major chatbots rely on it to varying degrees. Vendor-sourced with no published method: cite only as reporting, never as a measured rate. |
+| R19 | Belem et al., *From 'May' to 'Is': Certainty Distortion in Language Model Rewriting*, EMNLP 2026 ([arXiv](https://arxiv.org/abs/2606.07951)) | B | LM rewrites shift certainty in up to 75% of outputs and raise it more often than they lower it; prompting reduces but does not remove the effect. Supports pattern 56 and the post-edit modality check. |
+| R20 | van Nuenen, *Voice Under Revision: Large Language Models and the Normalization of Personal Narrative* ([arXiv](https://arxiv.org/abs/2604.22142)) | B | Frontier-model revision of personal narratives reduced contractions and first-person pronouns and raised word length and vocabulary diversity; voice-preserving prompts reduced but did not reverse the drift. Supports the voice-drift audit item. |
+| R21 | Park, Jeong & Kim, *Style as a Confound: False Positives in AI Detection of Non-Native Academic Writing* ([arXiv](https://arxiv.org/abs/2608.26710)) | B | Across 13 detectors, false-positive rates on human non-native manuscripts ranged from 0% to 100%, and native editing moved scores in different directions per detector. Supports the translation and non-native guards. |
+| R22 | Shan, Lee & Hao, *AI Writers Have a Consistent Stylometric Footprint, but AI Editors Do Not* ([arXiv](https://arxiv.org/abs/2608.27855)) | B | Generated text shows a consistent stylometric footprint; AI-edited human text does not. Supports treating the skill as an editor of grounded text, not a detector. |
+| R23 | Paech et al., *Antislop* ([arXiv](https://arxiv.org/abs/2510.15061)) | B | Reports some repetitive patterns at over 1,000× the human rate in LLM output. The abstract names no specific pattern, so it supports the general approach only. |
+
+Not used: a "6% of ChatGPT responses" figure for `not just X` that circulates in blog posts could not be traced to its claimed Washington Post source.
+
 ### Claim hygiene for v2.21
 
 - A pattern may be useful for editing without being a validated authorship feature. The registry therefore requires genre gates, convergence across independent families, and abstention on short or already-humanized text.
-- Nature R4 documents what one tool removes; it does not establish that §9 or §14 were never common in model output. LEGACY means corroboration-only, and absence never counts as evidence of human authorship.
+- Nature R4 documents what one tool removes; it does not establish that §9 or §14 were never common in model output. Absence never counts as evidence of human authorship. Since v2.22, §9 is no longer LEGACY: R16–R18 show it remains the most visible current tell, so its presence is edited on one sighting. §14 stays LEGACY.
 - DAMAGE R3 does not directly validate persona injection, deliberate typo insertion, or hedge stripping as population-level signatures. Those remain quality and fact-preservation prohibitions.
 - Chambers & Kelley R5 supports a false-positive guard. The specific traits listed by the skill must not be presented as a diagnostic profile of autistic authors.
 - AINL-Eval's length difference is a dataset confound to control, not a human-versus-model target. The corpus must report or warn about mismatched lengths.

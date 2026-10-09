@@ -6,6 +6,36 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [2.22.0] - 2026-10-10
+
+### Added
+
+- `humanizer-slim`, a one-file companion skill (~1,650 words) in `skills/humanizer-slim/` for strong current models. It keeps the hard limits and the Russian rules, orders tells by strength, and returns only the final text by default. The plugin manifest now lists both skills.
+- An account of why AI text sounds the way it does and three strength tiers: act on one sighting, act on a cluster, weak alone.
+- Pattern #74 (re-explaining what the reader knows) and #75 (arguing with no one), with English and Russian forms, from upstream humanizer 3.1.
+- A `9-RU` section in `references/patterns-ru.md` for `не просто X, а Y`, `Это не про X. Это про Y.`, `Дело не в X`, and related frames, plus vague Russian attributions (`эксперты считают`).
+- Russian corporate calques (`культура команды`, `смена культуры`, `адресовать проблему`, `это имеет смысл`, `экспертиза`, `вызов`) in both skills. A calque copied from the source into the rewrite counts as a miss.
+- A `contrast_frames` compliance metric that counts staged not-X-but-Y forms in English and Russian.
+- File and embedded output modes.
+- A v2.22 evidence register (R16–R23): current English and Russian Wikipedia guidance, reporting on negative parallelism, certainty distortion in LM rewriting, voice normalization, non-native false positives, and AI-edited text.
+- Before/after images for English and Russian in the README, generated with `humanizer-slim`, and the same pairs as corpus entries.
+
+### Changed
+
+- Promoted not-X-but-Y (#9) from LEGACY to the strongest tell: act on one sighting, including split, reversed (`Y rather than X`), clipped, and Russian forms. Swapping in another contrast formula no longer counts as a fix.
+- Folded upstream 3.1 additions into existing numbers: "That distinction matters.", echo closers, and example restatement into #49 and #34; self-answered questions and stock openers into #28; headings written for effect into #17; method narration and layout description into #39, now "Writing about the document instead of its subject".
+- Kept #14 (dashes) as LEGACY and noted that Wikipedia moved em-dash overuse to historical indicators in October 2026. A rewrite should no longer turn every dash into a comma.
+- Strengthened #56 hedge stripping and added a voice-drift audit item based on LM-rewriting research.
+- Moved the skill version to `metadata.version`, as the Agent Skills spec expects, and taught the version check to read both skills.
+
+### Deprecated
+
+- Retired #11 (elegant variation) and #12 (false ranges) as standalone signals. Wikipedia lists the first as historical and no longer lists the second. The numbers stay reserved.
+
+### Fixed
+
+- `patterns-ru.md` no longer recommends replacing `Это не про X, это про Y` with `дело не столько в X, сколько в Y`, which kept the same tell.
+
 ## [2.21.0] - 2026-07-14
 
 ### Added
@@ -54,6 +84,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Fixed corpus path resolution, sentence splitting around common abbreviations, and the false positive for the month "May".
 - Ignored Python caches and local Claude settings, and enforced LF line endings.
 
-[Unreleased]: https://github.com/Dex719/humanizer-extended/compare/v2.21.0...HEAD
+[Unreleased]: https://github.com/Dex719/humanizer-extended/compare/v2.22.0...HEAD
+[2.22.0]: https://github.com/Dex719/humanizer-extended/compare/v2.21.0...v2.22.0
 [2.21.0]: https://github.com/Dex719/humanizer-extended/compare/v2.20.0...v2.21.0
 [2.20.0]: https://github.com/Dex719/humanizer-extended/compare/v2.19.0...v2.20.0

@@ -21,18 +21,30 @@ def require_match(path: Path, pattern: str, label: str, *, flags: int = 0) -> st
     return match.group("version")
 
 
-def skill_version() -> str:
-    path = ROOT / "SKILL.md"
+def skill_version(relative: str = "SKILL.md") -> str:
+    """Read ``metadata.version`` from a skill's YAML frontmatter.
+
+    The Agent Skills spec has no top-level ``version`` field, so the version
+    lives under ``metadata`` and a top-level one is rejected.
+    """
+
+    path = ROOT / relative
     text = path.read_text(encoding="utf-8")
     if not text.startswith("---\n"):
-        raise ValueError("SKILL.md must begin with YAML frontmatter")
+        raise ValueError(f"{relative} must begin with YAML frontmatter")
     try:
         frontmatter = text.split("---\n", 2)[1]
     except IndexError as exc:
-        raise ValueError("SKILL.md has unterminated YAML frontmatter") from exc
-    match = re.search(rf"^version:\s*(?P<version>{SEMVER})\s*$", frontmatter, re.MULTILINE)
+        raise ValueError(f"{relative} has unterminated YAML frontmatter") from exc
+    if re.search(r"^version:", frontmatter, re.MULTILINE):
+        raise ValueError(f"{relative}: move the top-level version under metadata.version")
+    match = re.search(
+        rf"^metadata:\s*\n(?:[ \t]+.*\n)*?[ \t]+version:\s*[\"']?(?P<version>{SEMVER})[\"']?\s*$",
+        frontmatter,
+        re.MULTILINE,
+    )
     if match is None:
-        raise ValueError("could not find a semantic version in SKILL.md frontmatter")
+        raise ValueError(f"could not find metadata.version in {relative} frontmatter")
     return match.group("version")
 
 
@@ -92,6 +104,9 @@ def marketplace_version() -> str:
 def main() -> int:
     readers = {
         "SKILL.md frontmatter": skill_version,
+        "skills/humanizer-slim/SKILL.md frontmatter": lambda: skill_version(
+            "skills/humanizer-slim/SKILL.md"
+        ),
         "README.md Version History": readme_version,
         "CHANGELOG.md latest release": changelog_version,
         ".claude-plugin/plugin.json": plugin_version,

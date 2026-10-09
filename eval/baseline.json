@@ -3,10 +3,10 @@
   "command": "aggregate",
   "corpus": {
     "path": "eval/corpus",
-    "pairs": 8,
+    "pairs": 10,
     "languages": {
-      "en": 1,
-      "ru": 7
+      "en": 2,
+      "ru": 8
     },
     "genres": {
       "bio": 1,
@@ -16,107 +16,119 @@
       "review": 1,
       "science-pop": 1,
       "scientific": 1,
-      "vc-habr": 1
+      "vc-habr": 1,
+      "blog": 2
     }
   },
   "structural": {
     "before_score": {
-      "passed": 13,
-      "applicable": 31,
-      "rate": 0.4194
+      "passed": 18,
+      "applicable": 40,
+      "rate": 0.45
     },
     "after_score": {
-      "passed": 16,
-      "applicable": 31,
-      "rate": 0.5161
+      "passed": 22,
+      "applicable": 38,
+      "rate": 0.5789
     },
-    "score_delta": 0.0967,
+    "score_delta": 0.1289,
     "metrics": {
       "agentless_passive_per_100_words": {
         "before_mean": 0.0,
-        "after_mean": 5.3571,
-        "delta": 5.3571,
-        "before_passed": 1,
-        "before_applicable": 1,
+        "after_mean": 2.6785,
+        "delta": 2.6785,
+        "before_passed": 2,
+        "before_applicable": 2,
         "before_pass_rate": 1.0,
-        "after_passed": 0,
-        "after_applicable": 1,
-        "after_pass_rate": 0.0
+        "after_passed": 1,
+        "after_applicable": 2,
+        "after_pass_rate": 0.5
       },
       "connector_opener_density": {
-        "before_mean": 0.2817,
+        "before_mean": 0.2254,
         "after_mean": 0.0,
-        "delta": -0.2817,
-        "before_passed": 7,
-        "before_applicable": 8,
-        "before_pass_rate": 0.875,
-        "after_passed": 8,
-        "after_applicable": 8,
+        "delta": -0.2254,
+        "before_passed": 9,
+        "before_applicable": 10,
+        "before_pass_rate": 0.9,
+        "after_passed": 10,
+        "after_applicable": 10,
         "after_pass_rate": 1.0
       },
       "paragraph_length_sd": {
-        "before_mean": 5.9123,
+        "before_mean": 7.1409,
         "after_mean": 8.9093,
-        "delta": 2.997,
+        "delta": 1.7684,
         "before_passed": 1,
-        "before_applicable": 6,
-        "before_pass_rate": 0.1667,
+        "before_applicable": 8,
+        "before_pass_rate": 0.125,
         "after_passed": 0,
         "after_applicable": 6,
         "after_pass_rate": 0.0
       },
       "participial_clauses_per_250_words": {
-        "before_mean": 1.2301,
-        "after_mean": 0.8596,
-        "delta": -0.3705,
-        "before_passed": 3,
-        "before_applicable": 8,
-        "before_pass_rate": 0.375,
-        "after_passed": 5,
-        "after_applicable": 8,
-        "after_pass_rate": 0.625
+        "before_mean": 1.1779,
+        "after_mean": 0.6876,
+        "delta": -0.4903,
+        "before_passed": 4,
+        "before_applicable": 10,
+        "before_pass_rate": 0.4,
+        "after_passed": 7,
+        "after_applicable": 10,
+        "after_pass_rate": 0.7
       },
       "sentence_length_sd": {
-        "before_mean": 3.3194,
-        "after_mean": 4.9416,
-        "delta": 1.6222,
-        "before_passed": 1,
-        "before_applicable": 8,
-        "before_pass_rate": 0.125,
-        "after_passed": 3,
-        "after_applicable": 8,
-        "after_pass_rate": 0.375
+        "before_mean": 4.0732,
+        "after_mean": 5.2642,
+        "delta": 1.191,
+        "before_passed": 2,
+        "before_applicable": 10,
+        "before_pass_rate": 0.2,
+        "after_passed": 4,
+        "after_applicable": 10,
+        "after_pass_rate": 0.4
       }
     }
   },
   "compliance": {
     "before_score": {
-      "passed": 22,
-      "applicable": 37,
-      "rate": 0.5946
+      "passed": 36,
+      "applicable": 55,
+      "rate": 0.6545
     },
     "after_score": {
-      "passed": 37,
-      "applicable": 37,
-      "rate": 1.0
+      "passed": 53,
+      "applicable": 55,
+      "rate": 0.9636
     },
-    "score_delta": 0.4054,
+    "score_delta": 0.3091,
     "metrics": {
       "boosters": {
         "before_mean": 0.0,
-        "after_mean": 1.0,
-        "delta": 1.0,
+        "after_mean": 0.3333,
+        "delta": 0.3333,
         "before_passed": 0,
-        "before_applicable": 1,
+        "before_applicable": 3,
         "before_pass_rate": 0.0,
         "after_passed": 1,
-        "after_applicable": 1,
-        "after_pass_rate": 1.0
+        "after_applicable": 3,
+        "after_pass_rate": 0.3333
       },
       "curly_quotes": {
         "before_mean": 0.0,
         "after_mean": 0.0,
         "delta": 0.0,
+        "before_passed": 10,
+        "before_applicable": 10,
+        "before_pass_rate": 1.0,
+        "after_passed": 10,
+        "after_applicable": 10,
+        "after_pass_rate": 1.0
+      },
+      "em_dashes": {
+        "before_mean": 0.25,
+        "after_mean": 0.75,
+        "delta": 0.5,
         "before_passed": 8,
         "before_applicable": 8,
         "before_pass_rate": 1.0,
@@ -124,57 +136,57 @@
         "after_applicable": 8,
         "after_pass_rate": 1.0
       },
-      "em_dashes": {
-        "before_mean": 0.0,
-        "after_mean": 0.8571,
-        "delta": 0.8571,
-        "before_passed": 7,
-        "before_applicable": 7,
-        "before_pass_rate": 1.0,
-        "after_passed": 7,
-        "after_applicable": 7,
-        "after_pass_rate": 1.0
-      },
       "ru_capital_after_colon": {
-        "before_mean": 0.8571,
+        "before_mean": 0.75,
         "after_mean": 0.0,
-        "delta": -0.8571,
-        "before_passed": 1,
-        "before_applicable": 7,
-        "before_pass_rate": 0.1429,
-        "after_passed": 7,
-        "after_applicable": 7,
+        "delta": -0.75,
+        "before_passed": 2,
+        "before_applicable": 8,
+        "before_pass_rate": 0.25,
+        "after_passed": 8,
+        "after_applicable": 8,
         "after_pass_rate": 1.0
       },
       "ru_odnako_comma": {
-        "before_mean": 0.8571,
+        "before_mean": 0.75,
         "after_mean": 0.0,
-        "delta": -0.8571,
-        "before_passed": 1,
-        "before_applicable": 7,
-        "before_pass_rate": 0.1429,
-        "after_passed": 7,
-        "after_applicable": 7,
+        "delta": -0.75,
+        "before_passed": 2,
+        "before_applicable": 8,
+        "before_pass_rate": 0.25,
+        "after_passed": 8,
+        "after_applicable": 8,
         "after_pass_rate": 1.0
       },
       "ru_quote_style": {
-        "before_mean": 0.4286,
+        "before_mean": 0.375,
         "after_mean": 0.0,
-        "delta": -0.4286,
-        "before_passed": 5,
-        "before_applicable": 7,
-        "before_pass_rate": 0.7143,
-        "after_passed": 7,
-        "after_applicable": 7,
+        "delta": -0.375,
+        "before_passed": 6,
+        "before_applicable": 8,
+        "before_pass_rate": 0.75,
+        "after_passed": 8,
+        "after_applicable": 8,
         "after_pass_rate": 1.0
+      },
+      "contrast_frames": {
+        "after_applicable": 10,
+        "after_mean": 0.0,
+        "after_pass_rate": 1.0,
+        "after_passed": 10,
+        "before_applicable": 10,
+        "before_mean": 0.6,
+        "before_pass_rate": 0.8,
+        "before_passed": 8,
+        "delta": -0.6
       }
     }
   },
   "integrity": {
     "immutable_token_audit": {
-      "applicable": 6,
+      "applicable": 8,
       "abstained": 2,
-      "passed": 6,
+      "passed": 8,
       "total_violations": 0
     }
   },
@@ -186,43 +198,43 @@
         "after_mean": 0.0,
         "delta": 0.0,
         "paired_applicable": 5,
-        "before_applicable": 6,
+        "before_applicable": 8,
         "after_applicable": 5,
         "before_abstained": 2,
-        "after_abstained": 3
+        "after_abstained": 5
       },
       "punctuation_entropy": {
         "value_field": "entropy",
-        "before_mean": 1.6182,
+        "before_mean": 1.6902,
         "after_mean": 1.8742,
         "delta": 0.2713,
         "paired_applicable": 5,
-        "before_applicable": 6,
+        "before_applicable": 8,
         "after_applicable": 5,
         "before_abstained": 2,
-        "after_abstained": 3
+        "after_abstained": 5
       },
       "windowed_ttr": {
         "value_field": "mean_ttr",
-        "before_mean": 0.8967,
+        "before_mean": 0.87,
         "after_mean": 0.872,
         "delta": -0.022,
         "paired_applicable": 5,
-        "before_applicable": 6,
+        "before_applicable": 8,
         "after_applicable": 5,
         "before_abstained": 2,
-        "after_abstained": 3
+        "after_abstained": 5
       },
       "content_function_ratio": {
         "value_field": "ratio",
-        "before_mean": 3.3488,
+        "before_mean": 2.996,
         "after_mean": 2.6177,
         "delta": -0.5748,
         "paired_applicable": 5,
-        "before_applicable": 6,
+        "before_applicable": 8,
         "after_applicable": 5,
         "before_abstained": 2,
-        "after_abstained": 3
+        "after_abstained": 5
       },
       "digit_density": {
         "value_field": "density_per_1000",
@@ -232,8 +244,8 @@
         "paired_applicable": 1,
         "before_applicable": 1,
         "after_applicable": 1,
-        "before_abstained": 7,
-        "after_abstained": 7
+        "before_abstained": 9,
+        "after_abstained": 9
       },
       "participial_stack_rate": {
         "value_field": "rate_per_500",
@@ -241,10 +253,10 @@
         "after_mean": 0.0,
         "delta": null,
         "paired_applicable": 0,
-        "before_applicable": 0,
+        "before_applicable": 1,
         "after_applicable": 0,
-        "before_abstained": 8,
-        "after_abstained": 8
+        "before_abstained": 9,
+        "after_abstained": 10
       },
       "that_clause_subject_rate": {
         "value_field": "rate_per_500",
@@ -252,30 +264,48 @@
         "after_mean": 0.0,
         "delta": null,
         "paired_applicable": 0,
-        "before_applicable": 0,
+        "before_applicable": 1,
         "after_applicable": 0,
-        "before_abstained": 8,
-        "after_abstained": 8
+        "before_abstained": 9,
+        "after_abstained": 10
       },
       "dangling_russian_participle": {
         "value_field": "count",
-        "before_mean": 0.1429,
+        "before_mean": 0.125,
         "after_mean": 0.0,
-        "delta": -0.1429,
-        "paired_applicable": 7,
-        "before_applicable": 7,
-        "after_applicable": 7,
-        "before_abstained": 1,
-        "after_abstained": 1
+        "delta": -0.125,
+        "paired_applicable": 8,
+        "before_applicable": 8,
+        "after_applicable": 8,
+        "before_abstained": 2,
+        "after_abstained": 2
       }
     },
-    "length_matching": []
+    "length_matching": [
+      {
+        "after_words": 68,
+        "before_words": 129,
+        "difference_ratio": 0.4729,
+        "id": "en-blog-weekly-releases",
+        "threshold": 0.35
+      },
+      {
+        "after_words": 54,
+        "before_words": 112,
+        "difference_ratio": 0.5179,
+        "id": "ru-blog-weekly-releases",
+        "threshold": 0.35
+      }
+    ]
   },
-  "warnings": [],
+  "warnings": [
+    "en-blog-weekly-releases: length mismatch 47.3% > 35% (before=129, after=68 words)",
+    "ru-blog-weekly-releases: length mismatch 51.8% > 35% (before=112, after=54 words)"
+  ],
   "tells": {
-    "before_total": 48,
+    "before_total": 50,
     "after_total": 0,
-    "delta": -48,
+    "delta": -50,
     "metrics": {
       "en_ai_phrases": {
         "before_total": 0,
@@ -288,136 +318,162 @@
         "before_total": 6,
         "after_total": 0,
         "delta": -6,
-        "before_mean": 0.75,
+        "before_mean": 0.6,
         "after_mean": 0.0
       },
       "ru_frame_phrases": {
-        "before_total": 33,
+        "before_total": 35,
         "after_total": 0,
-        "delta": -33,
-        "before_mean": 4.125,
+        "delta": -35,
+        "before_mean": 3.5,
         "after_mean": 0.0
       },
       "ru_non_guillemets": {
         "before_total": 3,
         "after_total": 0,
         "delta": -3,
-        "before_mean": 0.375,
+        "before_mean": 0.3,
         "after_mean": 0.0
       },
       "ru_odnako_comma": {
         "before_total": 6,
         "after_total": 0,
         "delta": -6,
-        "before_mean": 0.75,
+        "before_mean": 0.6,
         "after_mean": 0.0
       }
     }
   },
   "pairs": [
     {
-      "id": "humanizer-residue-municipal-report-en",
-      "genre": "report",
+      "compliance_after_rate": 0.6667,
+      "compliance_before_rate": 0.3333,
+      "genre": "blog",
+      "id": "en-blog-weekly-releases",
+      "immutable_token_audit_abstained": false,
+      "immutable_token_violations": 0,
       "language": "en",
-      "structural_before_rate": 0.75,
-      "structural_after_rate": 0.5,
-      "compliance_before_rate": 1.0,
-      "compliance_after_rate": 1.0,
-      "immutable_token_violations": 0,
-      "immutable_token_audit_abstained": true,
-      "tells_before": 0,
-      "tells_after": 0
-    },
-    {
-      "id": "ru-bio-architect",
-      "genre": "bio",
-      "language": "ru",
-      "structural_before_rate": 0.25,
-      "structural_after_rate": 0.5,
-      "compliance_before_rate": 0.6,
-      "compliance_after_rate": 1.0,
-      "immutable_token_violations": 0,
-      "immutable_token_audit_abstained": false,
-      "tells_before": 6,
-      "tells_after": 0
-    },
-    {
-      "id": "ru-dangling-kanclit",
-      "genre": "scientific",
-      "language": "ru",
-      "structural_before_rate": 0.6667,
-      "structural_after_rate": 0.6667,
-      "compliance_before_rate": 1.0,
-      "compliance_after_rate": 1.0,
-      "immutable_token_violations": 0,
-      "immutable_token_audit_abstained": true,
-      "tells_before": 1,
-      "tells_after": 0
-    },
-    {
-      "id": "ru-habr-cache",
-      "genre": "vc-habr",
-      "language": "ru",
-      "structural_before_rate": 0.25,
-      "structural_after_rate": 0.5,
-      "compliance_before_rate": 0.4,
-      "compliance_after_rate": 1.0,
-      "immutable_token_violations": 0,
-      "immutable_token_audit_abstained": false,
-      "tells_before": 10,
-      "tells_after": 0
-    },
-    {
-      "id": "ru-landing-meals",
-      "genre": "landing",
-      "language": "ru",
-      "structural_before_rate": 0.25,
-      "structural_after_rate": 0.5,
-      "compliance_before_rate": 0.6,
-      "compliance_after_rate": 1.0,
-      "immutable_token_violations": 0,
-      "immutable_token_audit_abstained": false,
-      "tells_before": 7,
-      "tells_after": 0
-    },
-    {
-      "id": "ru-readme-queue",
-      "genre": "readme",
-      "language": "ru",
-      "structural_before_rate": 0.5,
-      "structural_after_rate": 0.25,
-      "compliance_before_rate": 0.4,
-      "compliance_after_rate": 1.0,
-      "immutable_token_violations": 0,
-      "immutable_token_audit_abstained": false,
-      "tells_before": 9,
-      "tells_after": 0
-    },
-    {
-      "id": "ru-review-reader",
-      "genre": "review",
-      "language": "ru",
-      "structural_before_rate": 0.5,
       "structural_after_rate": 0.75,
-      "compliance_before_rate": 0.5,
-      "compliance_after_rate": 1.0,
-      "immutable_token_violations": 0,
-      "immutable_token_audit_abstained": false,
-      "tells_before": 7,
-      "tells_after": 0
+      "structural_before_rate": 0.4,
+      "tells_after": 0,
+      "tells_before": 0
     },
     {
-      "id": "ru-science-sleep",
-      "genre": "science-pop",
-      "language": "ru",
-      "structural_before_rate": 0.25,
-      "structural_after_rate": 0.5,
-      "compliance_before_rate": 0.6,
       "compliance_after_rate": 1.0,
+      "compliance_before_rate": 1.0,
+      "genre": "report",
+      "id": "humanizer-residue-municipal-report-en",
+      "immutable_token_audit_abstained": true,
       "immutable_token_violations": 0,
+      "language": "en",
+      "structural_after_rate": 0.5,
+      "structural_before_rate": 0.75,
+      "tells_after": 0,
+      "tells_before": 0
+    },
+    {
+      "compliance_after_rate": 1.0,
+      "compliance_before_rate": 0.6667,
+      "genre": "bio",
+      "id": "ru-bio-architect",
       "immutable_token_audit_abstained": false,
-      "tells_before": 8,
-      "tells_after": 0
+      "immutable_token_violations": 0,
+      "language": "ru",
+      "structural_after_rate": 0.5,
+      "structural_before_rate": 0.25,
+      "tells_after": 0,
+      "tells_before": 6
+    },
+    {
+      "compliance_after_rate": 0.8571,
+      "compliance_before_rate": 0.7143,
+      "genre": "blog",
+      "id": "ru-blog-weekly-releases",
+      "immutable_token_audit_abstained": false,
+      "immutable_token_violations": 0,
+      "language": "ru",
+      "structural_after_rate": 1.0,
+      "structural_before_rate": 0.75,
+      "tells_after": 0,
+      "tells_before": 2
+    },
+    {
+      "compliance_after_rate": 1.0,
+      "compliance_before_rate": 1.0,
+      "genre": "scientific",
+      "id": "ru-dangling-kanclit",
+      "immutable_token_audit_abstained": true,
+      "immutable_token_violations": 0,
+      "language": "ru",
+      "structural_after_rate": 0.6667,
+      "structural_before_rate": 0.6667,
+      "tells_after": 0,
+      "tells_before": 1
+    },
+    {
+      "compliance_after_rate": 1.0,
+      "compliance_before_rate": 0.5,
+      "genre": "vc-habr",
+      "id": "ru-habr-cache",
+      "immutable_token_audit_abstained": false,
+      "immutable_token_violations": 0,
+      "language": "ru",
+      "structural_after_rate": 0.5,
+      "structural_before_rate": 0.25,
+      "tells_after": 0,
+      "tells_before": 10
+    },
+    {
+      "compliance_after_rate": 1.0,
+      "compliance_before_rate": 0.6667,
+      "genre": "landing",
+      "id": "ru-landing-meals",
+      "immutable_token_audit_abstained": false,
+      "immutable_token_violations": 0,
+      "language": "ru",
+      "structural_after_rate": 0.5,
+      "structural_before_rate": 0.25,
+      "tells_after": 0,
+      "tells_before": 7
+    },
+    {
+      "compliance_after_rate": 1.0,
+      "compliance_before_rate": 0.5,
+      "genre": "readme",
+      "id": "ru-readme-queue",
+      "immutable_token_audit_abstained": false,
+      "immutable_token_violations": 0,
+      "language": "ru",
+      "structural_after_rate": 0.25,
+      "structural_before_rate": 0.5,
+      "tells_after": 0,
+      "tells_before": 9
+    },
+    {
+      "compliance_after_rate": 1.0,
+      "compliance_before_rate": 0.5714,
+      "genre": "review",
+      "id": "ru-review-reader",
+      "immutable_token_audit_abstained": false,
+      "immutable_token_violations": 0,
+      "language": "ru",
+      "structural_after_rate": 0.75,
+      "structural_before_rate": 0.5,
+      "tells_after": 0,
+      "tells_before": 7
+    },
+    {
+      "compliance_after_rate": 1.0,
+      "compliance_before_rate": 0.6667,
+      "genre": "science-pop",
+      "id": "ru-science-sleep",
+      "immutable_token_audit_abstained": false,
+      "immutable_token_violations": 0,
+      "language": "ru",
+      "structural_after_rate": 0.5,
+      "structural_before_rate": 0.25,
+      "tells_after": 0,
+      "tells_before": 8
     }
   ],
   "targets": {

@@ -12,7 +12,7 @@ The runtime entry point is `SKILL.md`: compatible agents read its YAML frontmatt
 ## Key files (and how they relate)
 - `SKILL.md`
   - The actual skill definition.
-  - Starts with YAML frontmatter (`---` … `---`) containing `name`, `version`, `description`, and `allowed-tools`.
+  - Starts with YAML frontmatter (`---` … `---`) containing `name`, `description`, `metadata.version`, and `allowed-tools`. A second skill, `skills/humanizer-slim/SKILL.md`, is a one-file compact version and shares the release version.
   - After the frontmatter is the editor prompt: the canonical, detailed pattern list with examples.
 - `README.md`
   - Installation and usage instructions.
@@ -48,7 +48,7 @@ Invoke the skill:
 
 ## Making changes safely
 ### Versioning (keep in sync)
-- `SKILL.md` has a `version:` field in its YAML frontmatter.
+- `SKILL.md` and `skills/humanizer-slim/SKILL.md` keep their version under `metadata.version` in YAML frontmatter, not as a top-level `version:` field.
 - `README.md` has a “Version History” section.
 - `CHANGELOG.md` has the latest released version.
 - `.claude-plugin/plugin.json` has the plugin version.

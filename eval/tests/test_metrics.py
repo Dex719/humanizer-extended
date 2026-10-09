@@ -138,19 +138,15 @@ def test_compare_has_separate_structural_and_compliance_blocks() -> None:
 def test_ru_corpus_has_six_contentful_genres() -> None:
     pairs = load_corpus(DEFAULT_CORPUS)
     ru_pairs = [item for item in pairs if item.get("language") == "ru"]
+    core_genres = {"vc-habr", "landing", "bio", "review", "science-pop", "readme"}
     assert len(ru_pairs) >= 6
-    assert {item["genre"] for item in ru_pairs} >= {
-        "vc-habr",
-        "landing",
-        "bio",
-        "review",
-        "science-pop",
-        "readme",
-    }
+    assert {item["genre"] for item in ru_pairs} >= core_genres
+    # The length floor guards the six core genre pairs. Short demo pairs, such as
+    # the README before/after, may legitimately lose half their filler.
     for item in ru_pairs:
         if item["genre"] == "scientific":
             assert item["id"] == "ru-dangling-kanclit"
-        else:
+        elif item["genre"] in core_genres:
             assert len(item["before"].split()) >= 65
             assert len(item["after"].split()) >= 55
 
@@ -404,3 +400,50 @@ def test_dangling_en_abstain() -> None:
     assert dangling_russian_participle("Using this method, results improved.", "en")[
         "abstained"
     ]
+
+
+@pytest.mark.parametrize(
+    ("text", "language", "expected"),
+    [
+        ("It's not merely a song, it's a statement.", "en", 1),
+        ("This isn't about speed. It's about trust.", "en", 1),
+        ("Shipping weekly isn't just a process change.", "en", 1),
+        ("The goal wasn't speed. It was predictability.", "en", 1),
+        ("It is less about tools and more about habits.", "en", 1),
+        ("The meeting moved not in May but in June.", "en", 0),
+        ("It does not run on Windows. This is a known issue.", "en", 0),
+        ("Это не просто инструмент, а целая философия.", "ru", 1),
+        ("Кэш — это не оптимизация, а архитектурное решение.", "ru", 1),
+        ("Целью была не скорость. Это про предсказуемость.", "ru", 1),
+        ("Встреча прошла не в мае, а в июне.", "ru", 0),
+    ],
+)
+def test_contrast_frames(text: str, language: str, expected: int) -> None:
+    assert metrics(text, language=language)["compliance"]["contrast_frames"] == expected
+
+
+def test_contrast_frames_is_a_compliance_check() -> None:
+    check = metrics("This isn't about speed. It's about trust.", language="en")["compliance"][
+        "checks"
+    ]["contrast_frames"]
+    assert check["applicable"] and check["passed"] is False
+
+
+def test_immutable_ignores_negation_dropped_with_staged_contrast() -> None:
+    filler = " The team reviews the release calendar every Monday and records each decision." * 8
+    before = (
+        "When we moved to weekly releases in March, the goal wasn't speed. It was "
+        "predictability. Rollbacks dropped from 9 to 2." + filler
+    )
+    after = "When we moved to weekly releases in March, the goal was predictability. " + (
+        "Rollbacks dropped from 9 to 2." + filler
+    )
+    audit = immutable_token_audit(before, after)
+    assert audit["categories"]["negations"]["violations"] == 0
+    assert audit["total_violations"] == 0
+
+
+def test_ru_participial_count_ignores_genitive_plural() -> None:
+    text = "Обратная связь приходит быстрее, диффы стали меньше, сюрпризов стало меньше."
+    assert metrics(text, language="ru")["structural"]["participial_clauses"] == 0
+    assert metrics("Он ушёл, сделав всё.", language="ru")["structural"]["participial_clauses"] == 1

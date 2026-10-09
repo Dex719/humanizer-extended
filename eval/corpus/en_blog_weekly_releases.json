@@ -1,0 +1,9 @@
+{
+  "id": "en-blog-weekly-releases",
+  "name": "en_blog_weekly_releases",
+  "title": "README before/after (English): weekly releases",
+  "language": "en",
+  "genre": "blog",
+  "before": "Great question! Here's a look at why our team switched to weekly releases.\n\nShipping weekly isn't just a process change — it's a cultural shift. When we moved from monthly to weekly releases in March, the goal wasn't speed. It was predictability.\n\nThe results speak for themselves. Rollbacks dropped from 9 in the first quarter to 2 in the second, and the average pull request now waits 1.5 days for review instead of 4. Faster feedback. Smaller diffs. Fewer surprises.\n\nTo be clear, this isn't about working harder. It's about working in smaller steps — a pivotal shift that underscores our commitment to quality, fostering trust across the team.\n\nAnd that's the real win.\n\nI hope this helps! Let me know if you'd like a template for your own release calendar.",
+  "after": "When we moved from monthly to weekly releases in March, the goal was predictability. Shipping weekly has been a cultural shift for the team.\n\nRollbacks dropped from 9 in the first quarter to 2 in the second, and the average pull request now waits 1.5 days for review instead of 4. Feedback is faster, diffs are smaller, and there are fewer surprises. We work in smaller steps now."
+}

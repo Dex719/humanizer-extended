@@ -2,7 +2,24 @@
 
 A portable agent skill that removes signs of AI-generated writing from English and Russian text, making it sound more natural while preserving the original facts and meaning.
 
-> **Fork.** `humanizer-extended` is a fork of [blader/humanizer](https://github.com/blader/humanizer) (original by Siqi Chen, MIT). It diverged after upstream 2.5.1 and adds patterns #30–38 (model-tool markup, hallucinated citations, placeholder leakage, document-internal style shift, aphoristic closer, prestige-metaphor frames, false balance, generic stock examples, nominalization) plus a FACT PRESERVATION section. Version 2.20.0 synchronizes upstream 2.8.x patterns as #49–51 and moves conditional detail into `references/`. Version 2.21.0 adds anti-humanization damage, current-era, grammar, and Russian patterns #52–73; it also demotes the old hard em-dash and negative-parallelism signals to LEGACY. Pattern numbers in this fork do **not** match upstream's.
+![Before and after: an English AI-sounding blog excerpt rewritten by humanizer-slim](assets/before-after-en.png)
+
+![До и после: русский фрагмент с признаками ИИ, переписанный humanizer-slim](assets/before-after-ru.png)
+
+Both rewrites are unedited output of `humanizer-slim` run on Claude Sonnet 5.5. Highlighted phrases on the left are the tells it removed. Every number in the input survives, and nothing new is added. The same pairs live in [`eval/corpus/`](eval/corpus/) as regression tests.
+
+## Two skills: full and slim
+
+| | `humanizer-extended` (full) | `humanizer-slim` |
+|---|---|---|
+| Size read per run | ~4,300 words plus on-demand references | ~1,650 words, one file |
+| Patterns | 75 numbered patterns, examples, research notes, metrics | The same priorities, condensed: strongest tells first, then clusters, then weak signals |
+| Output | Draft, audit, final | Final text only (review mode on request) |
+| Best for | Auditing, teaching, tuning the rules, running `eval/` | Everyday rewriting with strong current models (Claude Opus/Sonnet 5.5 class) |
+
+Both share the same hard limits: invent nothing, lose nothing, keep certainty and secondhand text as they are. Both treat **not X but Y** (`не просто X, а Y`) as the strongest current tell.
+
+> **Fork.** `humanizer-extended` is a fork of [blader/humanizer](https://github.com/blader/humanizer) (original by Siqi Chen, MIT). It diverged after upstream 2.5.1 and adds patterns #30–38 (model-tool markup, hallucinated citations, placeholder leakage, document-internal style shift, aphoristic closer, prestige-metaphor frames, false balance, generic stock examples, nominalization) plus a FACT PRESERVATION section. Version 2.20.0 synchronizes upstream 2.8.x patterns as #49–51 and moves conditional detail into `references/`. Version 2.21.0 adds anti-humanization damage, current-era, grammar, and Russian patterns #52–73. Version 2.22.0 syncs with upstream 3.1: not-X-but-Y becomes the strongest tell again, patterns #11–12 are retired, #74–75 are added, and a compact `humanizer-slim` skill ships alongside the full one. Pattern numbers in this fork do **not** match upstream's.
 
 ## Installation
 
@@ -12,6 +29,12 @@ Install with the cross-agent [skills CLI](https://skills.sh/docs/cli):
 
 ```bash
 npx skills add Dex719/humanizer-extended
+```
+
+Install the slim skill (it lives in `skills/humanizer-slim/`, so the CLI needs `--full-depth`):
+
+```bash
+npx skills add Dex719/humanizer-extended --full-depth --skill humanizer-slim
 ```
 
 Update an existing install:
@@ -41,7 +64,7 @@ Claude Code users can also install Humanizer Extended as a plugin:
 /plugin install humanizer-extended@humanizer-extended
 ```
 
-The plugin exposes the skill as `/humanizer-extended:humanizer-extended`.
+The plugin exposes both skills: `/humanizer-extended:humanizer-extended` and `/humanizer-extended:humanizer-slim`.
 
 ### Manual installation
 
@@ -59,6 +82,13 @@ mkdir -p ~/.config/opencode/skills
 git clone https://github.com/Dex719/humanizer-extended.git ~/.config/opencode/skills/humanizer-extended
 ```
 
+For the slim skill alone, copy only its folder:
+
+```bash
+git clone https://github.com/Dex719/humanizer-extended.git /tmp/humanizer-extended
+cp -r /tmp/humanizer-extended/skills/humanizer-slim ~/.claude/skills/humanizer-slim
+```
+
 If the repository is already cloned, copy the complete skill directory rather than only `SKILL.md`; current releases load supporting files under `references/` on demand. The `eval/` directory is for development and is not needed at runtime.
 
 > **Note:** OpenCode also scans `~/.claude/skills/` for compatibility, so a single clone into `~/.claude/skills/humanizer-extended/` works for both tools.
@@ -69,6 +99,14 @@ If the repository is already cloned, copy the complete skill directory rather th
 
 ```
 /humanizer-extended
+
+[paste your text here]
+```
+
+Or the slim version:
+
+```
+/humanizer-slim
 
 [paste your text here]
 ```
@@ -113,7 +151,9 @@ The skill also includes a final "obviously AI generated" audit pass and a second
 
 > "LLMs use statistical algorithms to guess what should come next. The result tends toward the most statistically likely result that applies to the widest variety of cases."
 
-## 51 Patterns Detected (with Before/After Examples)
+## Patterns (with Before/After Examples)
+
+Strength tiers decide what to fix first. **Act on one sighting:** #9, #49, #34/#50, #27/#28/#51, #75, and the leftovers #20, #30, #32. **Act on a cluster:** most of the rest. **Weak alone:** #7 single words, #13, #14, #19, #24, #26, #48, #68–69.
 
 ### Content Patterns
 
@@ -132,10 +172,10 @@ The skill also includes a final "obviously AI generated" audit pass and a second
 |---|---------|--------|-------|
 | 7 | **AI vocabulary** | "Actually... additionally... testament... landscape... showcasing" | "also... remain common" |
 | 8 | **Copula avoidance** | "serves as... features... boasts" | "is... has" |
-| 9 | **Negative parallelisms / tailing negations (LEGACY)** | Repeated "not just X, but Y" and clipped negation tails | Reduce mechanical clusters; absence is not evidence of human authorship |
+| 9 | **Not X but Y — strongest tell** | "It's not just a process change, it's a cultural shift." / «Это не про скорость. Это про предсказуемость.» | State Y directly; keep a contrast only when X is a belief the reader actually holds |
 | 10 | **Rule of three** | "innovation, inspiration, and insights" | Use natural number of items |
-| 11 | **Synonym cycling** | "protagonist... main character... central figure... hero" | "protagonist" (repeat when clearest) |
-| 12 | **False ranges** | "from the Big Bang to dark matter" | List topics directly |
+| 11 | **Synonym cycling (retired)** | "protagonist... main character... central figure... hero" | Historical on Wikipedia; fix only when one subject looks like several |
+| 12 | **False ranges (retired)** | "from the Big Bang to dark matter" | No longer listed by Wikipedia; fold clear cases into #1 or #35 |
 | 13 | **Passive voice / subjectless fragments** | "No configuration file needed" | Name the actor when it helps clarity |
 | 38 | **Nominalization overuse** | "the implementation of indexing resulted in optimization of queries" | Turn the abstract noun back into a verb: "indexing made queries faster" |
 
@@ -143,20 +183,20 @@ The skill also includes a final "obviously AI generated" audit pass and a second
 
 | # | Pattern | Before | After |
 |---|---------|--------|-------|
-| 14 | **Em/en dashes (LEGACY)** | Mechanical dash clusters in English with no matching voice habit | Recast only the mechanical uses; frequency is corroboration, not a pass/fail signal |
+| 14 | **Em/en dashes (LEGACY)** | Mechanical dash clusters in English with no matching voice habit | Historical on Wikipedia since Oct 2026; recast clusters without turning every dash into a comma |
 | 15 | **Boldface overuse** | "**OKRs**, **KPIs**, **BMC**" | "OKRs, KPIs, BMC" |
 | 16 | **Inline-header lists** | "**Performance:** Performance improved" | Convert to prose |
-| 17 | **Title Case Headings** | "Strategic Negotiations And Partnerships" | "Strategic negotiations and partnerships" |
+| 17 | **Title Case and decorative headings** | "Strategic Negotiations And Partnerships", "The decision, on one screen" | "Strategic negotiations and partnerships", "How the six options compare" |
 | 18 | **Emojis** | "🚀 Launch Phase: 💡 Key Insight:" | Remove emojis |
 | 19 | **Curly quotes** | `said “the project”` | `said "the project"` |
 | 26 | **Hyphenated word-pair clusters** | "cross-functional, data-driven, client-facing" repeated throughout | Keep required compounds; vary only conspicuous clusters of optional forms |
 | 27 | **Persuasive authority tropes** | "At its core, what matters is..." | State the point directly |
-| 28 | **Signposting announcements** | "Let's dive in", "Here's what you need to know" | Start with the content |
+| 28 | **Signposting and self-answered questions** | "Let's dive in", "Why does this matter? Because…" | Start with the content |
 | 29 | **Fragmented headers** | "## Performance" + "Speed matters." | Let the heading do the work |
 | 33 | **Document-internal style shift** | Formal academic paragraph followed by "pretty nuts honestly" paragraph | Pick one register and enforce it; ask if the input mixes two |
 | 34 | **Aphoristic closer** | "And in the end — that's what great software has always been about: not the code, but the craft." | Cut the epigram or end on a specific fact |
 | 35 | **Prestige-metaphor nouns as frames** | "the tapestry of modern software, a symphony of productivity, an orchestra of creation" | Delete mixed metaphors; keep at most one earned one |
-| 39 | **Diff-anchored writing** | "This function was added to replace the previous approach..." | Describe what it does, not what changed |
+| 39 | **Writing about the document** | "This function was added to replace...", "anything unconfirmed is flagged rather than guessed" | Describe the subject, not the diff or the method |
 
 ### Communication Patterns
 
@@ -209,9 +249,16 @@ The skill also includes a final "obviously AI generated" audit pass and a second
 
 | # | Pattern | Before | After |
 |---|---------|--------|-------|
-| 49 | **Manufactured punchlines / staccato drama** | "It had no preference. No prior. No nostalgia." | Connect the routine claim as ordinary prose; preserve only earned emphasis |
+| 49 | **One-line closers / staccato drama** | "That distinction matters.", "And that's the real win.", "No prior. No nostalgia." | Cut the closer, or merge the fragments into a sentence that keeps every item |
 | 50 | **Aphorism formulas** | "Symmetry is the language of trust." | State the precise claim instead of dressing it as a maxim |
 | 51 | **Conversational rhetorical openers** | "Honestly? It depends on how often you'll use it." | "Whether it's worth the price depends on how often you'll use it." |
+
+### Arguing With No One and the Wrong Reader (2.22)
+
+| # | Pattern | Before | After |
+|---|---------|--------|-------|
+| 74 | **Re-explaining what the reader knows** | A reply that restates the problem, diagnosis, and proof before the decision | Lead with the decision and the one fact the reader lacks |
+| 75 | **Arguing with no one** | "To be clear, this isn't about working harder." / «Я не говорю, что тесты не нужны.» | Remove the defense against an objection nobody raised |
 
 ### v2.21 Pattern Families
 
@@ -222,7 +269,7 @@ The skill also includes a final "obviously AI generated" audit pass and a second
 | 68–69 | **Genre-gated grammar fingerprints** | Present-participial stacks and sentence-subject `That` clauses, with news and formal-register exceptions |
 | 70–73 | **Additional Russian patterns** | Dangling adverbial participles, didactic disclaimers, formulaic openings, and recap-only conclusions |
 
-The **Reliability and false positives** section now includes neurodivergent, translation, genre, short-text, post-paraphrase, and no-model-attribution guards. Aggressive rewriting requires convergence across independent pattern families. Em dashes and negative parallelism remain LEGACY corroboration only; their absence never proves human authorship.
+The **Reliability and false positives** section now includes neurodivergent, translation, genre, short-text, post-paraphrase, and no-model-attribution guards. Aggressive rewriting requires convergence across independent pattern families, except for the act-on-one-sighting tier. Em dashes remain LEGACY corroboration only. The absence of any tell never proves human authorship.
 
 ## Full Example
 
@@ -240,10 +287,12 @@ The complete draft-audit-final example lives in [`references/examples.md`](refer
 - Shalevska 2024, *Hedges and Boosters in AI and Human Writing* - resolved hedge/booster frequencies; backs #24
 - Geng & Trotta 2025 ([arXiv 2502.09606](https://arxiv.org/abs/2502.09606)) - AI vocabulary timeline and the April 2024 "delve" collapse; backs #7
 - Russian-language tells: community write-ups on [Habr](https://habr.com/ru/articles/1022906/) and vc.ru (heuristic, not peer-reviewed) - backs #44–46
+- [v2.22 additions](references/research.md#v222-additions) - current Wikipedia sections (negative parallelisms live; em dashes and elegant variation historical), the Russian Wikipedia guide, certainty distortion in LM rewriting, voice normalization, and non-native false positives
 - [v2.21 evidence register](references/research.md#v221-evidence-register) - verified primary links and bounded claims for patterns #52–73, reliability guards, and evaluation methodology
 
 ## Version History
 
+- **2.22.0** - Synced with upstream humanizer 3.1. Promoted not-X-but-Y (#9) to the strongest tell with English, split, reversed, and Russian forms, plus a `contrast_frames` metric. Added strength tiers, #74 (re-explaining what the reader knows) and #75 (arguing with no one); folded one-line closers, self-answered questions, decorative headings, and self-describing text into #49, #28, #17, and #39. Retired #11 and #12. Added the compact `humanizer-slim` skill, before/after images, and two corpus pairs. See [CHANGELOG.md](CHANGELOG.md).
 - **2.21.0** - Added patterns #52–73, evidence-backed reliability guards, specific-author voice anchoring, residue-first fact locking, nine stdlib diagnostics, two corpus pairs, and length/integrity reporting. Demoted #9 and #14 to LEGACY and expanded Russian канцелярит and grammar checks. See [CHANGELOG.md](CHANGELOG.md) for the full release notes.
 - **2.20.0** - Added three upstream 2.8.x writing-pattern guards, fail-safe voice calibration, genre-aware booster guidance, and stronger fact preservation. Split the large skill into a compact core plus conditional references. Added Russian-aware structural/compliance metrics, a six-genre Russian eval corpus, aggregate baselines, tests, cross-agent skills CLI and Claude Code marketplace packaging, repository hygiene, and CI checks. See [CHANGELOG.md](CHANGELOG.md) for the full release notes.
 - **2.19.0** - Eval-driven fix. Built a deterministic structural-metrics harness (kept local, not shipped) and ran it on a 12-genre before/after corpus. Result: applied to real text, the skill reliably strips em dashes (100%), participial overload (0%→83% pass), nominalizations, and the *may*-heavy hedging, and it *improves* sentence-length variance (17%→83% pass) rather than regressing as one hand-written example had implied. The one systematic gap was boosters: across all 12 rewrites the skill added *zero* boosters, even though booster-absence is the single most reliable AI tell (pattern 24). Hardened pattern 24, the structural self-audit, and the Process so that adding at least one booster (where the evidence earns it) is a mandatory step, not an optional check. No new patterns.

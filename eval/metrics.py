@@ -509,10 +509,13 @@ def _immutable_inventory(text: str) -> dict[str, Counter[str]]:
         names.append(match.group(0).casefold())
 
     language = detect_language(text)
-    negations = count_phrase_details(text, _NEGATION_PATTERNS[language])
+    negation_source = _blank_contrast_frames(text, language)
+    negations = count_phrase_details(negation_source, _NEGATION_PATTERNS[language])
     # English contracted negation is not covered by word-boundary phrase lists.
     if language == "en":
-        contracted = len(re.findall(r"\b[A-Za-z]+n't\b", text, flags=re.IGNORECASE))
+        contracted = len(
+            re.findall(r"\b[A-Za-z]+n['’]t\b", negation_source, flags=re.IGNORECASE)
+        )
         if contracted:
             negations["n't"] = contracted
     modality = count_phrase_details(text, _MODALITY_PATTERNS[language])
@@ -1164,6 +1167,96 @@ def _count_capital_after_colon(text: str) -> int:
     return len(re.findall(r":\s+(?![«“\"'\n\-*])[А-ЯЁA-Z](?=[а-яёa-z])", text))
 
 
+# Pattern 9: "not X but Y" contrastive framing, the strongest current tell.
+# Each regex targets the staged form rather than any negation followed by a
+# contrast, so plain factual corrections ("not in May but in June") stay rare.
+_EN_CONTRAST_RES = (
+    # not just / not only / not merely / not simply ... but
+    re.compile(r"\bnot\s+(?:just|only|merely|simply)\b[^.?!]{0,120}?\bbut\b", re.IGNORECASE),
+    # it's not X, it's Y / this isn't X; it's Y (same sentence)
+    re.compile(
+        r"\b(?:it|this|that)(?:['’]s|\s+is|\s+was)\s+not\b[^.?!]{0,80}?[,;]\s*"
+        r"(?:it|this|that)(?:['’]s|\s+is|\s+was)\b",
+        re.IGNORECASE,
+    ),
+    re.compile(
+        r"\b(?:it|this|that)\s+(?:isn['’]t|wasn['’]t)\b[^.?!]{0,80}?[,;]\s*"
+        r"(?:it|this|that)(?:['’]s|\s+is|\s+was)\b",
+        re.IGNORECASE,
+    ),
+    # split form: "This isn't about X. It's about Y." / "This does not mean X. It means Y."
+    re.compile(
+        r"\b(?i:it|this|that)\s+(?i:(?:isn['’]t|is\s+not|wasn['’]t|was\s+not)\s+"
+        r"(?:about|just|only|merely|simply)|(?:doesn['’]t|does\s+not)\s+mean)\b"
+        r"[^.?!]{0,100}[.!]\s+(?:It|This|That)(?:['’]s|\s+is|\s+was|\s+means)\b",
+    ),
+    # less about X, more about Y
+    re.compile(r"\bless\s+about\b[^.?!]{0,80}?\bmore\s+about\b", re.IGNORECASE),
+    # "X isn't just Y" with any subject; the follow-up clause is optional
+    re.compile(
+        r"\b(?:isn['’]t|wasn['’]t|aren['’]t|(?:is|was|are)\s+not)\s+(?:just|only|merely|simply)\b",
+        re.IGNORECASE,
+    ),
+    # split form with any subject: "The goal wasn't speed. It was predictability."
+    re.compile(
+        r"\b(?i:isn['’]t|wasn['’]t|is\s+not|was\s+not)\s+[^.?!]{1,60}[.!]\s+"
+        r"(?:It|This|That)(?:['’]s|\s+is|\s+was)\s+[^.?!]{1,40}[.!]",
+    ),
+)
+
+_RU_CONTRAST_RES = (
+    # не просто X, а Y / не только X, но и Y
+    re.compile(r"\bне\s+просто\b[^.?!]{0,120}?,\s*(?:а|но)\b", re.IGNORECASE),
+    re.compile(r"\bне\s+только\b[^.?!]{0,120}?,?\s*но\s+и\b", re.IGNORECASE),
+    # Это не про X. Это про Y. / Речь не о X / Дело не в X
+    re.compile(r"\b(?:это|речь|дело|вопрос)\s+не\s+(?:про|о|об|в|во)\b", re.IGNORECASE),
+    # X — это не Y, а Z / X — это не Y. Это Z.
+    re.compile(r"[—–-]\s*это\s+не\b[^.?!]{0,80}?(?:,\s*а\b|[.!]\s+это\b)", re.IGNORECASE),
+    # не столько X, сколько Y
+    re.compile(r"\bне\s+столько\b[^.?!]{0,120}?\bсколько\b", re.IGNORECASE),
+    # split form: "Целью была не скорость. Это про предсказуемость."
+    re.compile(r"\bне\s+[^.?!]{1,60}[.!]\s+Это\s+(?:про|о|об)\b"),
+)
+
+
+def _contrast_patterns(language: str) -> tuple[re.Pattern[str], ...]:
+    return _RU_CONTRAST_RES if language == "ru" else _EN_CONTRAST_RES
+
+
+def _contrast_spans(text: str, language: str) -> list[tuple[int, int]]:
+    """Return merged spans so one contrast matched by two regexes counts once."""
+
+    spans = sorted(
+        (match.start(), match.end())
+        for pattern in _contrast_patterns(language)
+        for match in pattern.finditer(text)
+    )
+    merged: list[tuple[int, int]] = []
+    for start, end in spans:
+        if merged and start < merged[-1][1]:
+            merged[-1] = (merged[-1][0], max(merged[-1][1], end))
+        else:
+            merged.append((start, end))
+    return merged
+
+
+def _count_contrast_frames(text: str, language: str) -> int:
+    return len(_contrast_spans(text, language))
+
+
+def _blank_contrast_frames(text: str, language: str) -> str:
+    """Blank staged contrasts so removing them is not a lost negation.
+
+    Pattern 9 asks the editor to drop the staged negative half of a
+    not-X-but-Y contrast; the fact-lock audit must not count that as an error.
+    """
+
+    chars = list(text)
+    for start, end in _contrast_spans(text, language):
+        chars[start:end] = " " * (end - start)
+    return "".join(chars)
+
+
 def _count_participial_clauses(text: str, language: str) -> int:
     if language == "en":
         return len(re.findall(r",\s+(?:thereby\s+)?[a-z]+ing\b", text, flags=re.IGNORECASE))
@@ -1171,7 +1264,9 @@ def _count_participial_clauses(text: str, language: str) -> int:
     # treating ordinary words ending in -я/-в as clauses.
     return len(
         re.findall(
-            r",\s+(?:не\s+)?[а-яё]{3,}(?:в|вши|ши|я)(?:сь)?\b",
+            # "-в" gerunds end in -ав/-ев/-ив/-ыв/-яв; "-ов" is a genitive plural
+            # noun ("сюрпризов"), not a participle.
+            r",\s+(?:не\s+)?[а-яё]{2,}(?:[аеиыя]в|вши|ши|я)(?:сь)?\b",
             text,
             flags=re.IGNORECASE,
         )
@@ -1351,10 +1446,17 @@ def metrics(text: str, genre: str | None = None, language: str | None = None) ->
     ru_frames = count_phrases(text, RU_FRAME_PHRASES) if language == "ru" else 0
     en_ai_phrases = count_phrases(text, EN_AI_PHRASES) if language == "en" else 0
     tell_total = ru_odnako + ru_colon_capital + ru_non_guillemets + ru_frames + en_ai_phrases
+    contrast_frames = _count_contrast_frames(text, language)
 
     booster_applicable = normalized_genre in BOOSTER_TARGET_GENRES
     ru_dash_limit = max(1, math.ceil(max(sentence_count, 1) * 0.75))
     compliance_checks = {
+        "contrast_frames": _check(
+            contrast_frames,
+            "==",
+            0,
+            description="pattern 9: staged not-X-but-Y contrasts (EN and RU forms)",
+        ),
         "em_dashes": _check(
             em_dashes,
             "<=",
@@ -1466,6 +1568,7 @@ def metrics(text: str, genre: str | None = None, language: str | None = None) ->
             "total": tell_total,
         },
         "compliance": {
+            "contrast_frames": contrast_frames,
             "em_dashes": em_dashes,
             "curly_quotes": curly_quotes,
             "boosters_total": sum(booster_details.values()),
