@@ -470,6 +470,102 @@ _MODALITY_PATTERNS = {
 }
 
 
+# Modal forms that carry the same claim strength. The fact-lock audit compares
+# these classes rather than surface forms, so "следует" -> "стоит" or
+# "may" -> "might" is not a violation, while "may" -> nothing still is.
+_MODALITY_CLASSES = {
+    "en": {
+        "possibility": ("may", "might", "could", "perhaps", "possibly"),
+        "ability": ("can",),
+        "probability": ("probably", "likely", "appears to", "seems to"),
+        "obligation": ("must", "should", "ought to"),
+        "future": ("shall", "will", "would"),
+    },
+    "ru": {
+        "possibility": ("может", "могут", "мог", "могла", "могло", "могли", "можно", "возможно"),
+        "probability": ("вероятно", "по-видимому", "предположительно"),
+        "obligation": ("должен", "должна", "должно", "должны", "следует", "нужно", "необходимо"),
+    },
+}
+
+# Rhetorical frames whose modal or negation word carries no claim. Patterns 44,
+# 71, and 28 ask the editor to delete them, so their removal is not a lost fact.
+_RHETORICAL_FRAMES = {
+    "en": (
+        "it should be noted",
+        "it must be noted",
+        "it is worth noting",
+        "it can be said",
+        "needless to say",
+        "it goes without saying",
+        "cannot be overstated",
+    ),
+    "ru": (
+        "следует отметить",
+        "следует подчеркнуть",
+        "стоит отметить",
+        "стоит подчеркнуть",
+        "необходимо отметить",
+        "необходимо подчеркнуть",
+        "можно отметить",
+        "можно сказать",
+        "нельзя не заметить",
+        "нельзя не отметить",
+        "нельзя переоценить",
+        "не секрет",
+    ),
+}
+
+# "стоит" is obligation in "стоит учитывать" but a price in "стоит 500 рублей".
+_RU_STOIT_MODAL_RE = re.compile(
+    r"\bстоит\b(?!\s+(?:\d|около|примерно|всего|дешевле|дороже|от\b|до\b|рубл|долл|евро))",
+    re.IGNORECASE,
+)
+
+_RU_NAME_ENDING_RE = re.compile(r"(?:ого|ему|ой|ей|ом|ем|ым|им|ую|ая|ий|а|я|у|ю|ы|и|е)$")
+
+
+def _ru_name_key(name: str) -> str:
+    """Collapse Russian case endings so "Корнеева" and "Корнееву" match."""
+
+    parts = []
+    for token in name.split():
+        if len(token) > 4 and re.search(r"[а-яё]", token):
+            token = _RU_NAME_ENDING_RE.sub("", token)
+        parts.append(token)
+    return " ".join(parts)
+
+
+def _name_keys(names: Iterable[str], language: str) -> set[str]:
+    keys: set[str] = set()
+    for name in names:
+        key = _ru_name_key(name) if language == "ru" else name
+        keys.add(key)
+        tokens = key.split()
+        if len(tokens) > 1:
+            keys.update(tokens)
+    return keys
+
+
+def _blank_phrases(text: str, phrases: Iterable[str]) -> str:
+    chars = list(text)
+    for phrase in phrases:
+        for match in _phrase_pattern(phrase).finditer(text):
+            chars[match.start() : match.end()] = " " * (match.end() - match.start())
+    return "".join(chars)
+
+
+def _modality_classes(text: str, language: str) -> dict[str, int]:
+    classes: dict[str, int] = {}
+    for label, forms in _MODALITY_CLASSES[language].items():
+        count = count_phrases(text, forms)
+        if label == "obligation" and language == "ru":
+            count += len(_RU_STOIT_MODAL_RE.findall(text))
+        if count:
+            classes[label] = count
+    return classes
+
+
 def _trim_url(value: str) -> str:
     return value.rstrip(".,;:!?)]}»”\"'")
 
@@ -509,16 +605,27 @@ def _immutable_inventory(text: str) -> dict[str, Counter[str]]:
         names.append(match.group(0).casefold())
 
     language = detect_language(text)
-    negation_source = _blank_contrast_frames(text, language)
-    negations = count_phrase_details(negation_source, _NEGATION_PATTERNS[language])
-    # English contracted negation is not covered by word-boundary phrase lists.
-    if language == "en":
-        contracted = len(
-            re.findall(r"\b[A-Za-z]+n['’]t\b", negation_source, flags=re.IGNORECASE)
-        )
-        if contracted:
-            negations["n't"] = contracted
-    modality = count_phrase_details(text, _MODALITY_PATTERNS[language])
+
+    def negation_details(source: str) -> dict[str, int]:
+        details = count_phrase_details(source, _NEGATION_PATTERNS[language])
+        # English contracted negation is not covered by word-boundary phrase lists.
+        if language == "en":
+            contracted = len(re.findall(r"\b[A-Za-z]+n['’]t\b", source, flags=re.IGNORECASE))
+            if contracted:
+                # "wasn't" and "was not" are the same negation.
+                details["not"] = details.get("not", 0) + contracted
+        return details
+
+    # "Required" forms sit outside staged contrasts and rhetorical frames, which
+    # patterns 9, 28, 44, and 71 ask the editor to remove. "Allowed" forms are
+    # every form in the text, so a contrast kept in plain words is not "added".
+    required_source = _blank_phrases(
+        _blank_contrast_frames(text, language), _RHETORICAL_FRAMES[language]
+    )
+    negations = negation_details(required_source)
+    negations_allowed = negation_details(text)
+    modality = _modality_classes(required_source, language)
+    modality_allowed = _modality_classes(text, language)
 
     def present(details: Mapping[str, int]) -> Counter[str]:
         return Counter({key.casefold(): 1 for key, value in details.items() if value})
@@ -529,9 +636,13 @@ def _immutable_inventory(text: str) -> dict[str, Counter[str]]:
         # Presence semantics avoid treating harmless repetition compaction as a
         # factual change. Numbers, dates, and URLs remain multisets because each
         # repeated occurrence may encode a separate datum.
-        "names": Counter(set(names)),
+        # Multi-token names also count token by token, so a later mention by
+        # surname alone ("Корнееву") matches "Анна Корнеева".
+        "names": Counter(_name_keys(names, language)),
         "negations": present(negations),
         "modality": present(modality),
+        "negations_allowed": present(negations_allowed),
+        "modality_allowed": present(modality_allowed),
     }
 
 
@@ -568,8 +679,14 @@ def immutable_token_audit(before: str, after: str) -> dict[str, Any]:
     for name in ("numbers_dates", "urls", "names", "negations", "modality"):
         before_values = before_inventory[name]
         after_values = after_inventory[name]
-        missing = before_values - after_values
-        added = after_values - before_values
+        if name in ("negations", "modality"):
+            # Lost: a required form that appears nowhere in the rewrite.
+            # Added: a required form in the rewrite that the input never used.
+            missing = before_values - after_inventory[f"{name}_allowed"]
+            added = after_values - before_inventory[f"{name}_allowed"]
+        else:
+            missing = before_values - after_values
+            added = after_values - before_values
         violations = sum(missing.values()) + sum(added.values())
         total += violations
         categories[name] = {
@@ -1474,13 +1591,18 @@ def metrics(text: str, genre: str | None = None, language: str | None = None) ->
             0,
             description="skill-level English curly-quote compliance",
         ),
+        # Informational since v2.22: requiring a booster pushed rewrites to
+        # manufacture confidence the author never expressed (pattern 24 allows
+        # one only when the evidence earns it). The count is still reported.
         "boosters": _check(
             sum(booster_details.values()),
             ">=",
-            1,
-            applicable=booster_applicable,
+            None,
+            applicable=False,
             description=(
-                "genre-gated confidence marker; only voice-led genres are scored"
+                "informational confidence-marker count for voice-led genres; never a target"
+                if booster_applicable
+                else "informational confidence-marker count; never a target"
             ),
         ),
         "ru_quote_style": _check(

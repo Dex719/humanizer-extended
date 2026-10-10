@@ -1,0 +1,114 @@
+[
+  {
+    "id": "en-blog-postgres-migration",
+    "A": {"added": [], "lost": [], "tells": [], "naturalness": 5},
+    "B": {"added": [], "lost": [], "tells": [], "naturalness": 5},
+    "better": "tie",
+    "reason": "Both are near-verbatim copies of an already clean input, and each differs only in one clause about latency, with equal fidelity."
+  },
+  {
+    "id": "en-readme-logslice",
+    "A": {"added": [], "lost": [], "tells": [], "naturalness": 5},
+    "B": {"added": [], "lost": [], "tells": [], "naturalness": 4},
+    "better": "A",
+    "reason": "Both cut the same filler, but A also code-formats the flags and commands as a README should."
+  },
+  {
+    "id": "en-landing-bike-shop",
+    "A": {"added": [], "lost": [], "tells": ["'We keep things simple:' stock frame", "'Visit us in Leeds today.' CTA closer (genre-acceptable)"], "naturalness": 4},
+    "B": {"added": [], "lost": [], "tells": ["'Visit us in Leeds today.' CTA closer (genre-acceptable)"], "naturalness": 4},
+    "better": "B",
+    "reason": "B drops the 'We keep things simple' frame and states the honest-quote promise directly, with no loss of facts."
+  },
+  {
+    "id": "en-bio-engineer",
+    "A": {"added": [], "lost": [], "tells": ["'conversation between load and material' metaphor kept", "'anything but simple' cliché"], "naturalness": 4},
+    "B": {"added": [], "lost": ["her view of structures as a 'conversation' between load and material flattened to 'a matter of load and material', which changes the meaning"], "tells": ["'anything but simple' cliché"], "naturalness": 4},
+    "better": "A",
+    "reason": "A keeps every supported detail, including how she sees structures, while B's 'a matter of load and material' empties out that point."
+  },
+  {
+    "id": "en-review-novel",
+    "A": {"added": [], "lost": [], "tells": [], "naturalness": 5},
+    "B": {"added": [], "lost": [], "tells": [], "naturalness": 5},
+    "better": "tie",
+    "reason": "Both keep the review whole and change only how the last two sentences are joined, and both endings read naturally."
+  },
+  {
+    "id": "en-report-support-q2",
+    "A": {"added": [], "lost": [], "tells": [], "naturalness": 5},
+    "B": {"added": [], "lost": [], "tells": ["'top issue... more than any other category' redundancy kept"], "naturalness": 4},
+    "better": "A",
+    "reason": "Both drop the staged 'next area to watch' opener and the 'clear decline' filler, but A also merges the redundant billing sentences into one."
+  },
+  {
+    "id": "en-blog-weekly-releases",
+    "A": {"added": [], "lost": ["the goal explicitly 'wasn't speed'"], "tells": ["'which we see as good for quality and for trust' is a slightly vague closer"], "naturalness": 4},
+    "B": {"added": [], "lost": ["the goal explicitly 'wasn't speed'"], "tells": ["'That fits our focus on quality' corporate phrasing", "'changed the team's culture as well as its process' keeps the inflated framing"], "naturalness": 3},
+    "better": "A",
+    "reason": "A removes the chatbot wrapper and the cultural-shift hype cleanly and keeps the quality and trust claims hedged, while B keeps corporate framing."
+  },
+  {
+    "id": "humanizer-residue-municipal-report-en",
+    "A": {"added": [], "lost": ["'Several scholars' reduced to Harrington alone, so the number of endorsers changes"], "tells": [], "naturalness": 4},
+    "B": {"added": [], "lost": [], "tells": ["choppy one-clause sentences ('It improved participation.') remain"], "naturalness": 3},
+    "better": "B",
+    "reason": "A reads better, but it misstates the source by saying only Harrington praised the initiative, while B keeps the 'several scholars' attribution."
+  },
+  {
+    "id": "ru-bio-architect",
+    "A": {"added": [], "lost": [], "tells": ["«приверженная инновациям» — оставлен пафос", "«Её подход определяет проекты на пересечении…» — пустая формула", "«передовые форматы» — рекламное", "«и она продолжает» — двусмысленное «она» (мастерская или Корнеева)"], "naturalness": 3},
+    "B": {"added": [], "lost": [], "tells": ["«География проектов отражает рост команды» — канцелярит", "запятая вместо союза во фразе «девять человек, она продолжает» и двусмысленное «она»"], "naturalness": 4},
+    "better": "B",
+    "reason": "B removes the innovation and «передовые» hype and turns the empty «уникальный подход» line into a plain fact, while A keeps several of these tells."
+  },
+  {
+    "id": "ru-blog-weekly-releases",
+    "A": {"added": [], "lost": ["то, что целью была не скорость"], "tells": [], "naturalness": 4},
+    "B": {"added": [], "lost": ["то, что целью была не скорость"], "tells": ["«Цель была в предсказуемости» звучит натянуто"], "naturalness": 4},
+    "better": "A",
+    "reason": "The texts are nearly identical, but A's opening with «потому что нам нужна была предсказуемость» reads more naturally than B's «Цель была в предсказуемости»."
+  },
+  {
+    "id": "ru-dangling-kanclit",
+    "A": {"added": [], "lost": [], "tells": ["«С предложенным методом» — разговорно для научного текста", "«соответствующих показателей» — остаток канцелярита"], "naturalness": 4},
+    "B": {"added": [], "lost": ["«в работе показано» — вывод больше не привязан к работе"], "tells": ["«оценивает эффективность по соответствующим показателям» — слегка сдвинут смысл исходной фразы"], "naturalness": 4},
+    "better": "tie",
+    "reason": "A is closer to the source on the evaluation-system sentence and the 'shown in this work' attribution, B has the better scientific register («При использовании»), and overall they balance out."
+  },
+  {
+    "id": "ru-habr-cache",
+    "A": {"added": [], "lost": [], "tells": ["«Высокая доступность важна любому цифровому продукту» — общий вступительный штамп оставлен"], "naturalness": 4},
+    "B": {"added": [], "lost": [], "tells": ["«два уровня кэша» повторяется в соседних предложениях"], "naturalness": 4},
+    "better": "B",
+    "reason": "B drops the generic «высокая доступность» opener, goes straight to the incident and keeps every fact and hedge."
+  },
+  {
+    "id": "ru-landing-meals",
+    "A": {"added": [], "lost": [], "tells": ["«Вы экономите время, а меню разнообразное» — неловкая связка"], "naturalness": 4},
+    "B": {"added": [], "lost": [], "tells": ["«Правильное питание важно, и…» — общий вступительный штамп с натянутой связкой", "«ведущие повара» — рекламное", "финальный призыв повторяет уже сказанное про заказ до 20:00 и доставку с 7:00 до 11:00"], "naturalness": 3},
+    "better": "A",
+    "reason": "A removes the generic opener and the hype and keeps every term of the offer, while B keeps «Правильное питание важно» and ends by repeating the delivery window as a CTA."
+  },
+  {
+    "id": "ru-readme-queue",
+    "A": {"added": [], "lost": [], "tells": ["«Так работает модель at-least-once, и это нужно учитывать» — слегка назидательная концовка"], "naturalness": 4},
+    "B": {"added": [], "lost": [], "tells": [], "naturalness": 5},
+    "better": "B",
+    "reason": "B states the at-least-once → idempotency link directly, reads like a native README and formats `Queue` and `docs` as code."
+  },
+  {
+    "id": "ru-review-reader",
+    "A": {"added": [], "lost": [], "tells": ["«сочетает стиль, автономность и функциональность» — рекламная триада оставлена", "«может стать отличным выбором для тех, кто ценит комфорт и современные технологии» — рекламная концовка"], "naturalness": 3},
+    "B": {"added": [], "lost": [], "tells": ["«для тех, кто ценит комфорт и современные технологии» — рекламная формула (смягчена до «хорошим выбором»)"], "naturalness": 4},
+    "better": "B",
+    "reason": "B drops the style/autonomy/functionality triad and tones down the closer while keeping every spec, the PDF caveat and the price, and A keeps both sales tells."
+  },
+  {
+    "id": "ru-science-sleep",
+    "A": {"added": ["«поэтому исследования стоит продолжать» — причинная связь, которой нет в исходнике"], "lost": [], "tells": [], "naturalness": 4},
+    "B": {"added": ["«поэтому дальнейшие исследования очень важны» — причинная связь, которой нет в исходнике"], "lost": [], "tells": ["«Исследования сна важны для понимания работы нервной системы» — общий вступительный штамп", "«могут оказаться решающими» — раздутая значимость", "«потенциально напоминает» — калька"], "naturalness": 3},
+    "better": "A",
+    "reason": "A drops the generic opener and the inflated «определяющим фактором» claim while keeping every hedge, and B keeps the opener and the inflated significance."
+  }
+]

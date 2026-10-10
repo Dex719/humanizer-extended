@@ -73,14 +73,14 @@ COPY = {
         "title": "Before and after",
         "before": "Before",
         "after": "After · humanizer-slim",
-        "foot": "Kept: March, monthly → weekly, 9 → 2 rollbacks, 1.5 vs 4 days, faster feedback, smaller diffs, fewer surprises, smaller steps. Added: nothing.",
+        "foot": "Kept: March, monthly → weekly, predictability over speed, 9 → 2 rollbacks, 1.5 vs 4 days, faster feedback, smaller diffs, fewer surprises, smaller steps, trust. Added: nothing.",
         "model": "Unedited output, Claude Sonnet 5.5",
     },
     "ru": {
         "title": "До и после",
         "before": "До",
         "after": "После · humanizer-slim",
-        "foot": "Сохранено: март, ежемесячный → еженедельный цикл, 9 → 2 отката, 1,5 дня вместо 4, быстрая обратная связь, маленькие диффы, меньше сюрпризов, маленькие шаги. Убрано: калька «смена культуры», за которой во входе нет конкретики. Добавлено: ничего.",
+        "foot": "Сохранено: март, ежемесячный → еженедельный цикл, предсказуемость вместо скорости, 9 → 2 отката, 1,5 дня вместо 4, быстрая обратная связь, маленькие диффы, меньше сюрпризов, маленькие шаги. Калька «смена культуры» заменена на «команда стала работать иначе». Добавлено: ничего.",
         "model": "Вывод без правок, Claude Sonnet 5.5",
     },
 }

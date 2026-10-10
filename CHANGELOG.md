@@ -6,6 +6,27 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [2.23.0] - 2026-10-11
+
+### Added
+
+- A blind full-vs-slim comparison on 16 texts in `eval/results/2026-10-11-full-vs-slim/`, with inputs, outputs, the A/B key, judge notes, and a scoring script. Slim was preferred 10 times, the full skill 3 times, with 3 ties.
+- Six English corpus pairs with a `provenance` field: Claude Haiku 5.5 inputs from recorded fact-list prompts, and skill outputs that a blind review found to add and lose nothing.
+- Tests for modal synonyms, rhetorical frames, kept contrasts, Russian name cases, and the informational booster check.
+
+### Changed
+
+- Pattern 9 in both skills keeps a contrast when the reader would naturally assume the negative half (weekly releases suggest speed), written short and inside one sentence: "for predictability, not speed".
+- Both skills forbid adding a causal link (`so`, `because`, `поэтому`, `так что`) between facts the input only places side by side.
+- Slim's sales-language list now includes `for those who value…`, `для тех, кто ценит…`, and `идеальное решение для`.
+- The fact-lock audit compares modality by class (`следует` and `стоит` match; `may` and nothing does not), ignores negations and modals inside staged contrasts and rhetorical frames when checking for losses, still allows a contrast kept in plain words, treats `wasn't` and `was not` as the same negation, and matches Russian names across cases.
+- The booster check is informational. It still counts confidence markers but no longer fails a rewrite that adds none.
+- The README before/after images use slim's outputs after these fixes.
+
+### Fixed
+
+- Replaced the 2.21 reference rewrite for `ru-landing-meals`, which commented on its source in almost every sentence and used an `а не` contrast, with landing copy that keeps every fact.
+
 ## [2.22.0] - 2026-10-10
 
 ### Added
@@ -84,7 +105,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Fixed corpus path resolution, sentence splitting around common abbreviations, and the false positive for the month "May".
 - Ignored Python caches and local Claude settings, and enforced LF line endings.
 
-[Unreleased]: https://github.com/Dex719/humanizer-extended/compare/v2.22.0...HEAD
+[Unreleased]: https://github.com/Dex719/humanizer-extended/compare/v2.23.0...HEAD
+[2.23.0]: https://github.com/Dex719/humanizer-extended/compare/v2.22.0...v2.23.0
 [2.22.0]: https://github.com/Dex719/humanizer-extended/compare/v2.21.0...v2.22.0
 [2.21.0]: https://github.com/Dex719/humanizer-extended/compare/v2.20.0...v2.21.0
 [2.20.0]: https://github.com/Dex719/humanizer-extended/compare/v2.19.0...v2.20.0

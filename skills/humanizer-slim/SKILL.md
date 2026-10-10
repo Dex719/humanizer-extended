@@ -8,7 +8,7 @@ description: |
   leftovers, канцелярит, or English calques in Russian.
 license: MIT
 metadata:
-  version: "2.22.0"
+  version: "2.23.0"
 ---
 
 # Humanizer slim
@@ -23,7 +23,7 @@ A model picks the continuation that suits the most readers, so it stages points 
 
 ## Hard limits
 
-- **No invention.** Add no fact, name, number, date, quote, source, example, feeling, or personal experience that is not in the input or the user's messages. If a sentence needs a detail you lack, write a simpler sentence or ask. Fiction is exempt.
+- **No invention.** Add no fact, name, number, date, quote, source, example, feeling, or personal experience that is not in the input or the user's messages. If a sentence needs a detail you lack, write a simpler sentence or ask. Do not add a causal link (`so`, `because`, `therefore`, `поэтому`, `так что`) between facts the input only places side by side. Fiction is exempt.
 - **No loss.** Keep every supported claim, caveat, list item, ranking, and number. You may merge, shorten, and reorder. When you merge a row of fragments ("Faster feedback. Smaller diffs."), every item must survive in the merged sentence. Cut only what a pattern below says to cut: staging, inflation, wrappers.
 - **Keep certainty as it is.** `may` stays `may`, `suggests` stays `suggests`. Rewrites tend to raise certainty; check every modal after editing.
 - **Keep secondhand text.** Leave watched phrases inside quotations, titles, names, citations, code, and passages that discuss the phrase.
@@ -34,7 +34,7 @@ A model picks the continuation that suits the most readers, so it stages points 
 
 These are the strongest and most visible tells in current model prose.
 
-1. **Not X but Y.** "It's not X, it's Y", "not just X, but Y", "less about X, more about Y", the reversed "Y rather than X", the split form ("This isn't about X. It's about Y."), and clipped tails ("…, no guessing"). Russian: `не просто X, а Y`, `не только X, но и Y` used for weight, `Это не про X. Это про Y.`, `Речь не о X`, `Дело не в X`, `X — это не Y, а Z`. State Y directly. Keep the contrast only when X is a belief the reader actually holds or the source states, or when both halves are facts ("moved not to May but to June"). Swapping in another formula (`не столько X, сколько Y`) does not fix it. Dropping the staged negative half is fine; turning it into a new factual claim ("the point isn't working harder" → "we don't work more hours") is invention.
+1. **Not X but Y.** "It's not X, it's Y", "not just X, but Y", "less about X, more about Y", the reversed "Y rather than X", the split form ("This isn't about X. It's about Y."), and clipped tails ("…, no guessing"). Russian: `не просто X, а Y`, `не только X, но и Y` used for weight, `Это не про X. Это про Y.`, `Речь не о X`, `Дело не в X`, `X — это не Y, а Z`. State Y directly. Keep the contrast only when X is a belief the reader actually holds or would naturally assume (weekly releases suggest speed), when the source states X, or when both halves are facts ("moved not to May but to June"). Then keep it short and plain, inside one sentence: "for predictability, not speed", `ради предсказуемости, а не скорости`. Swapping in another formula (`не столько X, сколько Y`) does not fix it. Dropping the staged negative half is fine; turning it into a new factual claim ("the point isn't working harder" → "we don't work more hours") is invention.
 2. **One-line closers and dramatic fragments.** A line that restates the paragraph ("That is the real win.", "That distinction matters.", "Let that sink in.", `И это важно.`), the same closer after each section, a last line that echoes the first, a sentence that explains what an example just showed, a row of fragments ("No nostalgia. No compromise."), `every. single. day.` Cut it, or merge it into a sentence with a real claim.
 3. **Sayings that sound deep.** "The real question is", "at its core", "X is the language of Y", "X becomes a trap", `по сути`, `в конечном счёте всё сводится к`. Replace with the specific claim.
 4. **Staged run-ups.** "Let's dive in", "Here's the thing:", "Honestly?", "The answer? …", "Why does this matter? Because…", "In today's fast-paced world", `Давайте разберёмся`, `Почему это важно? Потому что…`, `В современном мире`. Start with the point.
@@ -46,7 +46,7 @@ These are the strongest and most visible tells in current model prose.
 One of these proves nothing. Several in one passage do.
 
 - **Inflation:** "pivotal moment", "stands as a testament", "plays a key role", "reflects a broader", "Despite these challenges… continues to thrive", "the future looks bright", `играет ключевую роль`, `открывает новые возможности`. Keep the fact, drop the significance. End on the last concrete fact.
-- **Sales language:** "nestled", "vibrant", "breathtaking", "renowned", "rich heritage". Say what the thing is.
+- **Sales language:** "nestled", "vibrant", "breathtaking", "renowned", "rich heritage", "for those who value…", `для тех, кто ценит…`, `идеальное решение для`. Say what the thing is.
 - **Borrowed authority and vague links:** "experts argue", "observers note", lists of outlets, `эксперты считают`; "associated with", "in connection with". Name the source and the relationship if the input gives them; otherwise hedge or cut. Never invent the expert.
 - **Shallow -ing riders:** ", highlighting…", ", underscoring…", ", reflecting…". Keep the fact; keep the rider only if the source supports it.
 - **Copula avoidance:** "serves as", "boasts", "features", `является`, `представляет собой`. Use is/has or a plain verb.

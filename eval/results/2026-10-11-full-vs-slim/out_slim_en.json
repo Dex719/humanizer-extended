@@ -1,0 +1,42 @@
+[
+ {
+  "id": "en-blog-postgres-migration",
+  "output": "When we planned the move off MySQL 5.7, the goal was simple: faster reads without rewriting half the application. We chose PostgreSQL 16 for its planner, richer indexing, and strong handling of concurrent writes.\n\nThe migration took 14 weeks, and 3 engineers owned it end to end. Most of the schema moved cleanly. The surprises were at the edges: implicit type conversions that MySQL allowed silently, and a handful of stored procedures that needed a full rethink.\n\nWe kept the old database in read-only mode for a while so we could compare results. Every query on our top list was checked against both engines before we flipped anything.\n\nThe number we watch most is p95 query latency. It dropped from 420 ms to 180 ms across the services we measured, which is what our users feel on slow connections.\n\nThe cutover was not perfect. On 12 May 2026 we had one outage that lasted 25 minutes. A connection pool setting we had not tuned for the new driver caused it, and we fixed it the same day.",
+  "note": ""
+ },
+ {
+  "id": "en-readme-logslice",
+  "output": "# logslice\n\nlogslice filters JSON log files so you can find the lines that matter without writing a one-off script. It reads plain and gzip-compressed files alike, so rotated logs can be queried in place.\n\n## Installation\n\nInstall it from PyPI with `pip install logslice`. logslice requires Python 3.10 or later.\n\n## Quick start\n\nThe main flags are --since and --level. --since keeps only entries newer than a given time, and --level keeps only entries at or above a severity. Combine them to narrow a large log down to the events you are chasing. Run logslice --help to see the full list of options.\n\nlogslice streams the input rather than loading whole files into memory, and it writes matching lines to standard output, so it fits into existing shell pipelines.\n\n## License\n\nlogslice is released under the MIT license.",
+  "note": ""
+ },
+ {
+  "id": "en-landing-bike-shop",
+  "output": "Spoke & Chain\n\nBike repairs in Leeds, done properly and done fast.\n\nWe are a small independent workshop founded in 2019 and run by two mechanics who have been fixing bikes since then. Whether you ride to work every day or dust off a bike for weekends, we will get you back on the road.\n\nSame-day repairs for jobs under £40. Bring your bike in the morning and, for most smaller jobs, collect it the same afternoon. Flat tyres, brake adjustments, gear tuning, and chain replacements are the daily work here.\n\nOpen Tuesday to Saturday, 9:00 to 18:00. Drop in during opening hours, or check ahead if you have a tricky problem.\n\nYou get an honest quote before any work starts, and no surprises when you pick up your bike. Visit us in Leeds today.",
+  "note": ""
+ },
+ {
+  "id": "en-bio-engineer",
+  "output": "Marta Kowalski is a structural engineer best known for the two footbridges she designed. Born in 1971 in Gdańsk, she grew up with the shipyards and rivers that shaped the city, and she later came to see every structure as a matter of load and material.\n\nBoth footbridges are known for their slender profiles and careful use of steel. In each project she worked closely with architects and local planners, insisting that the structure should feel light to the people who walk across it, even when the calculations were anything but simple.\n\nFrom 2008 to 2015 she taught at TU Delft, where she ran design studios for structural engineering students. Colleagues remember her as a demanding teacher who asked students to justify every assumption on paper before they touched a computer model.\n\nOutside work, Kowalski is known for long walks along the river, a habit she says helps her think about how bridges handle motion over time. She continues to advise on small public projects.",
+  "note": ""
+ },
+ {
+  "id": "en-review-novel",
+  "output": "I finished The Quiet Harbor by J. Ellis, and I am still not sure whether I loved it or just stuck with it. The novel runs to 312 pages and was published in 2025. Its opening is slow. The first half moves through small domestic scenes and long descriptions of the harbor town, and for a while I wondered where it was going.\n\nStay with it, though. Something shifts once the story turns toward the missing ferry captain, and the pace tightens into something close to a thriller. The last 100 pages are strong, with a final confrontation that pays off the quiet details planted earlier.\n\nThe prose is precise and often lovely, especially in its descriptions of weather and water. Ellis is better at atmosphere than at dialogue, and a few conversations feel stiff. Still, the characters grew on me, and by the end I cared about what happened to them.\n\nI would recommend it to readers who like slow-burn mysteries and do not mind a long setup: the first half asks a lot, but the ending makes it feel earned.",
+  "note": ""
+ },
+ {
+  "id": "en-report-support-q2",
+  "output": "Support volume fell in Q2. The team handled 1,240 tickets, compared with 1,515 in Q1, which let us spend more time on the backlog of complex cases.\n\nThe median first response time was 3 h 10 min, and the team worked to keep that figure predictable through the busiest weeks of the quarter.\n\nCustomer satisfaction remained strong. CSAT reached 4.4 out of 5, with positive feedback on resolution quality and the friendlier tone of recent replies.\n\nBilling questions were the top category, at 31% of tickets. Many of them trace back to invoice formatting and plan changes, so the product team has been asked to review both areas before next quarter.\n\nNext quarter, we will focus on reducing billing contacts through clearer invoices and better self-service guides. We will also keep watching first response time, since it has the biggest effect on how customers feel about the support they receive.",
+  "note": ""
+ },
+ {
+  "id": "en-blog-weekly-releases",
+  "output": "We moved from monthly to weekly releases in March, and the goal was predictability.\n\nRollbacks dropped from 9 in the first quarter to 2 in the second, and the average pull request now waits 1.5 days for review instead of 4. Feedback is faster, diffs are smaller, and there are fewer surprises.\n\nThe team now works in smaller steps, which we see as good for quality and for trust across the team.",
+  "note": ""
+ },
+ {
+  "id": "humanizer-residue-municipal-report-en",
+  "output": "The municipal ordinance reduces spending on waste transport. The program started in March, covers four districts, and employs twelve workers. It improved participation. Several scholars (Harrington, 2019) have praised the initiative's effective design. Costs fell by 18 percent. Residents were satisfied.",
+  "note": ""
+ }
+]

@@ -10,7 +10,7 @@ description: |
 license: MIT
 compatibility: claude-code opencode
 metadata:
-  version: "2.22.0"
+  version: "2.23.0"
 allowed-tools:
   - Read
   - Write
@@ -51,6 +51,7 @@ Keep this file as the operating core. Load only the reference needed for the cur
 ### Preserve facts
 
 - Do not add statistics, dates, names, companies, institutions, studies, quotations, citations, identifiers, or URLs absent from the input or user-supplied context.
+- Do not add a causal link (`so`, `because`, `therefore`, `поэтому`, `так что`) between facts the input only places side by side.
 - Do not turn “experts believe” into a plausible specific citation. If a claim lacks support, hedge it honestly, mark `[citation needed]`, say it is not well documented, or remove the unsupported claim.
 - Do not silently fill placeholders such as `[Your Name]`, `[Insert URL]`, or `YYYY-MM-DD`; flag them for the user.
 - Do not invent a personal experience, feeling, interview, case study, or “realistic” example to add soul.
@@ -92,7 +93,7 @@ Use the registry to scan. Open the examples reference for complete signs, explan
 6. **Outline-like challenges and future prospects:** replace stock “Despite these challenges…” sections with documented problems, actions, and outcomes.
 7. **Overused AI vocabulary (era-stratified):** treat 2023–24 words (`delve`, `tapestry`, `testament`) as deprecated solo signals, 2024–25 vocabulary as transitional, and 2025+ clusters (`emphasizing`, `enhance`, `highlighting`, `showcasing`, notability language) as current leads. Watch the shift from superlatives to evaluatives such as `notable`, `considerable`, `meaningful`, `robust`, and `nuanced`. Vocabulary from any era requires corroboration from another pattern family.
 8. **Copula avoidance:** replace ornamental “serves as,” “stands as,” “boasts,” and “features” with `is`, `are`, or `has` where accurate.
-9. **Not X but Y (contrastive staging) — strongest tell, act on one sighting:** “not X but Y”; “not just/only/merely X, but Y”; “it's not X, it's Y”; “less about X, more about Y”; the reversed “X rather than Y”; the split form (“This isn't about X. It's about Y.”, “This does not mean X. It means Y.”); clipped tails (“…, no guessing”). Russian: `не просто X, а Y`, `не только X, но и Y` used for weight, `Это не про X. Это про Y.`, `Речь не о X`, `Дело не в X`, `X — это не Y, а Z`. The negative half names something nobody claimed so the positive half sounds bigger. State Y directly. Keep a contrast only when the negative half corrects a belief the reader actually holds or the source states, or when both halves carry information (“not in May but in June”). Never swap one contrast formula for another, such as `не столько X, сколько Y`. Dropping the staged negative half is fine; turning it into a new factual claim is invention.
+9. **Not X but Y (contrastive staging) — strongest tell, act on one sighting:** “not X but Y”; “not just/only/merely X, but Y”; “it's not X, it's Y”; “less about X, more about Y”; the reversed “X rather than Y”; the split form (“This isn't about X. It's about Y.”, “This does not mean X. It means Y.”); clipped tails (“…, no guessing”). Russian: `не просто X, а Y`, `не только X, но и Y` used for weight, `Это не про X. Это про Y.`, `Речь не о X`, `Дело не в X`, `X — это не Y, а Z`. The negative half names something nobody claimed so the positive half sounds bigger. State Y directly. Keep a contrast only when the negative half corrects a belief the reader actually holds or would naturally assume (weekly releases suggest speed), when the source states it, or when both halves carry information (“not in May but in June”); then keep it short and inside one sentence (“for predictability, not speed”). Never swap one contrast formula for another, such as `не столько X, сколько Y`. Dropping the staged negative half is fine; turning it into a new factual claim is invention.
 10. **Rule-of-three overuse:** use the number of items the content requires instead of forcing repeated tricolons. The tell also works at paragraph scale: three parallel examples, or three short facts followed by a lesson.
 11. **Elegant variation (retired in 2.22):** Wikipedia now lists synonym cycling under historical indicators, and non-native writers avoid repetition too. Do not act on it alone; fix it only when it makes one subject look like several.
 12. **False ranges (retired in 2.22):** Wikipedia no longer lists false ranges, and upstream humanizer 3.0 dropped them. Do not act on one alone; fold a clear case into pattern 35 or 1.

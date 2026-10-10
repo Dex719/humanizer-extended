@@ -110,13 +110,15 @@ def test_ru_inverted_targets_allow_dash_and_do_not_penalize_passive() -> None:
     assert ru["structural"]["long_sentence_threshold"] > en["structural"]["long_sentence_threshold"]
 
 
-def test_booster_compliance_is_genre_gated() -> None:
+def test_booster_check_is_informational() -> None:
     readme = metrics("Короткая техническая справка без оценки.", genre="readme", language="ru")
     review = metrics("Короткий обзор без оценки.", genre="review", language="ru")
-    assert readme["compliance"]["checks"]["boosters"]["applicable"] is False
-    assert readme["compliance"]["checks"]["boosters"]["passed"] is None
-    assert review["compliance"]["checks"]["boosters"]["applicable"] is True
-    assert review["compliance"]["checks"]["boosters"]["passed"] is False
+    for profile in (readme, review):
+        check = profile["compliance"]["checks"]["boosters"]
+        assert check["applicable"] is False
+        assert check["passed"] is None
+        assert check["value"] == 0
+    assert "voice-led" in review["compliance"]["checks"]["boosters"]["description"]
 
 
 def test_compare_has_separate_structural_and_compliance_blocks() -> None:
@@ -447,3 +449,32 @@ def test_ru_participial_count_ignores_genitive_plural() -> None:
     text = "Обратная связь приходит быстрее, диффы стали меньше, сюрпризов стало меньше."
     assert metrics(text, language="ru")["structural"]["participial_clauses"] == 0
     assert metrics("Он ушёл, сделав всё.", language="ru")["structural"]["participial_clauses"] == 1
+
+
+def _long(text: str) -> str:
+    return text + " Команда проверяет календарь релизов каждый понедельник и записывает решения." * 14
+
+
+def test_immutable_treats_modal_synonyms_as_equivalent() -> None:
+    before = _long("Разработчикам следует учитывать модель доставки, и решение может считаться надёжным.")
+    after = _long("Разработчикам стоит учитывать модель доставки, и решение можно считать надёжным.")
+    assert immutable_token_audit(before, after)["total_violations"] == 0
+
+
+def test_immutable_still_catches_dropped_hedge() -> None:
+    before = _long("Решение может считаться надёжным.")
+    after = _long("Решение надёжно.")
+    audit = immutable_token_audit(before, after)
+    assert audit["categories"]["modality"]["missing"] == {"possibility": 1}
+
+
+def test_immutable_ignores_removed_rhetorical_frames() -> None:
+    before = _long("В заключение нельзя не заметить, что сервис удобен. Следует подчеркнуть, что он быстрый.")
+    after = _long("Сервис удобен и быстр.")
+    assert immutable_token_audit(before, after)["total_violations"] == 0
+
+
+def test_immutable_matches_russian_name_cases() -> None:
+    before = _long("Анна Корнеева руководит мастерской. На сегодняшний день Корнеева ведёт девять человек.")
+    after = _long("Анна Корнеева руководит мастерской. Корнееву ценят за точность, она ведёт девять человек.")
+    assert immutable_token_audit(before, after)["categories"]["names"]["violations"] == 0

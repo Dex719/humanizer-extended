@@ -12,12 +12,13 @@ Both rewrites are unedited output of `humanizer-slim` run on Claude Sonnet 5.5. 
 
 | | `humanizer-extended` (full) | `humanizer-slim` |
 |---|---|---|
-| Size read per run | ~4,300 words plus on-demand references | ~1,650 words, one file |
+| Size read per run | ~4,300 words plus on-demand references | ~1,800 words, one file |
 | Patterns | 75 numbered patterns, examples, research notes, metrics | The same priorities, condensed: strongest tells first, then clusters, then weak signals |
 | Output | Draft, audit, final | Final text only (review mode on request) |
 | Best for | Auditing, teaching, tuning the rules, running `eval/` | Everyday rewriting with strong current models (Claude Opus/Sonnet 5.5 class) |
+| Blind comparison (16 texts, 2026-10-11) | 3 wins, 22 remaining tells | 10 wins, 12 remaining tells (3 ties) |
 
-Both share the same hard limits: invent nothing, lose nothing, keep certainty and secondhand text as they are. Both treat **not X but Y** (`не просто X, а Y`) as the strongest current tell.
+Both share the same hard limits: invent nothing, lose nothing, keep certainty and secondhand text as they are. Both treat **not X but Y** (`не просто X, а Y`) as the strongest current tell. The comparison method, raw outputs, and limits are in [`eval/results/2026-10-11-full-vs-slim/`](eval/results/2026-10-11-full-vs-slim/).
 
 > **Fork.** `humanizer-extended` is a fork of [blader/humanizer](https://github.com/blader/humanizer) (original by Siqi Chen, MIT). It diverged after upstream 2.5.1 and adds patterns #30–38 (model-tool markup, hallucinated citations, placeholder leakage, document-internal style shift, aphoristic closer, prestige-metaphor frames, false balance, generic stock examples, nominalization) plus a FACT PRESERVATION section. Version 2.20.0 synchronizes upstream 2.8.x patterns as #49–51 and moves conditional detail into `references/`. Version 2.21.0 adds anti-humanization damage, current-era, grammar, and Russian patterns #52–73. Version 2.22.0 syncs with upstream 3.1: not-X-but-Y becomes the strongest tell again, patterns #11–12 are retired, #74–75 are added, and a compact `humanizer-slim` skill ships alongside the full one. Pattern numbers in this fork do **not** match upstream's.
 
@@ -292,6 +293,7 @@ The complete draft-audit-final example lives in [`references/examples.md`](refer
 
 ## Version History
 
+- **2.23.0** - Ran the first blind full-vs-slim comparison on 16 texts (slim preferred 10 to 3) and fixed what it found: pattern 9 now keeps a contrast the reader would naturally expect, in one plain clause; both skills forbid adding causal links; slim lists more ad formulas. Added six English corpus pairs with recorded provenance. Made the fact-lock audit understand modal synonyms, deleted rhetorical frames, kept contrasts, contracted negations, and Russian name cases, and made the booster check informational. See [CHANGELOG.md](CHANGELOG.md).
 - **2.22.0** - Synced with upstream humanizer 3.1. Promoted not-X-but-Y (#9) to the strongest tell with English, split, reversed, and Russian forms, plus a `contrast_frames` metric. Added strength tiers, #74 (re-explaining what the reader knows) and #75 (arguing with no one); folded one-line closers, self-answered questions, decorative headings, and self-describing text into #49, #28, #17, and #39. Retired #11 and #12. Added the compact `humanizer-slim` skill, before/after images, and two corpus pairs. See [CHANGELOG.md](CHANGELOG.md).
 - **2.21.0** - Added patterns #52–73, evidence-backed reliability guards, specific-author voice anchoring, residue-first fact locking, nine stdlib diagnostics, two corpus pairs, and length/integrity reporting. Demoted #9 and #14 to LEGACY and expanded Russian канцелярит and grammar checks. See [CHANGELOG.md](CHANGELOG.md) for the full release notes.
 - **2.20.0** - Added three upstream 2.8.x writing-pattern guards, fail-safe voice calibration, genre-aware booster guidance, and stronger fact preservation. Split the large skill into a compact core plus conditional references. Added Russian-aware structural/compliance metrics, a six-genre Russian eval corpus, aggregate baselines, tests, cross-agent skills CLI and Claude Code marketplace packaging, repository hygiene, and CI checks. See [CHANGELOG.md](CHANGELOG.md) for the full release notes.

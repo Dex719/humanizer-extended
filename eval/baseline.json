@@ -3,132 +3,132 @@
   "command": "aggregate",
   "corpus": {
     "path": "eval/corpus",
-    "pairs": 10,
+    "pairs": 16,
     "languages": {
-      "en": 2,
+      "en": 8,
       "ru": 8
     },
     "genres": {
-      "bio": 1,
-      "landing": 1,
-      "readme": 1,
-      "report": 1,
-      "review": 1,
+      "bio": 2,
+      "landing": 2,
+      "readme": 2,
+      "report": 2,
+      "review": 2,
       "science-pop": 1,
       "scientific": 1,
       "vc-habr": 1,
-      "blog": 2
+      "blog": 3
     }
   },
   "structural": {
     "before_score": {
-      "passed": 18,
-      "applicable": 40,
-      "rate": 0.45
+      "passed": 37,
+      "applicable": 70,
+      "rate": 0.5286
     },
     "after_score": {
-      "passed": 22,
-      "applicable": 38,
-      "rate": 0.5789
+      "passed": 41,
+      "applicable": 70,
+      "rate": 0.5857
     },
-    "score_delta": 0.1289,
+    "score_delta": 0.0571,
     "metrics": {
       "agentless_passive_per_100_words": {
-        "before_mean": 0.0,
-        "after_mean": 2.6785,
-        "delta": 2.6785,
-        "before_passed": 2,
-        "before_applicable": 2,
+        "before_mean": 0.6013,
+        "after_mean": 1.1446,
+        "delta": 0.5433,
+        "before_passed": 8,
+        "before_applicable": 8,
         "before_pass_rate": 1.0,
-        "after_passed": 1,
-        "after_applicable": 2,
-        "after_pass_rate": 0.5
+        "after_passed": 7,
+        "after_applicable": 8,
+        "after_pass_rate": 0.875
       },
       "connector_opener_density": {
-        "before_mean": 0.2254,
+        "before_mean": 0.1409,
         "after_mean": 0.0,
-        "delta": -0.2254,
-        "before_passed": 9,
-        "before_applicable": 10,
-        "before_pass_rate": 0.9,
-        "after_passed": 10,
-        "after_applicable": 10,
+        "delta": -0.1409,
+        "before_passed": 15,
+        "before_applicable": 16,
+        "before_pass_rate": 0.9375,
+        "after_passed": 16,
+        "after_applicable": 16,
         "after_pass_rate": 1.0
       },
       "paragraph_length_sd": {
-        "before_mean": 7.1409,
-        "after_mean": 8.9093,
-        "delta": 1.7684,
+        "before_mean": 8.5973,
+        "after_mean": 9.0965,
+        "delta": 0.4992,
         "before_passed": 1,
-        "before_applicable": 8,
-        "before_pass_rate": 0.125,
+        "before_applicable": 14,
+        "before_pass_rate": 0.0714,
         "after_passed": 0,
-        "after_applicable": 6,
+        "after_applicable": 14,
         "after_pass_rate": 0.0
       },
       "participial_clauses_per_250_words": {
-        "before_mean": 1.1779,
-        "after_mean": 0.6876,
-        "delta": -0.4903,
-        "before_passed": 4,
-        "before_applicable": 10,
-        "before_pass_rate": 0.4,
-        "after_passed": 7,
-        "after_applicable": 10,
-        "after_pass_rate": 0.7
+        "before_mean": 0.826,
+        "after_mean": 0.3058,
+        "delta": -0.5202,
+        "before_passed": 9,
+        "before_applicable": 16,
+        "before_pass_rate": 0.5625,
+        "after_passed": 14,
+        "after_applicable": 16,
+        "after_pass_rate": 0.875
       },
       "sentence_length_sd": {
-        "before_mean": 4.0732,
-        "after_mean": 5.2642,
-        "delta": 1.191,
-        "before_passed": 2,
-        "before_applicable": 10,
-        "before_pass_rate": 0.2,
+        "before_mean": 5.1402,
+        "after_mean": 5.8218,
+        "delta": 0.6816,
+        "before_passed": 4,
+        "before_applicable": 16,
+        "before_pass_rate": 0.25,
         "after_passed": 4,
-        "after_applicable": 10,
-        "after_pass_rate": 0.4
+        "after_applicable": 16,
+        "after_pass_rate": 0.25
       }
     }
   },
   "compliance": {
     "before_score": {
-      "passed": 36,
-      "applicable": 55,
-      "rate": 0.6545
+      "passed": 48,
+      "applicable": 64,
+      "rate": 0.75
     },
     "after_score": {
-      "passed": 53,
-      "applicable": 55,
-      "rate": 0.9636
+      "passed": 64,
+      "applicable": 64,
+      "rate": 1.0
     },
-    "score_delta": 0.3091,
+    "score_delta": 0.25,
     "metrics": {
       "boosters": {
         "before_mean": 0.0,
-        "after_mean": 0.3333,
-        "delta": 0.3333,
+        "after_mean": 0.0,
+        "delta": 0.0,
         "before_passed": 0,
-        "before_applicable": 3,
-        "before_pass_rate": 0.0,
-        "after_passed": 1,
-        "after_applicable": 3,
-        "after_pass_rate": 0.3333
+        "before_applicable": 0,
+        "before_pass_rate": null,
+        "after_passed": 0,
+        "after_applicable": 0,
+        "after_pass_rate": null
       },
       "curly_quotes": {
         "before_mean": 0.0,
         "after_mean": 0.0,
         "delta": 0.0,
-        "before_passed": 10,
-        "before_applicable": 10,
+        "before_passed": 16,
+        "before_applicable": 16,
         "before_pass_rate": 1.0,
-        "after_passed": 10,
-        "after_applicable": 10,
+        "after_passed": 16,
+        "after_applicable": 16,
         "after_pass_rate": 1.0
       },
       "em_dashes": {
         "before_mean": 0.25,
-        "after_mean": 0.75,
-        "delta": 0.5,
+        "after_mean": 0.5,
+        "delta": 0.25,
         "before_passed": 8,
         "before_applicable": 8,
         "before_pass_rate": 1.0,
@@ -170,23 +170,23 @@
         "after_pass_rate": 1.0
       },
       "contrast_frames": {
-        "after_applicable": 10,
+        "after_applicable": 16,
         "after_mean": 0.0,
         "after_pass_rate": 1.0,
-        "after_passed": 10,
-        "before_applicable": 10,
-        "before_mean": 0.6,
-        "before_pass_rate": 0.8,
-        "before_passed": 8,
-        "delta": -0.6
+        "after_passed": 16,
+        "before_applicable": 16,
+        "before_mean": 0.375,
+        "before_pass_rate": 0.875,
+        "before_passed": 14,
+        "delta": -0.375
       }
     }
   },
   "integrity": {
     "immutable_token_audit": {
-      "applicable": 8,
+      "applicable": 14,
       "abstained": 2,
-      "passed": 8,
+      "passed": 14,
       "total_violations": 0
     }
   },
@@ -194,47 +194,47 @@
     "metrics": {
       "human_marker_floor": {
         "value_field": "count",
-        "before_mean": 0.0,
-        "after_mean": 0.0,
+        "before_mean": 0.0714,
+        "after_mean": 0.1,
         "delta": 0.0,
-        "paired_applicable": 5,
-        "before_applicable": 8,
-        "after_applicable": 5,
+        "paired_applicable": 10,
+        "before_applicable": 14,
+        "after_applicable": 10,
         "before_abstained": 2,
-        "after_abstained": 5
+        "after_abstained": 6
       },
       "punctuation_entropy": {
         "value_field": "entropy",
-        "before_mean": 1.6902,
-        "after_mean": 1.8742,
-        "delta": 0.2713,
-        "paired_applicable": 5,
-        "before_applicable": 8,
-        "after_applicable": 5,
+        "before_mean": 1.4769,
+        "after_mean": 1.4346,
+        "delta": 0.1067,
+        "paired_applicable": 10,
+        "before_applicable": 14,
+        "after_applicable": 10,
         "before_abstained": 2,
-        "after_abstained": 5
+        "after_abstained": 6
       },
       "windowed_ttr": {
         "value_field": "mean_ttr",
-        "before_mean": 0.87,
-        "after_mean": 0.872,
-        "delta": -0.022,
-        "paired_applicable": 5,
-        "before_applicable": 8,
-        "after_applicable": 5,
+        "before_mean": 0.8243,
+        "after_mean": 0.802,
+        "delta": -0.015,
+        "paired_applicable": 10,
+        "before_applicable": 14,
+        "after_applicable": 10,
         "before_abstained": 2,
-        "after_abstained": 5
+        "after_abstained": 6
       },
       "content_function_ratio": {
         "value_field": "ratio",
-        "before_mean": 2.996,
-        "after_mean": 2.6177,
-        "delta": -0.5748,
-        "paired_applicable": 5,
-        "before_applicable": 8,
-        "after_applicable": 5,
+        "before_mean": 2.2358,
+        "after_mean": 1.7635,
+        "delta": -0.2276,
+        "paired_applicable": 10,
+        "before_applicable": 14,
+        "after_applicable": 10,
         "before_abstained": 2,
-        "after_abstained": 5
+        "after_abstained": 6
       },
       "digit_density": {
         "value_field": "density_per_1000",
@@ -244,17 +244,17 @@
         "paired_applicable": 1,
         "before_applicable": 1,
         "after_applicable": 1,
-        "before_abstained": 9,
-        "after_abstained": 9
+        "before_abstained": 15,
+        "after_abstained": 15
       },
       "participial_stack_rate": {
         "value_field": "rate_per_500",
         "before_mean": 0.0,
         "after_mean": 0.0,
-        "delta": null,
-        "paired_applicable": 0,
-        "before_applicable": 1,
-        "after_applicable": 0,
+        "delta": 0.0,
+        "paired_applicable": 6,
+        "before_applicable": 7,
+        "after_applicable": 6,
         "before_abstained": 9,
         "after_abstained": 10
       },
@@ -262,10 +262,10 @@
         "value_field": "rate_per_500",
         "before_mean": 0.0,
         "after_mean": 0.0,
-        "delta": null,
-        "paired_applicable": 0,
-        "before_applicable": 1,
-        "after_applicable": 0,
+        "delta": 0.0,
+        "paired_applicable": 6,
+        "before_applicable": 7,
+        "after_applicable": 6,
         "before_abstained": 9,
         "after_abstained": 10
       },
@@ -277,30 +277,38 @@
         "paired_applicable": 8,
         "before_applicable": 8,
         "after_applicable": 8,
-        "before_abstained": 2,
-        "after_abstained": 2
+        "before_abstained": 8,
+        "after_abstained": 8
       }
     },
     "length_matching": [
       {
-        "after_words": 68,
+        "after_words": 77,
         "before_words": 129,
-        "difference_ratio": 0.4729,
+        "difference_ratio": 0.4031,
         "id": "en-blog-weekly-releases",
         "threshold": 0.35
       },
       {
-        "after_words": 54,
+        "after_words": 62,
         "before_words": 112,
-        "difference_ratio": 0.5179,
+        "difference_ratio": 0.4464,
         "id": "ru-blog-weekly-releases",
+        "threshold": 0.35
+      },
+      {
+        "after_words": 72,
+        "before_words": 122,
+        "difference_ratio": 0.4098,
+        "id": "ru-landing-meals",
         "threshold": 0.35
       }
     ]
   },
   "warnings": [
-    "en-blog-weekly-releases: length mismatch 47.3% > 35% (before=129, after=68 words)",
-    "ru-blog-weekly-releases: length mismatch 51.8% > 35% (before=112, after=54 words)"
+    "en-blog-weekly-releases: length mismatch 40.3% > 35% (before=129, after=77 words)",
+    "ru-blog-weekly-releases: length mismatch 44.6% > 35% (before=112, after=62 words)",
+    "ru-landing-meals: length mismatch 41.0% > 35% (before=122, after=72 words)"
   ],
   "tells": {
     "before_total": 50,
@@ -318,43 +326,121 @@
         "before_total": 6,
         "after_total": 0,
         "delta": -6,
-        "before_mean": 0.6,
+        "before_mean": 0.375,
         "after_mean": 0.0
       },
       "ru_frame_phrases": {
         "before_total": 35,
         "after_total": 0,
         "delta": -35,
-        "before_mean": 3.5,
+        "before_mean": 2.1875,
         "after_mean": 0.0
       },
       "ru_non_guillemets": {
         "before_total": 3,
         "after_total": 0,
         "delta": -3,
-        "before_mean": 0.3,
+        "before_mean": 0.1875,
         "after_mean": 0.0
       },
       "ru_odnako_comma": {
         "before_total": 6,
         "after_total": 0,
         "delta": -6,
-        "before_mean": 0.6,
+        "before_mean": 0.375,
         "after_mean": 0.0
       }
     }
   },
   "pairs": [
     {
-      "compliance_after_rate": 0.6667,
-      "compliance_before_rate": 0.3333,
+      "compliance_after_rate": 1.0,
+      "compliance_before_rate": 1.0,
+      "genre": "bio",
+      "id": "en-bio-engineer",
+      "immutable_token_audit_abstained": false,
+      "immutable_token_violations": 0,
+      "language": "en",
+      "structural_after_rate": 0.6,
+      "structural_before_rate": 0.6,
+      "tells_after": 0,
+      "tells_before": 0
+    },
+    {
+      "compliance_after_rate": 1.0,
+      "compliance_before_rate": 1.0,
+      "genre": "blog",
+      "id": "en-blog-postgres-migration",
+      "immutable_token_audit_abstained": false,
+      "immutable_token_violations": 0,
+      "language": "en",
+      "structural_after_rate": 0.6,
+      "structural_before_rate": 0.6,
+      "tells_after": 0,
+      "tells_before": 0
+    },
+    {
+      "compliance_after_rate": 1.0,
+      "compliance_before_rate": 0.5,
       "genre": "blog",
       "id": "en-blog-weekly-releases",
       "immutable_token_audit_abstained": false,
       "immutable_token_violations": 0,
       "language": "en",
-      "structural_after_rate": 0.75,
+      "structural_after_rate": 0.6,
       "structural_before_rate": 0.4,
+      "tells_after": 0,
+      "tells_before": 0
+    },
+    {
+      "compliance_after_rate": 1.0,
+      "compliance_before_rate": 1.0,
+      "genre": "landing",
+      "id": "en-landing-bike-shop",
+      "immutable_token_audit_abstained": false,
+      "immutable_token_violations": 0,
+      "language": "en",
+      "structural_after_rate": 0.6,
+      "structural_before_rate": 0.6,
+      "tells_after": 0,
+      "tells_before": 0
+    },
+    {
+      "compliance_after_rate": 1.0,
+      "compliance_before_rate": 1.0,
+      "genre": "readme",
+      "id": "en-readme-logslice",
+      "immutable_token_audit_abstained": false,
+      "immutable_token_violations": 0,
+      "language": "en",
+      "structural_after_rate": 0.6,
+      "structural_before_rate": 0.6,
+      "tells_after": 0,
+      "tells_before": 0
+    },
+    {
+      "compliance_after_rate": 1.0,
+      "compliance_before_rate": 1.0,
+      "genre": "report",
+      "id": "en-report-support-q2",
+      "immutable_token_audit_abstained": false,
+      "immutable_token_violations": 0,
+      "language": "en",
+      "structural_after_rate": 0.6,
+      "structural_before_rate": 0.8,
+      "tells_after": 0,
+      "tells_before": 0
+    },
+    {
+      "compliance_after_rate": 1.0,
+      "compliance_before_rate": 1.0,
+      "genre": "review",
+      "id": "en-review-novel",
+      "immutable_token_audit_abstained": false,
+      "immutable_token_violations": 0,
+      "language": "en",
+      "structural_after_rate": 0.6,
+      "structural_before_rate": 0.6,
       "tells_after": 0,
       "tells_before": 0
     },
@@ -385,14 +471,14 @@
       "tells_before": 6
     },
     {
-      "compliance_after_rate": 0.8571,
-      "compliance_before_rate": 0.7143,
+      "compliance_after_rate": 1.0,
+      "compliance_before_rate": 0.8333,
       "genre": "blog",
       "id": "ru-blog-weekly-releases",
       "immutable_token_audit_abstained": false,
       "immutable_token_violations": 0,
       "language": "ru",
-      "structural_after_rate": 1.0,
+      "structural_after_rate": 0.75,
       "structural_before_rate": 0.75,
       "tells_after": 0,
       "tells_before": 2
@@ -431,7 +517,7 @@
       "immutable_token_audit_abstained": false,
       "immutable_token_violations": 0,
       "language": "ru",
-      "structural_after_rate": 0.5,
+      "structural_after_rate": 0.75,
       "structural_before_rate": 0.25,
       "tells_after": 0,
       "tells_before": 7
@@ -451,7 +537,7 @@
     },
     {
       "compliance_after_rate": 1.0,
-      "compliance_before_rate": 0.5714,
+      "compliance_before_rate": 0.6667,
       "genre": "review",
       "id": "ru-review-reader",
       "immutable_token_audit_abstained": false,

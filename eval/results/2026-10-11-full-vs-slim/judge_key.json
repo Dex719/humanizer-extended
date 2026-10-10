@@ -1,0 +1,66 @@
+{
+ "en-blog-postgres-migration": {
+  "A": "full",
+  "B": "slim"
+ },
+ "en-readme-logslice": {
+  "A": "full",
+  "B": "slim"
+ },
+ "en-landing-bike-shop": {
+  "A": "full",
+  "B": "slim"
+ },
+ "en-bio-engineer": {
+  "A": "full",
+  "B": "slim"
+ },
+ "en-review-novel": {
+  "A": "full",
+  "B": "slim"
+ },
+ "en-report-support-q2": {
+  "A": "slim",
+  "B": "full"
+ },
+ "en-blog-weekly-releases": {
+  "A": "slim",
+  "B": "full"
+ },
+ "humanizer-residue-municipal-report-en": {
+  "A": "full",
+  "B": "slim"
+ },
+ "ru-bio-architect": {
+  "A": "full",
+  "B": "slim"
+ },
+ "ru-blog-weekly-releases": {
+  "A": "slim",
+  "B": "full"
+ },
+ "ru-dangling-kanclit": {
+  "A": "slim",
+  "B": "full"
+ },
+ "ru-habr-cache": {
+  "A": "full",
+  "B": "slim"
+ },
+ "ru-landing-meals": {
+  "A": "slim",
+  "B": "full"
+ },
+ "ru-readme-queue": {
+  "A": "slim",
+  "B": "full"
+ },
+ "ru-review-reader": {
+  "A": "full",
+  "B": "slim"
+ },
+ "ru-science-sleep": {
+  "A": "slim",
+  "B": "full"
+ }
+}
